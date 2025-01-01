@@ -730,6 +730,65 @@ header, main, .social-icons a, nav ul li a {
   color: #e0e0e0 !important;
 }
 
+#Skills {
+  padding: 80px 50px;
+}
+
+.skills-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 30px;
+}
+
+.skill-category {
+  background-color: rgba(0, 0, 0, 0.5);
+  padding: 25px;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+}
+
+.skill-category:hover {
+  transform: translateY(-5px);
+}
+
+.skill-category h3 {
+  color: var(--themeColor);
+  font-size: 1.2rem;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.skill-category h3 i {
+  width: 24px;
+  color: var(--themeColor);
+}
+
+.skills-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.skill-tag {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+  border: 1px solid var(--themeColor);
+}
+
+.skill-tag:hover {
+  background-color: var(--themeColor);
+  transform: translateY(-2px);
+}
+
 /* Education Section Styles */
 #Education {
   padding: 80px 50px;
@@ -929,5 +988,35 @@ section {
 @media only screen and (max-width: 768px) {
   section {
       padding: 60px 20px !important;
+  }
+}
+
+@media only screen and (max-width: 1024px) {
+  .skills-container {
+      grid-template-columns: 1fr;
+  }
+}
+
+@media only screen and (max-width: 768px) {
+  #Skills, #Resume {
+      padding: 60px 20px;
+  }
+
+  .skill-tag {
+      font-size: 0.85rem;
+      padding: 6px 12px;
+  }
+
+  .resume-actions {
+      flex-direction: column;
+  }
+
+  .resume-button {
+      width: 100%;
+      justify-content: center;
+  }
+
+  .resume-preview {
+      height: 600px;
   }
 }
