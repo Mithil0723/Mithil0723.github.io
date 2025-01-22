@@ -1169,27 +1169,3 @@ section {
   }
 }
 
-@media only screen and (max-width: 768px) {
-  #Skills, #Resume {
-      padding: 60px 20px;
-  }
-
-  .skill-tag {
-      font-size: 0.85rem;
-      padding: 6px 12px;
-  }
-
-  .resume-actions {
-      flex-direction: column;
-  }
-
-  .resume-button {
-      width: 100%;
-      justify-content: center;
-  }
-
-  .resume-preview {
-      height: 600px;
-  }
-}
-
