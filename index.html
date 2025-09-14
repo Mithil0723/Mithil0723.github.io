@@ -172,187 +172,52 @@
     <!-- Projects -->
     <section id="Projects" class="px-6 py-12">
       <h2 class="text-2xl font-semibold text-gray-900">Featured Projects</h2>
-      <div class="mt-6 grid gap-6 md:grid-cols-2">
-
-        <!-- Tata -->
-        <article class="bg-white rounded-lg shadow overflow-hidden">
-          <img src="project images/tata.jpg" alt="Tata Data Visualization" class="w-full h-56 object-cover">
-          <div class="p-4">
-            <h3 class="font-semibold text-primary">Tata Data Visualization</h3>
-            <p class="text-sm text-gray-600 mt-2">Created executive-level dashboards and visual narratives to help leadership make data-driven decisions during a Forage simulation with Tata Consultancy Services.</p>
-            <div class="mt-3 flex gap-2">
-              <a href="https://public.tableau.com/app/profile/venkata.sai.mithil.ravulapalli/viz/BuisnessAnalysisVisuals/Dashboard1" class="text-sm bg-gray-800 text-white px-3 py-1 rounded">Visualizations</a>
-              <button data-target="tata" class="details-toggle text-sm bg-primary text-white px-3 py-1 rounded">Show More</button>
-            </div>
-            <div class="mt-3 hidden details-content text-sm text-gray-700" id="tata">Empowered decision making by translating complex datasets into concise dashboards for executive review. Focused on clarity, KPI design, and storytelling through visuals.</div>
-          </div>
-        </article>
-
-        <!-- DSA -->
-        <article class="bg-white rounded-lg shadow overflow-hidden">
-          <img src="project images/DSA.png" alt="DSA Projects" class="w-full h-56 object-cover">
-          <div class="p-4">
-            <h3 class="font-semibold text-primary">Data Structure Algorithms</h3>
-            <p class="text-sm text-gray-600 mt-2">Implemented BSTs, graph algorithms, encryption techniques and efficient data structures in C++ for performance-critical tasks.</p>
-            <div class="mt-3 flex gap-2">
-              <a href="https://github.com/Mithil0723/DSA" class="text-sm bg-gray-800 text-white px-3 py-1 rounded">Source Code</a>
-              <button data-target="dsa" class="details-toggle text-sm bg-primary text-white px-3 py-1 rounded">Show More</button>
-            </div>
-            <div class="mt-3 hidden details-content text-sm text-gray-700" id="dsa">Projects include a priority queue using BSTs, cipher systems combining Caesar and Vigenère, and a graph-based campus navigation using OpenStreetMap.</div>
-          </div>
-        </article>
-
-        <!-- Recommendation -->
-        <article class="bg-white rounded-lg shadow overflow-hidden">
-          <img src="project images/Recommendation.png" alt="Recommendation System" class="w-full h-56 object-cover">
-          <div class="p-4">
-            <h3 class="font-semibold text-primary">Recommendation System</h3>
-            <p class="text-sm text-gray-600 mt-2">Built SVD-based and deep-learning recommendation approaches; addressed bias, cold-start and scaled models for production-ready pipelines.</p>
-            <div class="mt-3 flex gap-2">
-              <a href="https://github.com/Mithil0723/Recommendation-System/blob/main/Recommendation_Systems_Learner_Notebook_Full_Code.ipynb" class="text-sm bg-gray-800 text-white px-3 py-1 rounded">Source Code</a>
-              <button data-target="reco" class="details-toggle text-sm bg-primary text-white px-3 py-1 rounded">Show More</button>
-            </div>
-            <div class="mt-3 hidden details-content text-sm text-gray-700" id="reco">Used TF-IDF, matrix factorization (SVD) and TensorFlow experiments to create and evaluate recommender systems with focus on fairness and scalability.</div>
-          </div>
-        </article>
-
-        <!-- Predictive Analysis -->
-        <article class="bg-white rounded-lg shadow overflow-hidden">
-          <img src="project images/Predictive analysis.png" alt="Predictive Analysis" class="w-full h-56 object-cover">
-          <div class="p-4">
-            <h3 class="font-semibold text-primary">Customer Prediction Model</h3>
-            <p class="text-sm text-gray-600 mt-2">Built classification models (Decision Trees, Random Forests) with careful preprocessing and hyperparameter tuning to identify high-potential customers.</p>
-            <div class="mt-3 flex gap-2">
-              <a href="https://github.com/Mithil0723/Predicting-Potential-Customers/blob/main/Learner%2BNotebook%2B-%2BFull%2BCode%2BVersion%2B-%2BPotential%2BCustomers%2BPrediction.ipynb" class="text-sm bg-gray-800 text-white px-3 py-1 rounded">Source Code</a>
-              <button data-target="pred" class="details-toggle text-sm bg-primary text-white px-3 py-1 rounded">Show More</button>
-            </div>
-            <div class="mt-3 hidden details-content text-sm text-gray-700" id="pred">Work focused on data cleaning, feature engineering and evaluation using cross-validation, confusion matrices and ROC analysis to improve model robustness.</div>
-          </div>
-        </article>
-
-        <!-- Projects -->
-    <section id="Projects" class="px-6 py-12">
-      <h2 class="text-2xl font-semibold text-gray-900">Featured Projects</h2>
       <div class="mt-6 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
 
         <!-- Project Card 1: Tata -->
-        <div class="project-card bg-white rounded-lg shadow-lg overflow-hidden transform hover:-translate-y-2 transition-transform duration-300">
+        <div class="project-card bg-white rounded-lg shadow-lg overflow-hidden transform hover:-translate-y-2 transition-transform duration-300" data-modal="tata">
           <img src="project images/tata.jpg" alt="Tata Data Visualization" class="w-full h-56 object-cover">
           <div class="p-6">
             <h3 class="font-semibold text-xl text-primary">Tata Data Visualization</h3>
             <p class="text-sm text-gray-600 mt-2">Executive-level dashboards for data-driven decisions.</p>
-            <button class="modal-open mt-4 text-sm bg-primary text-white px-4 py-2 rounded-full hover:bg-primary-dark transition-colors duration-300" data-modal="modal-tata">View Case Study</button>
           </div>
         </div>
 
         <!-- Project Card 2: DSA -->
-        <div class="project-card bg-white rounded-lg shadow-lg overflow-hidden transform hover:-translate-y-2 transition-transform duration-300">
+        <div class="project-card bg-white rounded-lg shadow-lg overflow-hidden transform hover:-translate-y-2 transition-transform duration-300" data-modal="dsa">
           <img src="project images/DSA.png" alt="DSA Projects" class="w-full h-56 object-cover">
           <div class="p-6">
             <h3 class="font-semibold text-xl text-primary">Data Structure Algorithms</h3>
             <p class="text-sm text-gray-600 mt-2">Performance-critical data structures in C++.</p>
-            <button class="modal-open mt-4 text-sm bg-primary text-white px-4 py-2 rounded-full hover:bg-primary-dark transition-colors duration-300" data-modal="modal-dsa">View Case Study</button>
           </div>
         </div>
 
         <!-- Project Card 3: Recommendation System -->
-        <div class="project-card bg-white rounded-lg shadow-lg overflow-hidden transform hover:-translate-y-2 transition-transform duration-300">
+        <div class="project-card bg-white rounded-lg shadow-lg overflow-hidden transform hover:-translate-y-2 transition-transform duration-300" data-modal="reco">
           <img src="project images/Recommendation.png" alt="Recommendation System" class="w-full h-56 object-cover">
           <div class="p-6">
             <h3 class="font-semibold text-xl text-primary">Recommendation System</h3>
             <p class="text-sm text-gray-600 mt-2">SVD-based and deep-learning recommendation models.</p>
-            <button class="modal-open mt-4 text-sm bg-primary text-white px-4 py-2 rounded-full hover:bg-primary-dark transition-colors duration-300" data-modal="modal-reco">View Case Study</button>
           </div>
         </div>
 
         <!-- Project Card 4: Predictive Analysis -->
-        <div class="project-card bg-white rounded-lg shadow-lg overflow-hidden transform hover:-translate-y-2 transition-transform duration-300">
+        <div class="project-card bg-white rounded-lg shadow-lg overflow-hidden transform hover:-translate-y-2 transition-transform duration-300" data-modal="pred">
           <img src="project images/Predictive analysis.png" alt="Predictive Analysis" class="w-full h-56 object-cover">
           <div class="p-6">
             <h3 class="font-semibold text-xl text-primary">Customer Prediction Model</h3>
             <p class="text-sm text-gray-600 mt-2">Classification models to identify high-potential customers.</p>
-            <button class="modal-open mt-4 text-sm bg-primary text-white px-4 py-2 rounded-full hover:bg-primary-dark transition-colors duration-300" data-modal="modal-pred">View Case Study</button>
           </div>
         </div>
 
         <!-- Project Card 5: FoodHub -->
-        <div class="project-card bg-white rounded-lg shadow-lg overflow-hidden transform hover:-translate-y-2 transition-transform duration-300">
+        <div class="project-card bg-white rounded-lg shadow-lg overflow-hidden transform hover:-translate-y-2 transition-transform duration-300" data-modal="foodhub">
           <img src="project images/FoodHub.png" alt="FoodHub Order Analysis" class="w-full h-56 object-cover">
           <div class="p-6">
             <h3 class="font-semibold text-xl text-primary">FoodHub Order Analysis</h3>
             <p class="text-sm text-gray-600 mt-2">EDA and visualizations for operational decisions.</p>
-            <button class="modal-open mt-4 text-sm bg-primary text-white px-4 py-2 rounded-full hover:bg-primary-dark transition-colors duration-300" data-modal="modal-foodhub">View Case Study</button>
           </div>
         </div>
-
-      </div>
-    </section>
-
-    <!-- Modals -->
-    <!-- Modal Tata -->
-    <div id="modal-tata" class="modal-container hidden">
-      <div class="modal-content bg-white rounded-lg shadow-xl p-8 max-w-2xl w-full">
-        <button class="modal-close absolute top-4 right-4 text-gray-500 hover:text-gray-800">&times;</button>
-        <h3 class="text-2xl font-bold text-primary mb-4">Tata Data Visualization</h3>
-        <p><strong>Objective:</strong> To create executive-level dashboards and visual narratives that empower leadership to make data-driven decisions during a Forage simulation with Tata Consultancy Services.</p>
-        <p class="mt-4"><strong>Technologies Used:</strong> Tableau, SQL</p>
-        <p class="mt-4"><strong>Process:</strong> I translated complex datasets into concise and intuitive dashboards. The focus was on Key Performance Indicator (KPI) design, clarity, and creating compelling visual stories that would resonate with an executive audience. The process involved understanding the business requirements, identifying key metrics, and iterating on the dashboard design to ensure maximum impact.</p>
-        <p class="mt-4"><strong>Outcome:</strong> The final dashboards provided a clear and actionable overview of the business, enabling stakeholders to quickly grasp trends and make informed decisions. The project demonstrated my ability to bridge the gap between raw data and strategic insights.</p>
-        <a href="https://public.tableau.com/app/profile/venkata.sai.mithil.ravulapalli/viz/BuisnessAnalysisVisuals/Dashboard1" class="mt-6 inline-block bg-gray-800 text-white px-4 py-2 rounded hover:bg-gray-700">View Visualizations</a>
-      </div>
-    </div>
-
-    <!-- Modal DSA -->
-    <div id="modal-dsa" class="modal-container hidden">
-      <div class="modal-content bg-white rounded-lg shadow-xl p-8 max-w-2xl w-full">
-        <button class="modal-close absolute top-4 right-4 text-gray-500 hover:text-gray-800">&times;</button>
-        <h3 class="text-2xl font-bold text-primary mb-4">Data Structure Algorithms</h3>
-        <p><strong>Objective:</strong> To implement and apply fundamental data structures and algorithms in C++ for performance-critical tasks, demonstrating a strong understanding of computational efficiency.</p>
-        <p class="mt-4"><strong>Technologies Used:</strong> C++, OpenStreetMap</p>
-        <p class="mt-4"><strong>Process:</strong> This collection of projects involved implementing various data structures from scratch, including Binary Search Trees (BSTs) for priority queues, and graph algorithms for a campus navigation system using OpenStreetMap data. I also developed encryption techniques by combining Caesar and Vigenère ciphers, focusing on the trade-offs between security and performance.</p>
-        <p class="mt-4"><strong>Outcome:</strong> These projects solidified my understanding of algorithmic complexity and data structure optimization. The campus navigation system, for example, efficiently found the shortest path between two points, showcasing the practical application of graph theory. The encryption project provided insights into building secure and efficient systems.</p>
-        <a href="https://github.com/Mithil0723/DSA" class="mt-6 inline-block bg-gray-800 text-white px-4 py-2 rounded hover:bg-gray-700">View Source Code</a>
-      </div>
-    </div>
-
-    <!-- Modal Recommendation System -->
-    <div id="modal-reco" class="modal-container hidden">
-      <div class="modal-content bg-white rounded-lg shadow-xl p-8 max-w-2xl w-full">
-        <button class="modal-close absolute top-4 right-4 text-gray-500 hover:text-gray-800">&times;</button>
-        <h3 class="text-2xl font-bold text-primary mb-4">Recommendation System</h3>
-        <p><strong>Objective:</strong> To build and evaluate both traditional and deep-learning-based recommendation systems, addressing common challenges such as bias, the cold-start problem, and scalability.</p>
-        <p class="mt-4"><strong>Technologies Used:</strong> Python, TensorFlow, Scikit-learn, Pandas</p>
-        <p class="mt-4"><strong>Process:</strong> I experimented with various recommendation approaches, including TF-IDF for content-based filtering, Singular Value Decomposition (SVD) for collaborative filtering, and deep learning models using TensorFlow. A significant part of the project was dedicated to evaluating the models for fairness and accuracy, and designing them to be scalable for production environments.</p>
-        <p class="mt-4"><strong>Outcome:</strong> The project resulted in a comprehensive understanding of different recommendation techniques and their trade-offs. I developed a robust pipeline for preprocessing data, training models, and evaluating their performance, with a strong focus on creating fair and scalable systems.</p>
-        <a href="https://github.com/Mithil0723/Recommendation-System/blob/main/Recommendation_Systems_Learner_Notebook_Full_Code.ipynb" class="mt-6 inline-block bg-gray-800 text-white px-4 py-2 rounded hover:bg-gray-700">View Source Code</a>
-      </div>
-    </div>
-
-    <!-- Modal Predictive Analysis -->
-    <div id="modal-pred" class="modal-container hidden">
-      <div class="modal-content bg-white rounded-lg shadow-xl p-8 max-w-2xl w-full">
-        <button class="modal-close absolute top-4 right-4 text-gray-500 hover:text-gray-800">&times;</button>
-        <h3 class="text-2xl font-bold text-primary mb-4">Customer Prediction Model</h3>
-        <p><strong>Objective:</strong> To build classification models that identify high-potential customers, enabling targeted marketing efforts and improving conversion rates.</p>
-        <p class="mt-4"><strong>Technologies Used:</strong> Python, Scikit-learn, Pandas</p>
-        <p class="mt-4"><strong>Process:</strong> The project involved extensive data cleaning and feature engineering to prepare the dataset for modeling. I then trained and tuned Decision Tree and Random Forest models, using techniques like cross-validation, confusion matrices, and ROC analysis to evaluate and enhance their performance and robustness.</p>
-        <p class="mt-4"><strong>Outcome:</strong> The final model was able to predict with high accuracy which customers were most likely to make a purchase. This project highlighted my skills in the entire machine learning workflow, from data preprocessing and model selection to evaluation and interpretation.</p>
-        <a href="https://github.com/Mithil0723/Predicting-Potential-Customers/blob/main/Learner%2BNotebook%2B-%2BFull%2BCode%2BVersion%2B-%2BPotential%2BCustomers%2BPrediction.ipynb" class="mt-6 inline-block bg-gray-800 text-white px-4 py-2 rounded hover:bg-gray-700">View Source Code</a>
-      </div>
-    </div>
-
-    <!-- Modal FoodHub -->
-    <div id="modal-foodhub" class="modal-container hidden">
-      <div class="modal-content bg-white rounded-lg shadow-xl p-8 max-w-2xl w-full">
-        <button class="modal-close absolute top-4 right-4 text-gray-500 hover:text-gray-800">&times;</button>
-        <h3 class="text-2xl font-bold text-primary mb-4">FoodHub Order Analysis</h3>
-        <p><strong>Objective:</strong> To perform Exploratory Data Analysis (EDA) and create visualizations that guide operational decisions and reveal customer preferences for a food delivery service.</p>
-        <p class="mt-4"><strong>Technologies Used:</strong> Python, Pandas, Seaborn, Matplotlib</p>
-        <p class="mt-4"><strong>Process:</strong> I analyzed a large dataset of food orders to identify patterns and trends. This included exploring order dynamics, identifying peak order times, and analyzing restaurant-level performance. I used Pandas for data manipulation and Seaborn/Matplotlib to create a variety of visualizations to communicate the findings.</p>
-        <p class="mt-4"><strong>Outcome:</strong> The analysis provided valuable insights that could be used to optimize operations, such as staffing during peak hours and promoting popular menu items. The project demonstrated my ability to extract actionable insights from raw data and present them in a clear and compelling way.</p>
-        <a href="https://github.com/Mithil0723/Food-Hub-Order-Analysis/blob/main/FDS_Project_LearnerNotebook_FullCode.ipynb" class="mt-6 inline-block bg-gray-800 text-white px-4 py-2 rounded hover:bg-gray-700">View Source Code</a>
-      </div>
-    </div>
 
       </div>
     </section>
