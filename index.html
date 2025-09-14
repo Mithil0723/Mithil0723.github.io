@@ -1,277 +1,655 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Modern Design System 2025</title>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Playfair+Display:wght@700&display=swap');
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Mithil Ravulapalli — Data Scientist</title>
+  <meta name="description" content="Mithil Ravulapalli — Data Scientist focused on business transformation with AI, ML and data engineering." />
 
-        :root {
-            /* Color Palette */
-            --primary-brown: #6D5D4D;
-            --primary-green: #A9B4A8;
-            --accent-peach: #F5D6C6;
-            --accent-gold: #E5B873;
-            --neutral-light: #F8F5F2;
-            --neutral-medium: #EAE3DC;
-            --neutral-dark: #3C3633;
-            --color-white: #FFFFFF;
-            --color-black: #000000;
-
-            /* Typography */
-            --font-headline: 'Playfair Display', serif;
-            --font-body: 'Montserrat', sans-serif;
-            --font-size-h1: clamp(2.5rem, 5vw + 1rem, 4.5rem);
-            --font-size-h2: clamp(2rem, 4vw + 1rem, 3.5rem);
-            --font-size-h3: clamp(1.5rem, 3vw + 1rem, 2.5rem);
-            --font-size-h4: clamp(1.2rem, 2vw + 1rem, 2rem);
-            --font-size-body: clamp(1rem, 1.5vw + 0.5rem, 1.25rem);
-            --font-size-accent: clamp(0.8rem, 1vw + 0.5rem, 1rem);
-            --font-weight-regular: 400;
-            --font-weight-bold: 700;
-            --line-height-heading: 1.2;
-            --line-height-body: 1.6;
-
-            /* Spacing & Layout */
-            --space-xs: 0.25rem;
-            --space-s: 0.5rem;
-            --space-m: 1rem;
-            --space-l: 1.5rem;
-            --space-xl: 2.5rem;
-            --space-xxl: 4rem;
-            --container-max-width: 1200px;
-            --container-padding: var(--space-l);
-
-            /* Interactions & Animations */
-            --transition-duration: 0.3s;
-            --transition-easing: ease-in-out;
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#a00964',
+            sidebg: '#0e1722',
+            iconbg: '#202647'
+          }
         }
+      }
+    }
+  </script>
 
-        body {
-            font-family: var(--font-body);
-            font-size: var(--font-size-body);
-            color: var(--neutral-dark);
-            background-color: var(--neutral-light);
-            line-height: var(--line-height-body);
-            margin: 0;
-            padding: var(--space-xl) 0;
-        }
+  <!-- Fonts & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
-        .container {
-            max-width: var(--container-max-width);
-            margin-left: auto;
-            margin-right: auto;
-            padding-left: var(--container-padding);
-            padding-right: var(--container-padding);
-        }
-
-        section {
-            margin-bottom: var(--space-xxl);
-            padding: var(--space-xl);
-            background-color: var(--color-white);
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-        }
-
-        h1, h2, h3, h4 {
-            font-family: var(--font-headline);
-            font-weight: var(--font-weight-bold);
-            line-height: var(--line-height-heading);
-            color: var(--primary-brown);
-        }
-
-        h1 { font-size: var(--font-size-h1); margin-bottom: var(--space-l); }
-        h2 { font-size: var(--font-size-h2); border-bottom: 2px solid var(--neutral-medium); padding-bottom: var(--space-s); margin-bottom: var(--space-l);}
-        h3 { font-size: var(--font-size-h3); margin-bottom: var(--space-m);}
-        h4 { font-size: var(--font-size-h4); margin-bottom: var(--space-s);}
-
-        p { margin-bottom: 1rem; max-width: 75ch; }
-
-        .grid { display: grid; grid-gap: var(--space-l); }
-        .grid-auto-fit { grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
-
-        .color-swatch {
-            display: flex;
-            align-items: center;
-            margin-bottom: var(--space-m);
-        }
-        .color-circle {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            margin-right: var(--space-l);
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-        }
-        .color-info span { display: block; }
-        .color-info .hex { font-weight: bold; font-family: monospace; }
-
-        .btn {
-            display: inline-block;
-            padding: var(--space-s) var(--space-l);
-            font-family: var(--font-body);
-            font-size: var(--font-size-body);
-            font-weight: var(--font-weight-bold);
-            text-decoration: none;
-            border: 2px solid transparent;
-            border-radius: 50px;
-            cursor: pointer;
-            transition: all var(--transition-duration) var(--transition-easing);
-        }
-        .btn-primary { background-color: var(--primary-brown); color: var(--neutral-light); }
-        .btn-primary:hover, .btn-primary:focus { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.1); background-color: #5a4b3c; }
-        .btn-secondary { background-color: transparent; color: var(--primary-brown); border-color: var(--primary-brown); }
-        .btn-secondary:hover, .btn-secondary:focus { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.1); background-color: var(--primary-brown); color: var(--neutral-light); }
-
-        a { color: var(--primary-brown); text-decoration: none; position: relative; }
-        a::after {
-            content: '';
-            position: absolute;
-            bottom: -2px;
-            left: 0;
-            width: 100%;
-            height: 2px;
-            background-color: var(--accent-peach);
-            transform: scaleX(0);
-            transform-origin: right;
-            transition: transform var(--transition-duration) var(--transition-easing);
-        }
-        a:hover::after, a:focus::after { transform: scaleX(1); transform-origin: left; }
-
-        .form-input {
-            display: block;
-            width: 100%;
-            max-width: 400px;
-            padding: var(--space-s) var(--space-m);
-            font-family: var(--font-body);
-            font-size: var(--font-size-body);
-            border: 2px solid var(--neutral-medium);
-            border-radius: 8px;
-            background-color: var(--neutral-light);
-            color: var(--neutral-dark);
-            transition: all var(--transition-duration) var(--transition-easing);
-        }
-        .form-input:focus { outline: none; border-color: var(--primary-brown); box-shadow: 0 0 0 3px var(--accent-peach); }
-
-        @keyframes float {
-            0% { transform: translateY(0px); }
-            50% { transform: translateY(-20px); }
-            100% { transform: translateY(0px); }
-        }
-        .visual-accent-3d-wrapper {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: var(--space-xxl) 0;
-        }
-        .visual-accent-3d {
-            animation: float 4s ease-in-out infinite;
-            border-radius: 20px;
-            box-shadow: 0 40px 60px rgba(0,0,0,0.2);
-            max-width: 80%;
-            height: auto;
-        }
-
-        .header {
-            text-align: center;
-            margin-bottom: var(--space-xxl);
-            padding: 0 var(--container-padding);
-        }
-
-        .header p {
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-    </style>
+  <style>
+    :root{--bg:#0f1724}
+    html,body{font-family:Inter,ui-sans-serif,system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Neue',Arial}
+    /* nav hide class used by hide-on-scroll */
+    .nav-hidden{transform:translateY(-120%);transition:transform .28s ease-in-out}
+    
+    /* Modal styles */
+    .fixed { position: fixed; }
+    .inset-0 { top: 0; right: 0; bottom: 0; left: 0; }
+    .z-50 { z-index: 50; }
+    .transition-opacity { transition-property: opacity; }
+    .duration-300 { transition-duration: 300ms; }
+    .opacity-0 { opacity: 0; }
+    .opacity-100 { opacity: 1; }
+    .backdrop-blur-sm { backdrop-filter: blur(4px); }
+  </style>
 </head>
-<body>
 
-    <div class="container">
+<body class="bg-gray-50 text-gray-800">
+  <header id="topNav" class="bg-white shadow sticky top-0 z-40">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center py-4">
+        <div class="flex items-center gap-4">
+          <img src="IMG_2769.jpg" alt="Mithil Ravulapalli" class="w-14 h-14 rounded-full object-cover border-2 border-primary shadow-sm">
+          <div>
+            <a href="#Home" class="text-lg font-semibold text-gray-900">Mithil Ravulapalli</a>
+            <p class="text-sm text-gray-500">Data Scientist · ML & AI</p>
+          </div>
+        </div>
 
-        <header class="header">
-            <h1>Modern Design System 2025</h1>
-            <p>A design system for professional authority, incorporating bold typography, a sophisticated "comfortable color" palette, and subtle, emotionally intelligent interactions.</p>
-        </header>
+        <nav class="hidden md:flex items-center gap-6 text-sm">
+          <a href="#Home" class="hover:text-primary">Home</a>
+          <a href="#About" class="hover:text-primary">About</a>
+          <a href="#Skills" class="hover:text-primary">Skills</a>
+          <a href="#Projects" class="hover:text-primary">Projects</a>
+          <a href="#Education" class="hover:text-primary">Education</a>
+          <a href="#Contact" class="text-white bg-primary px-3 py-2 rounded-md hover:opacity-95">Get Started</a>
+        </nav>
 
-        <!-- 3D Visual Element -->
-        <section>
-            <h2>3D Visual Element</h2>
-            <p>A subtle, floating 3D element to add depth and a modern feel to layouts. This can be used for hero sections or as a decorative background element.</p>
-            <div class="visual-accent-3d-wrapper">
-                <img src="3d-accent.jpg" alt="3D abstract particle design" class="visual-accent-3d">
-            </div>
-        </section>
-
-        <!-- Color Palette -->
-        <section>
-            <h2>Color Palette</h2>
-            <div class="grid grid-auto-fit">
-                <div>
-                    <h3>Primary Colors</h3>
-                    <div class="color-swatch">
-                        <div class="color-circle" style="background-color: var(--primary-brown);"></div>
-                        <div class="color-info"><span>Primary Brown</span><span class="hex">#6D5D4D</span></div>
-                    </div>
-                    <div class="color-swatch">
-                        <div class="color-circle" style="background-color: var(--primary-green);"></div>
-                        <div class="color-info"><span>Primary Green</span><span class="hex">#A9B4A8</span></div>
-                    </div>
-                </div>
-                <div>
-                    <h3>Accent Colors</h3>
-                    <div class="color-swatch">
-                        <div class="color-circle" style="background-color: var(--accent-peach);"></div>
-                        <div class="color-info"><span>Accent Peach</span><span class="hex">#F5D6C6</span></div>
-                    </div>
-                    <div class="color-swatch">
-                        <div class="color-circle" style="background-color: var(--accent-gold);"></div>
-                        <div class="color-info"><span>Accent Gold</span><span class="hex">#E5B873</span></div>
-                    </div>
-                </div>
-                <div>
-                    <h3>Neutral Colors</h3>
-                    <div class="color-swatch">
-                        <div class="color-circle" style="background-color: var(--neutral-light); border: 1px solid var(--neutral-medium);"></div>
-                        <div class="color-info"><span>Neutral Light</span><span class="hex">#F8F5F2</span></div>
-                    </div>
-                    <div class="color-swatch">
-                        <div class="color-circle" style="background-color: var(--neutral-dark);"></div>
-                        <div class="color-info"><span>Neutral Dark</span><span class="hex">#3C3633</span></div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Typography -->
-        <section>
-            <h2>Typography</h2>
-            <h1>Headline 1: The Quick Brown Fox</h1>
-            <h2>Headline 2: Jumps Over the Lazy Dog</h2>
-            <h3>Headline 3: A Symphony of Fonts</h3>
-            <h4>Headline 4: For Professional Authority</h4>
-            <p>This is the body text, set in Montserrat. It's designed for maximum readability and a clean, modern aesthetic. It pairs well with the elegant, high-contrast Playfair Display used for headlines. This paragraph demonstrates a standard block of text, with a comfortable line height and measure. <a href="#">This is a text link</a> to show the interaction style.</p>
-        </section>
-
-        <!-- Buttons & Interactions -->
-        <section>
-            <h2>Buttons & Interactions</h2>
-            <div class="grid" style="grid-template-columns: 1fr 1fr; align-items: start; gap: var(--space-xl);">
-                <div>
-                    <h3>Buttons</h3>
-                    <p>Buttons are pill-shaped to evoke a sense of organic flow. They have subtle lift and shadow effects on hover for a tactile feel.</p>
-                    <button class="btn btn-primary">Primary Button</button>
-                    <button class="btn btn-secondary">Secondary Button</button>
-                </div>
-                <div>
-                    <h3>Form Input</h3>
-                    <p>Form inputs are clean and simple, with a clear focus state that uses the accent color to gently draw attention.</p>
-                    <input type="text" class="form-input" placeholder="Enter your email...">
-                </div>
-            </div>
-        </section>
-
+        <div class="md:hidden">
+          <button id="menuToggle" aria-label="Toggle menu" class="p-2 rounded-md bg-gray-100">
+            <i class="fa-solid fa-bars"></i>
+          </button>
+        </div>
+      </div>
     </div>
+    <!-- Mobile menu -->
+    <div id="mobileMenu" class="md:hidden hidden bg-white border-t">
+      <div class="px-4 py-3 space-y-2">
+        <a href="#Home" class="block">Home</a>
+        <a href="#About" class="block">About</a>
+        <a href="#Skills" class="block">Skills</a>
+        <a href="#Projects" class="block">Projects</a>
+        <a href="#Education" class="block">Education</a>
+        <a href="#Contact" class="block text-primary">Get Started</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto">
+    <!-- Hero: canvas particle background with overlay -->
+    <section id="Home" class="relative w-full h-screen overflow-hidden">
+      <canvas id="heroCanvas" class="absolute inset-0 w-full h-full"></canvas>
+
+      <div class="absolute inset-0 bg-black/30"></div>
+
+      <div class="relative z-10 flex items-center justify-center h-full px-6">
+        <div class="max-w-3xl w-full text-center text-white backdrop-blur-md bg-white/10 border border-white/20 rounded-2xl shadow-xl p-8 md:p-12" style="box-shadow:0 8px 40px 0 rgba(80,60,180,0.18);">
+          <h1 class="text-4xl md:text-6xl font-extrabold leading-tight tracking-tight drop-shadow-lg" style="text-shadow:0 2px 24px #6b21a8,0 1px 0 #000">I build data-driven products<br class="hidden md:inline">& AI systems that move businesses forward</h1>
+          <p class="mt-5 text-lg md:text-xl text-blue-100 max-w-2xl mx-auto font-medium drop-shadow">Data scientist skilled in Python, machine learning, and end-to-end AI solutions — specializing in predictive modeling, recommendation systems, and automation that boost efficiency and growth.</p>
+
+          <div class="mt-10 flex justify-center gap-4 flex-wrap">
+            <a href="#Projects" class="inline-block bg-gradient-to-r from-indigo-500 via-purple-600 to-pink-500 text-white px-7 py-3 rounded-lg shadow-lg font-semibold text-lg transition-all duration-200 hover:scale-105 hover:from-indigo-600 hover:to-pink-600 focus:outline-none focus:ring-2 focus:ring-primary">View My Work</a>
+            <a href="https://github.com/Mithil0723" target="_blank" rel="noopener" class="inline-block border border-white/40 text-white px-7 py-3 rounded-lg font-semibold text-lg bg-white/10 hover:bg-white/20 transition-all duration-200 shadow focus:outline-none focus:ring-2 focus:ring-primary">GitHub</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- About -->
+<section id="About" class="px-6 py-16">
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+    <div class="md:col-span-1">
+      <img src="IMG_2769.jpg" alt="Mithil" class="rounded-lg shadow-2xl w-full object-cover h-auto max-h-[500px]">
+    </div>
+    <div class="md:col-span-1">
+      <h2 class="text-3xl font-bold text-gray-900">About Me</h2>
+      <p class="mt-4 text-lg text-gray-700">I am a Data Science student at the University of Illinois at Chicago (UIC), passionate about transforming complex datasets into strategic insights. My goal is to build data-driven solutions that empower teams to make smarter, more informed decisions.</p>
+      <p class="mt-4 text-gray-600">My background of being raised across different parts of India has given me a unique adaptability and a global mindset, which I apply to my work in data science. I specialize in building recommendation systems, predictive models, and analytics pipelines using a variety of tools including Python, R, and SQL.</p>
+      
+      <h3 class="mt-8 text-2xl font-bold text-gray-900">Core Competencies</h3>
+      <div class="mt-4 flex flex-wrap gap-3">
+        <span class="bg-primary text-white px-3 py-1 rounded-full text-sm font-medium">Python</span>
+        <span class="bg-primary text-white px-3 py-1 rounded-full text-sm font-medium">Machine Learning</span>
+        <span class="bg-primary text-white px-3 py-1 rounded-full text-sm font-medium">Data Analysis</span>
+        <span class="bg-primary text-white px-3 py-1 rounded-full text-sm font-medium">SQL</span>
+        <span class="bg-primary text-white px-3 py-1 rounded-full text-sm font-medium">Tableau</span>
+        <span class="bg-primary text-white px-3 py-1 rounded-full text-sm font-medium">TensorFlow</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+    <!-- Skills -->
+    <section id="Skills" class="px-6 py-12 bg-white">
+      <h2 class="text-2xl font-semibold text-gray-900">Skills</h2>
+      <div class="mt-6 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <div class="p-4 bg-gray-50 rounded-lg shadow">
+          <h4 class="font-semibold text-primary">Programming</h4>
+          <p class="mt-2 text-sm text-gray-600">Python, R, SQL, C++, Java, C, SAS</p>
+        </div>
+        <div class="p-4 bg-gray-50 rounded-lg shadow">
+          <h4 class="font-semibold text-primary">Data Analysis</h4>
+          <p class="mt-2 text-sm text-gray-600">Exploratory Data Analysis, Hypothesis Testing, Business Analytics</p>
+        </div>
+        <div class="p-4 bg-gray-50 rounded-lg shadow">
+          <h4 class="font-semibold text-primary">Machine Learning</h4>
+          <p class="mt-2 text-sm text-gray-600">Decision Trees, Random Forests, Neural Networks, Deep Learning, Predictive Modeling</p>
+        </div>
+        <div class="p-4 bg-gray-50 rounded-lg shadow">
+          <h4 class="font-semibold text-primary">Libraries</h4>
+          <p class="mt-2 text-sm text-gray-600">NumPy, Pandas, Scikit-learn, TensorFlow, Matplotlib, Seaborn</p>
+        </div>
+        <div class="p-4 bg-gray-50 rounded-lg shadow">
+          <h4 class="font-semibold text-primary">Databases & Tools</h4>
+          <p class="mt-2 text-sm text-gray-600">MySQL, MariaDB, PowerBI, Tableau, GitHub, VS Code</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Projects -->
+    <section id="Projects" class="px-6 py-12">
+      <h2 class="text-2xl font-semibold text-gray-900">Featured Projects</h2>
+      <div class="mt-6 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+
+        <!-- Project Card 1: Tata -->
+        <div class="project-card bg-white rounded-lg shadow-lg overflow-hidden transform hover:-translate-y-2 transition-transform duration-300" data-modal="tata">
+          <img src="project images/tata.jpg" alt="Tata Data Visualization" class="w-full h-56 object-cover">
+          <div class="p-6">
+            <h3 class="font-semibold text-xl text-primary">Tata Data Visualization</h3>
+            <p class="text-sm text-gray-600 mt-2">Executive-level dashboards for data-driven decisions.</p>
+          </div>
+        </div>
+
+        <!-- Project Card 2: DSA -->
+        <div class="project-card bg-white rounded-lg shadow-lg overflow-hidden transform hover:-translate-y-2 transition-transform duration-300" data-modal="dsa">
+          <img src="project images/DSA.png" alt="DSA Projects" class="w-full h-56 object-cover">
+          <div class="p-6">
+            <h3 class="font-semibold text-xl text-primary">Data Structure Algorithms</h3>
+            <p class="text-sm text-gray-600 mt-2">Performance-critical data structures in C++.</p>
+          </div>
+        </div>
+
+        <!-- Project Card 3: Recommendation System -->
+        <div class="project-card bg-white rounded-lg shadow-lg overflow-hidden transform hover:-translate-y-2 transition-transform duration-300" data-modal="reco">
+          <img src="project images/Recommendation.png" alt="Recommendation System" class="w-full h-56 object-cover">
+          <div class="p-6">
+            <h3 class="font-semibold text-xl text-primary">Recommendation System</h3>
+            <p class="text-sm text-gray-600 mt-2">SVD-based and deep-learning recommendation models.</p>
+          </div>
+        </div>
+
+        <!-- Project Card 4: Predictive Analysis -->
+        <div class="project-card bg-white rounded-lg shadow-lg overflow-hidden transform hover:-translate-y-2 transition-transform duration-300" data-modal="pred">
+          <img src="project images/Predictive analysis.png" alt="Predictive Analysis" class="w-full h-56 object-cover">
+          <div class="p-6">
+            <h3 class="font-semibold text-xl text-primary">Customer Prediction Model</h3>
+            <p class="text-sm text-gray-600 mt-2">Classification models to identify high-potential customers.</p>
+          </div>
+        </div>
+
+        <!-- Project Card 5: FoodHub -->
+        <div class="project-card bg-white rounded-lg shadow-lg overflow-hidden transform hover:-translate-y-2 transition-transform duration-300" data-modal="foodhub">
+          <img src="project images/FoodHub.png" alt="FoodHub Order Analysis" class="w-full h-56 object-cover">
+          <div class="p-6">
+            <h3 class="font-semibold text-xl text-primary">FoodHub Order Analysis</h3>
+            <p class="text-sm text-gray-600 mt-2">EDA and visualizations for operational decisions.</p>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Education -->
+    <section id="Education" class="px-6 py-12 bg-white">
+      <h2 class="text-2xl font-semibold text-gray-900">Education</h2>
+      <div class="mt-6 bg-gray-50 p-6 rounded-lg shadow">
+        <h3 class="font-semibold text-primary">University of Illinois at Chicago</h3>
+        <p class="text-sm text-gray-600 mt-1">Bachelors — Data Science. Focus on Machine Learning and Statistical Analysis. Chicago, Illinois.</p>
+      </div>
+    </section>
+
+    <!-- Contact -->
+<section id="Contact" class="px-6 py-16 text-center bg-white">
+  <h2 class="text-3xl font-bold text-gray-900">Get in Touch</h2>
+  <p class="mt-4 text-lg text-gray-600">I'm always open to discussing new projects, creative ideas, or opportunities to be part of an amazing team. Feel free to reach out!</p>
+  <a href="mailto:vravu3@uic.edu" class="mt-8 inline-block bg-primary text-white px-8 py-4 rounded-lg shadow-lg font-semibold text-lg hover:bg-opacity-90 transition-colors">vravu3@uic.edu</a>
+</section>
+  </main>
+
+  <footer class="bg-gray-50 border-t border-gray-200">
+    <div class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8 overflow-hidden">
+      <div class="flex justify-center space-x-6">
+        <a href="https://www.linkedin.com/in/mithil-ravulapalli-24999127a" target="_blank" rel="noopener" class="text-gray-400 hover:text-primary">
+          <span class="sr-only">LinkedIn</span>
+          <i class="fab fa-linkedin fa-lg"></i>
+        </a>
+        <a href="https://github.com/Mithil0723" target="_blank" rel="noopener" class="text-gray-400 hover:text-primary">
+          <span class="sr-only">GitHub</span>
+          <i class="fab fa-github fa-lg"></i>
+        </a>
+        <a href="mailto:vravu3@uic.edu" class="text-gray-400 hover:text-primary">
+          <span class="sr-only">Email</span>
+          <i class="fas fa-envelope fa-lg"></i>
+        </a>
+      </div>
+      <p class="mt-8 text-center text-sm text-gray-500">&copy; 2025 Mithil Ravulapalli. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <!-- Inline JavaScript (scoped inside an IIFE) -->
+  <script>
+    (function () {
+      'use strict';
+
+      /* Particle background for hero canvas */
+      (function initHeroParticles() {
+        const canvas = document.getElementById('heroCanvas');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        let w = canvas.width = window.innerWidth;
+        let h = canvas.height = window.innerHeight;
+        const particles = [];
+        // More particles for denser effect
+        const PARTICLE_COUNT = Math.round((w * h) / 40000) + 60;
+        const mouse = { x: w / 2, y: h / 2, vx: 0, vy: 0, active: false };
+
+        function rand(min, max) { return Math.random() * (max - min) + min; }
+
+        function createParticles() {
+          particles.length = 0;
+          for (let i = 0; i < PARTICLE_COUNT; i++) {
+            particles.push({
+              x: Math.random() * w,
+              y: Math.random() * h,
+              r: rand(1.2, 2.8),
+              vx: rand(-0.18, 0.18),
+              vy: rand(-0.18, 0.18),
+              hue: rand(220, 285),
+              alpha: rand(0.32, 0.95)
+            });
+          }
+        }
+
+        function resize() {
+          w = canvas.width = window.innerWidth;
+          h = canvas.height = window.innerHeight;
+          createParticles();
+        }
+
+        function draw() {
+          ctx.clearRect(0, 0, w, h);
+          // blue-purple background gradient
+          const g = ctx.createLinearGradient(0, 0, w, h);
+          g.addColorStop(0, 'rgba(30,34,60,0.7)');
+          g.addColorStop(1, 'rgba(40,20,70,0.7)');
+          ctx.fillStyle = g;
+          ctx.fillRect(0, 0, w, h);
+
+          // update & draw particles
+          particles.forEach(p => {
+            // simple attraction to mouse when active
+            if (mouse.active) {
+              const dx = mouse.x - p.x;
+              const dy = mouse.y - p.y;
+              const dist = Math.sqrt(dx * dx + dy * dy) + 0.001;
+              const force = Math.min(120 / dist, 0.8);
+              p.vx += (dx / dist) * force * 0.018;
+              p.vy += (dy / dist) * force * 0.018;
+            }
+
+            // gentle friction and movement
+            p.vx *= 0.97;
+            p.vy *= 0.97;
+            p.x += p.vx;
+            p.y += p.vy;
+
+            // wrap edges
+            if (p.x < -10) p.x = w + 10;
+            if (p.x > w + 10) p.x = -10;
+            if (p.y < -10) p.y = h + 10;
+            if (p.y > h + 10) p.y = -10;
+
+            // draw with glow
+            ctx.save();
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+            ctx.shadowColor = `hsla(${p.hue}, 90%, 70%, 0.7)`;
+            ctx.shadowBlur = 12;
+            ctx.fillStyle = `hsla(${p.hue}, 80%, 70%, ${p.alpha})`;
+            ctx.fill();
+            ctx.restore();
+          });
+
+          // connect nearby particles with colored lines
+          for (let i = 0; i < particles.length; i++) {
+            for (let j = i + 1; j < particles.length; j++) {
+              const a = particles[i];
+              const b = particles[j];
+              const dx = a.x - b.x;
+              const dy = a.y - b.y;
+              const d2 = dx * dx + dy * dy;
+              if (d2 < 12000) {
+                const alpha = 0.16 - (d2 / 12000) * 0.13;
+                ctx.save();
+                ctx.strokeStyle = `hsla(260,80%,80%,${Math.max(0, alpha)})`;
+                ctx.lineWidth = 0.7;
+                ctx.beginPath();
+                ctx.moveTo(a.x, a.y);
+                ctx.lineTo(b.x, b.y);
+                ctx.stroke();
+                ctx.restore();
+              }
+            }
+          }
+
+          requestAnimationFrame(draw);
+        }
+
+        // mouse handlers
+        window.addEventListener('mousemove', (e) => {
+          const rect = canvas.getBoundingClientRect();
+          mouse.x = e.clientX - rect.left;
+          mouse.y = e.clientY - rect.top;
+          mouse.active = true;
+        }, { passive: true });
+
+        window.addEventListener('mouseleave', () => { mouse.active = false; }, { passive: true });
+        window.addEventListener('resize', resize, { passive: true });
+
+        createParticles();
+        draw();
+      })();
+
+      // Typing animation
+      const roles = ['Data Science Student', 'Machine Learning Enthusiast', 'Problem Solver'];
+      let roleIndex = 0, charIndex = 0, isDeleting = false;
+      const typedTextElement = document.getElementById('typed-text');
+
+      function typeText() {
+        if (!typedTextElement) return;
+        const current = roles[roleIndex];
+        if (!isDeleting) {
+          typedTextElement.textContent = current.substring(0, charIndex + 1);
+          charIndex++;
+        } else {
+          typedTextElement.textContent = current.substring(0, charIndex - 1);
+          charIndex--;
+        }
+
+        if (!isDeleting && charIndex === current.length) {
+          setTimeout(() => isDeleting = true, 1800);
+        } else if (isDeleting && charIndex === 0) {
+          isDeleting = false;
+          roleIndex = (roleIndex + 1) % roles.length;
+        }
+
+        const speed = isDeleting ? 80 : 160;
+        setTimeout(typeText, speed);
+      }
+      typeText();
+
+      // Mobile menu toggle
+      const menuToggle = document.getElementById('menuToggle');
+      const mobileMenu = document.getElementById('mobileMenu');
+      menuToggle && menuToggle.addEventListener('click', () => {
+        mobileMenu.classList.toggle('hidden');
+      });
+
+      // Smooth scrolling for anchor links
+      document.querySelectorAll('a[href^="#"]').forEach(a => {
+        a.addEventListener('click', function (e) {
+          const href = this.getAttribute('href');
+          if (href && href.startsWith('#')) {
+            e.preventDefault();
+            const el = document.querySelector(href);
+            if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            if (mobileMenu && !mobileMenu.classList.contains('hidden')) mobileMenu.classList.add('hidden');
+          }
+        });
+      });
+
+      // Project modal system
+      const modalData = {
+        tata: {
+          title: 'Tata Data Visualization',
+          role: 'Data Visualization Engineer',
+          duration: '4 weeks',
+          tech: ['Tableau', 'SQL', 'Excel', 'Data Analysis'],
+          objective: 'Create executive-level dashboards that enable data-driven decision making at Tata Consultancy Services.',
+          process: [
+            'Analyzed raw retail data to identify key performance indicators',
+            'Designed intuitive visualizations for complex sales patterns',
+            'Built interactive Tableau dashboards with drill-down capabilities',
+            'Implemented narrative-driven data storytelling techniques'
+          ],
+          outcome: 'Delivered a suite of interactive dashboards that helped leadership track KPIs and identify growth opportunities.',
+          link: 'https://public.tableau.com/app/profile/venkata.sai.mithil.ravulapalli/viz/BuisnessAnalysisVisuals/Dashboard1'
+        },
+        dsa: {
+          title: 'Data Structure Algorithms',
+          role: 'Algorithm Developer',
+          duration: '12 weeks',
+          tech: ['C++', 'BST', 'Graph Algorithms', 'OpenStreetMap'],
+          objective: 'Implement efficient data structures and algorithms for performance-critical applications.',
+          process: [
+            'Developed a priority queue system using Binary Search Trees',
+            'Created hybrid encryption combining Caesar and Vigenère ciphers',
+            'Built a graph-based navigation system using OpenStreetMap data',
+            'Optimized algorithms for space and time complexity'
+          ],
+          outcome: 'Successfully implemented and documented a suite of optimized data structures with practical applications.',
+          link: 'https://github.com/Mithil0723/DSA'
+        },
+        reco: {
+          title: 'Recommendation System',
+          role: 'ML Engineer',
+          duration: '8 weeks',
+          tech: ['Python', 'TensorFlow', 'SVD', 'scikit-learn'],
+          objective: 'Design and implement a scalable recommendation system with bias handling and cold-start mitigation.',
+          process: [
+            'Implemented Singular Value Decomposition (SVD) for collaborative filtering',
+            'Built deep learning models for content-based recommendations',
+            'Addressed algorithmic bias in recommendation outputs',
+            'Developed strategies for cold-start problem'
+          ],
+          outcome: 'Created a production-ready recommendation engine with 92% user satisfaction rate in testing.',
+          link: 'https://github.com/Mithil0723/Recommendation-System'
+        },
+        pred: {
+          title: 'Customer Prediction Model',
+          role: 'Data Analyst',
+          duration: '6 weeks',
+          tech: ['Python', 'Random Forests', 'sklearn', 'Feature Engineering'],
+          objective: 'Build ML models to identify high-potential customers for targeted marketing.',
+          process: [
+            'Performed extensive data cleaning and feature engineering',
+            'Implemented and tuned various classification models',
+            'Conducted cross-validation and hyperparameter optimization',
+            'Created evaluation metrics and ROC analysis'
+          ],
+          outcome: 'Delivered a model with 88% accuracy in identifying high-value customer prospects.',
+          link: 'https://github.com/Mithil0723/Predicting-Potential-Customers'
+        },
+        foodhub: {
+          title: 'FoodHub Order Analysis',
+          role: 'Data Analyst',
+          duration: '4 weeks',
+          tech: ['Python', 'Pandas', 'Seaborn', 'Statistical Analysis'],
+          objective: 'Analyze order patterns and customer behavior to optimize restaurant operations.',
+          process: [
+            'Cleaned and processed large-scale order data',
+            'Identified peak ordering times and popular cuisines',
+            'Created visualizations for customer preferences',
+            'Generated actionable insights for restaurants'
+          ],
+          outcome: 'Provided data-backed recommendations that increased average order value by 15%.',
+          link: 'https://github.com/Mithil0723/Food-Hub-Order-Analysis'
+        }
+      };
+
+      let currentModal = null;
+      
+      function createModal(data) {
+        const modal = document.createElement('div');
+        modal.className = 'fixed inset-0 z-50 flex items-center justify-center p-4 opacity-0 transition-opacity duration-300';
+        modal.innerHTML = `
+          <div class="fixed inset-0 bg-black/70 backdrop-blur-sm"></div>
+          <div class="relative bg-white rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-auto">
+            <button class="absolute right-4 top-4 text-gray-500 hover:text-gray-700 focus:outline-none" aria-label="Close modal">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+            <div class="p-8">
+              <h2 class="text-3xl font-bold text-gray-900">${data.title}</h2>
+              
+              <div class="mt-6 grid gap-6 md:grid-cols-3 text-sm">
+                <div>
+                  <h4 class="font-semibold text-gray-900">Role</h4>
+                  <p class="mt-1 text-gray-600">${data.role}</p>
+                </div>
+                <div>
+                  <h4 class="font-semibold text-gray-900">Duration</h4>
+                  <p class="mt-1 text-gray-600">${data.duration}</p>
+                </div>
+                <div>
+                  <h4 class="font-semibold text-gray-900">Technologies</h4>
+                  <p class="mt-1 text-gray-600">${data.tech.join(', ')}</p>
+                </div>
+              </div>
+
+              <div class="mt-8">
+                <h3 class="text-xl font-semibold text-gray-900">Project Objective</h3>
+                <p class="mt-2 text-gray-600">${data.objective}</p>
+              </div>
+
+              <div class="mt-8">
+                <h3 class="text-xl font-semibold text-gray-900">Development Process</h3>
+                <ul class="mt-4 space-y-3">
+                  ${data.process.map(step => `
+                    <li class="flex items-start">
+                      <svg class="w-5 h-5 text-primary mt-1 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                      </svg>
+                      <span class="text-gray-600">${step}</span>
+                    </li>
+                  `).join('')}
+                </ul>
+              </div>
+
+              <div class="mt-8">
+                <h3 class="text-xl font-semibold text-gray-900">Outcome</h3>
+                <p class="mt-2 text-gray-600">${data.outcome}</p>
+              </div>
+
+              <div class="mt-8 flex justify-end">
+                <a href="${data.link}" target="_blank" rel="noopener" class="inline-flex items-center px-4 py-2 bg-primary text-white rounded-lg hover:bg-opacity-90 transition-colors">
+                  View Project
+                  <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                  </svg>
+                </a>
+              </div>
+            </div>
+          </div>
+        `;
+
+        document.body.appendChild(modal);
+        requestAnimationFrame(() => modal.classList.add('opacity-100'));
+
+        // Close handlers
+        const closeModal = () => {
+          modal.classList.remove('opacity-100');
+          setTimeout(() => {
+            document.body.removeChild(modal);
+            currentModal = null;
+          }, 300);
+        };
+
+        modal.querySelector('button').addEventListener('click', closeModal);
+        modal.querySelector('.fixed').addEventListener('click', (e) => {
+          if (e.target === e.currentTarget) closeModal();
+        });
+
+        document.addEventListener('keydown', function closeOnEscape(e) {
+          if (e.key === 'Escape') {
+            closeModal();
+            document.removeEventListener('keydown', closeOnEscape);
+          }
+        });
+
+        currentModal = modal;
+      }
+
+      // Project card click handlers
+      document.querySelectorAll('[data-modal]').forEach(card => {
+        card.addEventListener('click', () => {
+          const modalId = card.getAttribute('data-modal');
+          if (modalData[modalId]) {
+            if (currentModal) currentModal.querySelector('button').click();
+            createModal(modalData[modalId]);
+          }
+        });
+      });
+
+      // Contact form validation (client side)
+      const contactForm = document.getElementById('contactForm');
+      contactForm && contactForm.addEventListener('submit', function (e) {
+        const name = this.querySelector('[name="name"]').value.trim();
+        const email = this.querySelector('[name="email"]').value.trim();
+        const message = this.querySelector('[name="message"]').value.trim();
+        if (!name || !email || !message) {
+          e.preventDefault();
+          alert('Please fill out all fields before submitting.');
+        }
+      });
+
+      // Accessibility: close mobile menu on escape
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && mobileMenu && !mobileMenu.classList.contains('hidden')) {
+          mobileMenu.classList.add('hidden');
+        }
+      });
+
+      // Hide-on-scroll header behavior
+      (function () {
+        const nav = document.getElementById('topNav');
+        if (!nav) return;
+        let lastScroll = window.scrollY || 0;
+        let ticking = false;
+        window.addEventListener('scroll', () => {
+          const current = window.scrollY || 0;
+          if (!ticking) {
+            window.requestAnimationFrame(() => {
+              if (current > lastScroll && current > 80) {
+                nav.classList.add('nav-hidden');
+              } else {
+                nav.classList.remove('nav-hidden');
+              }
+              lastScroll = current <= 0 ? 0 : current;
+              ticking = false;
+            });
+            ticking = true;
+          }
+        }, { passive: true });
+      })();
+
+    })();
+  </script>
 
 </body>
+
 </html>
