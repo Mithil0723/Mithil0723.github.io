@@ -1,343 +1,809 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="style.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
-    crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <title>Mithil Ravulapalli</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Mithil Ravulapalli — Data Scientist</title>
+  <meta name="description" content="Mithil Ravulapalli — Data Scientist focused on business transformation with AI, ML and data engineering." />
+
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#a00964',
+            sidebg: '#0e1722',
+            iconbg: '#202647'
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Fonts & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+  <style>
+    :root{--bg:#0f1724}
+    html,body{font-family:Inter,ui-sans-serif,system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Neue',Arial}
+    /* nav hide class used by hide-on-scroll */
+    .nav-hidden{transform:translateY(-120%);transition:transform .28s ease-in-out}
+    
+    /* Modal styles */
+    .fixed { position: fixed; }
+    .inset-0 { top: 0; right: 0; bottom: 0; left: 0; }
+    .z-50 { z-index: 50; }
+    .transition-opacity { transition-property: opacity; }
+    .duration-300 { transition-duration: 300ms; }
+    .opacity-0 { opacity: 0; }
+    .opacity-100 { opacity: 1; }
+    .backdrop-blur-sm { backdrop-filter: blur(4px); }
+  </style>
 </head>
 
-<body>
-  <header>
-    <div class="profile">
-      <img src="IMG_2769.jpg" alt="Mithil Ravulapalli">
-      <h1>Mithil Ravulapalli</h1>
-      <div class="social-icons">
-        <a href="https://www.linkedin.com/in/mithil-ravulapalli-24999127a" aria-label="LinkedIn Profile"><i class="fa-brands fa-linkedin"></i></a>
-        <a href="https://github.com/Mithil0723" aria-label="GitHub Profile"><i class="fa-brands fa-github"></i></a>
+<body class="bg-gray-50 text-gray-800">
+  <header id="topNav" class="bg-white shadow sticky top-0 z-40">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center py-4">
+        <div class="flex items-center gap-4">
+          <img src="IMG_2769.jpg" alt="Mithil Ravulapalli" class="w-14 h-14 rounded-full object-cover border-2 border-primary shadow-sm">
+          <div>
+            <a href="#Home" class="text-lg font-semibold text-gray-900">Mithil Ravulapalli</a>
+            <p class="text-sm text-gray-500">Data Scientist · ML & AI</p>
+          </div>
+        </div>
+
+        <nav class="hidden md:flex items-center gap-6 text-sm">
+          <a href="#Home" class="hover:text-primary">Home</a>
+          <a href="#About" class="hover:text-primary">About</a>
+          <a href="#Skills" class="hover:text-primary">Skills</a>
+          <a href="#Projects" class="hover:text-primary">Projects</a>
+          <a href="#Education" class="hover:text-primary">Education</a>
+          <a href="#Contact" class="text-white bg-primary px-3 py-2 rounded-md hover:opacity-95">Get Started</a>
+        </nav>
+
+        <div class="md:hidden">
+          <button id="menuToggle" aria-label="Toggle menu" class="p-2 rounded-md bg-gray-100">
+            <i class="fa-solid fa-bars"></i>
+          </button>
+        </div>
       </div>
-      <nav>
-        <ul>
-          <li><a href="#Home" class="active"><i class="fa-solid fa-house"></i> Home</a></li>
-          <li><a href="#About"><i class="fa-regular fa-user"></i> About</a></li>
-          <li><a href="#Skills"><i class="fa-solid fa-laptop-code"></i> Skills</a></li>
-          <li><a href="#Projects"><i class="fa-solid fa-briefcase"></i> Projects</a></li>
-          <li><a href="#Education"><i class="fa-solid fa-graduation-cap"></i> Education</a></li>
-          <li><a href="#Contact"><i class="fa-solid fa-envelope"></i> Contact</a></li>
-        </ul>
-      </nav>
-      <div class="footer">
-        <p>&copy; 2024 Mithil Ravulapalli<br>Portfolio</p>
+    </div>
+    <!-- Mobile menu -->
+    <div id="mobileMenu" class="md:hidden hidden bg-white border-t">
+      <div class="px-4 py-3 space-y-2">
+        <a href="#Home" class="block">Home</a>
+        <a href="#About" class="block">About</a>
+        <a href="#Skills" class="block">Skills</a>
+        <a href="#Projects" class="block">Projects</a>
+        <a href="#Education" class="block">Education</a>
+        <a href="#Contact" class="block text-primary">Get Started</a>
       </div>
     </div>
   </header>
 
-  <i class="fa-solid fa-bars" id="MenuBtn"></i>
+  <main class="max-w-6xl mx-auto">
+    <!-- Hero: canvas particle background with overlay -->
+    <section id="Home" class="relative w-full h-screen overflow-hidden">
+      <canvas id="heroCanvas" class="absolute inset-0 w-full h-full"></canvas>
 
-  <main>
-    <section id="Home">
-      <div class="home-row">
-          <h1>Hi, I'm <br>Mithil Ravulapalli.<span></span></h1>
-          <p>I'm a <span id="typed-text"></span></p>
-      </div>
-  </section>
+      <div class="absolute inset-0 bg-black/30"></div>
 
-  <section id="About" class="section-bg">
-    <h2>About Me</h2>
-    <div class="about-content">
-        <p class="intro">
-          Born on 23rd July 2001, I am presently pursuing my third year in Data Science at the University of Illinois at Chicago (UIC). My academic journey has been driven by an unwavering passion for transforming complex datasets into meaningful insights. With a strong foundation in both theoretical knowledge and practical applications, I strive to leverage data science capabilities for driving business excellence and societal progress.
-        </p>
-        
-        <div class="about-details">
-            <div class="about-subsection">
-                <h3>Background</h3>
-                <p>
-                  As the child of an army officer, I have had the distinct privilege of experiencing India's vast cultural tapestry. My formative years were enriched by relocations across diverse regions, from the technological hubs of Hyderabad and Bangalore to the pristine landscapes of Himachal Pradesh and the culturally rich Northeast. These transitions, whilst challenging, have instilled in me remarkable adaptability and a nuanced understanding of varied perspectives. Such exposure has proved invaluable in fostering a global mindset, particularly beneficial in today's interconnected professional landscape.
-                </p>
-            </div>
+      <div class="relative z-10 flex items-center justify-center h-full px-6">
+        <div class="max-w-3xl w-full text-center text-white backdrop-blur-md bg-white/10 border border-white/20 rounded-2xl shadow-xl p-8 md:p-12" style="box-shadow:0 8px 40px 0 rgba(80,60,180,0.18);">
+          <h1 class="text-4xl md:text-6xl font-extrabold leading-tight tracking-tight drop-shadow-lg" style="text-shadow:0 2px 24px #6b21a8,0 1px 0 #000">I build data-driven products<br class="hidden md:inline">& AI systems that move businesses forward</h1>
+          <p class="mt-5 text-lg md:text-xl text-blue-100 max-w-2xl mx-auto font-medium drop-shadow">Data scientist skilled in Python, machine learning, and end-to-end AI solutions — specializing in predictive modeling, recommendation systems, and automation that boost efficiency and growth.</p>
 
-            <div class="about-subsection">
-                <h3>Professional Focus</h3>
-                <p>
-                    My academic journey has equipped me with a robust foundation in data analysis, machine learning, and statistical modeling. I specialize in developing recommendation systems, predictive modeling, and conducting in-depth data analysis using Python, R, and various data science tools. My expertise extends to libraries such as NumPy, Pandas, and Scikit-learn, allowing me to tackle complex data challenges effectively.
-                </p>
-            </div>
-
-            <div class="about-subsection">
-                <h3>Goals & Aspirations</h3>
-                <p>
-                  My professional aspirations extend beyond conventional applications of data science. I aim to pioneer innovative solutions at the intersection of business intelligence and social impact, emphasising responsible deployment of artificial intelligence and machine learning technologies. My objective is to contribute meaningfully to organisations that value data-driven decision-making whilst maintaining ethical considerations. I remain committed to continuous learning and adaptation, recognising the dynamic nature of technological advancements in our field.
-                </p>
-            </div>
-        </div>
-    </div>
-</section>
-
-<section id="Skills" class="section-bg">
-  <h2>Skills</h2>
-  <div class="skills-container">
-      <div class="skill-category">
-          <h3><i class="fa-solid fa-code"></i> Programming Languages</h3>
-          <div class="skills-list">
-              <span class="skill-tag">Python</span>
-              <span class="skill-tag">R</span>
-              <span class="skill-tag">SQL</span>
-              <span class="skill-tag">C++</span>
-              <span class="skill-tag">Java</span>
-              <span class="skill-tag">C</span>
-              <span class="skill-tag">SAS</span>
-          </div>
-      </div>
-      
-      <div class="skill-category">
-        <h3><i class="fa-solid fa-magnifying-glass-chart"></i> Data Analysis</h3>
-        <div class="skills-list">
-            <span class="skill-tag">Exploratory Data Analysis</span>
-            <span class="skill-tag">Hypothesis Testing</span>
-            <span class="skill-tag">Buisness Analytics</span>
-            <span class="skill-tag">Data Interpretation</span>
-        </div>
-    </div>
-      <div class="skill-category">
-          <h3><i class="fa-solid fa-brain"></i> Machine Learning</h3>
-          <div class="skills-list">
-              <span class="skill-tag">Decision Trees</span>
-              <span class="skill-tag">Random Forests</span>
-              <span class="skill-tag">Neural Networks</span>
-              <span class="skill-tag">Deep Learning</span>
-              <span class="skill-tag">Statistical Analysis</span>
-              <span class="skill-tag">Predictive Modeling</span>
-          </div>
-      </div>
-      
-      <div class="skill-category">
-          <h3><i class="fa-solid fa-bookmark"></i> Libraries</h3>
-          <div class="skills-list">
-              <span class="skill-tag">NumPy</span>
-              <span class="skill-tag">Pandas</span>
-              <span class="skill-tag">Scikit-learn</span>
-              <span class="skill-tag">TensorFlow</span>
-              <span class="skill-tag">Matplotlib</span>
-              <span class="skill-tag">Seaborn</span>
-          </div>
-      </div>
-
-      <div class="skill-category">
-          <h3><i class="fa-solid fa-database"></i> Databases & Tools</h3>
-          <div class="skills-list">
-              <span class="skill-tag">MySQL</span>
-              <span class="skill-tag">MariaDB</span>
-              <span class="skill-tag">PowerBI</span>
-              <span class="skill-tag">Tableau</span>
-              <span class="skill-tag">GitHub</span>
-              <span class="skill-tag">VS Code</span>
-          </div>
-      </div>
-  </div>
-</section>
-
-<section id="Projects" class="section-bg">
-  <h2>Featured Projects</h2>
-  <div class="project-grid">
-    <div class="project-card">
-      <div class="project-image">
-        <img src="project images/tata.gif" alt="Tata Data Visualization Project" class="project-img">
-      </div>
-      <h3>Tata Data Visualization</h3>
-      <p>Crafted compelling visual narratives from complex datasets to guide executive-level decisions. Developed strategic analytical skills, enabling data-driven discussions with senior leadership and driving actionable business outcomes.</p>
-      <div class="project-tags">
-        <span>Data Visualization</span>
-        <span>Business Analytics</span>
-      </div>
-
-     <div class="project-details">
-        <div class="project-details-content">
-            <p>Empowering Business with Effective Insights Job Simulation on Forage in October 2024, I gained hands-on experience working with Tata Consultancy Services' data visualization practices. The simulation provided an opportunity to develop strategic analytical skills by formulating insightful questions for high-stakes meetings with client senior leadership, demonstrating my ability to understand and address executive-level business concerns. I created impactful data visualizations that transformed complex datasets into clear, actionable insights, enabling senior executives to make data-driven decisions more effectively. This experience enhanced my proficiency in translating raw data into compelling visual narratives that drive business strategy and decision-making processes.</p>
+          <div class="mt-10 flex justify-center gap-4 flex-wrap">
+            <a href="#Projects" class="inline-block bg-gradient-to-r from-indigo-500 via-purple-600 to-pink-500 text-white px-7 py-3 rounded-lg shadow-lg font-semibold text-lg transition-all duration-200 hover:scale-105 hover:from-indigo-600 hover:to-pink-600 focus:outline-none focus:ring-2 focus:ring-primary">View My Work</a>
+            <a href="https://github.com/Mithil0723" target="_blank" rel="noopener" class="inline-block border border-white/40 text-white px-7 py-3 rounded-lg font-semibold text-lg bg-white/10 hover:bg-white/20 transition-all duration-200 shadow focus:outline-none focus:ring-2 focus:ring-primary">GitHub</a>
           </div>
         </div>
-
-      <div class="project-buttons">
-        <a href="https://public.tableau.com/app/profile/venkata.sai.mithil.ravulapalli/viz/BuisnessAnalysisVisuals/Dashboard1" class="project-btn github-btn">
-          <i class="fa-solid fa-chart-simple"></i> Visualizations
-        </a>
-        <button class="project-btn details-btn">
-          <i class="fa-solid fa-circle-info"></i> Show More
-      </button>
-    </div>
-    </div>
-
-    <div class="project-card">
-      <div class="project-image">
-        <img src="project images/DSA.jpeg" alt="Data Structure Algorithms Project" class="project-img">
       </div>
-      <h3>Data Structure Algorithms</h3>
-      <p>Designed optimized systems using Binary Search Trees, graph algorithms, and encryption techniques. Balanced algorithmic efficiency with intuitive user interfaces, ensuring scalable and reliable performance across diverse applications.</p>
-      <div class="project-tags">
-        <span>Data Structures</span>
-        <span>C++</span>
-        <span>C</span>
-        <span>Algorithms</span>
-      </div>
-
-      <div class="project-details">
-        <div class="project-details-content">
-            <p>I developed diverse software applications demonstrating proficiency in C++ and data structures. Notable implementations include a priority queue using binary search trees with support for duplicate priorities, a sophisticated cipher system incorporating both Caesar and Vigenère encryption methods with dictionary-based decryption capabilities, and a campus navigation system utilizing OpenStreetMap data to create a graph-based pathfinding solution. These projects showcased my ability to work with complex data structures (BST, graphs), implement encryption algorithms, handle file I/O operations, and create intuitive user interfaces. I particularly focused on optimization and code organization, employing object-oriented principles and template programming to ensure code reusability and maintainability. Each project required careful consideration of algorithmic efficiency, demonstrated through the implementation of O(log n) operations in the priority queue and efficient graph traversal algorithms in the navigation system.</p>
-          </div>
-        </div>
-
-      <div class="project-buttons">
-        <a href="https://github.com/Mithil0723/DSA" class="project-btn github-btn">
-          <i class="fa-brands fa-codepen"></i> Source Code
-        </a>
-        <a href="project-details/DSA.html" class="project-btn details-btn">
-          <i class="fa-solid fa-circle-info"></i> Show More
-        </a>
-    </div>
-    </div>
-
-    <div class="project-card">
-      <div class="project-image">
-          <img src="project images/Recommendation.png" alt="Recommendation System Project" class="project-img">
-      </div>
-      <h3>Recommendation System</h3>
-      <p>Built robust recommendation models using SVD and deep learning techniques. Addressed industry challenges like scalability and bias, while fine-tuning models with precision and recall metrics for impactful results.</p>
-      <div class="project-tags">
-          <span>Machine Learning</span>
-          <span>Python</span>
-      </div>
-  
-      <div class="project-details">
-          <div class="project-details-content">
-              <p>
-                  I implemented practical algorithms such as TF-IDF for feature extraction and matrix factorization using SVD, while also exploring advanced techniques like deep learning for recommendations. The project exposed me to real-world challenges including the cold start problem and scalability issues, as well as the importance of proper evaluation using metrics like precision, recall, and RMSE. I learned to use popular libraries such as Surprise and TensorFlow, and gained valuable experience in building end-to-end recommendation systems. Importantly, I also considered ethical implications, understanding the potential for bias in these systems. This project not only enhanced my technical skills but also sparked my interest in ongoing advancements in the field, preparing me for future data science challenges and inspiring continued learning in this rapidly evolving area.
-              </p>
-          </div>
-      </div>
-  
-      <div class="project-buttons">
-          <a href="https://github.com/Mithil0723/Recommendation-System/blob/main/Recommendation_Systems_Learner_Notebook_Full_Code.ipynb" class="project-btn github-btn">
-              <i class="fa-brands fa-codepen"></i> Source Code
-          </a>
-          <a href="project-details/recommendation-system.html" class="project-btn details-btn">
-              <i class="fa-solid fa-circle-info"></i> Show More
-          </a>
-      </div>
-  </div>
-  
-
-    <div class="project-card">
-      <div class="project-image">
-        <img src="project images/Predictive analysis.png" alt="Customer Prediction Model Project" class="project-img">
-      </div>
-      <h3>Customer Prediction Model</h3>
-      <p>Developed predictive models to identify high-potential customers using Decision Trees and Random Forests. Focused on data preprocessing, hyperparameter tuning, and model evaluation for maximum accuracy and reliability.</p>
-      <div class="project-tags">
-        <span>Machine Learning</span>
-        <span>Python</span>
-      </div>
-
-      <div class="project-details">
-        <div class="project-details-content">
-            <p>I undertook a project focused on predicting potential customers by analyzing lead attributes and their interaction details. This experience provided me with a deep understanding of various machine learning techniques, particularly in the context of classification tasks. I started by exploring the dataset and learning the importance of data preprocessing, including handling missing values, feature scaling, and encoding categorical variables, which are crucial steps in ensuring the accuracy of any predictive model. As I progressed, I applied Decision Trees and Random Forests, which allowed me to grasp the strengths and limitations of different algorithms. I learned how these models can be used to make decisions based on complex, non-linear relationships between features. A significant part of the learning process was focused on hyperparameter tuning, where I fine-tuned the models to improve their performance, leading to a noticeable increase in the accuracy of predictions. The project also provided valuable insights into model evaluation, teaching me how to use cross-validation, confusion matrices, and ROC curves to assess the effectiveness of different models. The successful identification of potential customers with high precision was a testament to the skills and knowledge I acquired throughout this course.</p>
-          </div>
-        </div>
-
-      <div class="project-buttons">
-        <a href="https://github.com/Mithil0723/Predicting-Potential-Customers/blob/main/Learner%2BNotebook%2B-%2BFull%2BCode%2BVersion%2B-%2BPotential%2BCustomers%2BPrediction.ipynb" class="project-btn github-btn">
-          <i class="fa-brands fa-codepen"></i> Source Code
-        </a>
-        <a href="project-details/Pred Analysis.html" class="project-btn details-btn">
-          <i class="fa-solid fa-circle-info"></i> Show More
-        </a>
-    </div>
-    </div>
-
-    <div class="project-card">
-      <div class="project-image">
-        <img src="project images/FoodHub.png" alt="FoodHub Order Analysis Project" class="project-img">
-      </div>
-      <h3>FoodHub Order Analysis</h3>
-      <p>Conducted in-depth Exploratory Data Analysis (EDA) to uncover trends and customer preferences. Delivered actionable insights through visualizations, empowering business strategies and operational efficiency.</p>
-      <div class="project-tags">
-        <span>Exploratory Data Analysis</span>
-        <span>Statistics</span>
-        <span>Python</span>
-      </div>
-
-      <div class="project-details">
-        <div class="project-details-content">
-            <p>I undertook a detailed examination of order data to understand the demand dynamics across different restaurants. This analysis was instrumental in helping FoodHub enhance its business operations and improve customer experiences. The project began with an extensive Exploratory Data Analysis (EDA), where I carefully examined the dataset to identify key trends, patterns, and any anomalies. This initial step provided crucial insights into the distribution of orders, the busiest times, and the most popular restaurants. To further illustrate these findings, I employed various data visualization techniques, creating clear and informative graphs and charts. These visualizations highlighted the distribution of orders, customer preferences, and the performance of individual restaurants, making the data more accessible and easier to interpret. Additionally, I utilized statistical analysis to explore and quantify relationships between different variables, such as the correlation between restaurant ratings and order volumes. This analysis provided a strong foundation for making data-driven decisions that could enhance business strategies. Throughout the project, I gained significant hands-on experience with Python libraries like Pandas, Matplotlib, and Seaborn, which are essential tools for data manipulation and visualization. The project also reinforced my understanding of EDA, allowing me to derive valuable insights from raw data and communicate these findings effectively through visualizations.</p>
-          </div>
-        </div>
-
-      <div class="project-buttons">
-        <a href="https://github.com/Mithil0723/Food-Hub-Order-Analysis/blob/main/FDS_Project_LearnerNotebook_FullCode.ipynb" class="project-btn github-btn">
-          <i class="fa-brands fa-codepen"></i> Source Code
-        </a>
-        <a href="project-details/FoodHub.html" class="project-btn details-btn">
-          <i class="fa-solid fa-circle-info"></i> Show More
-        </a>
-    </div>
-    </div>
-  </div>
-</section>
-
-    <section id="Education" class="section-bg">
-      <h2>Education</h2>
-      <div class="education-container">
-          <div class="education-card">
-              <div class="education-icon">
-                  <i class="fa-solid fa-graduation-cap"></i>
-              </div>
-              <div class="education-details">
-                  <h3>University of Illinois at Chicago</h3>
-                  <p><i class="fa-solid fa-graduation-cap"></i> Degree: Bachelors</p>
-                  <p><i class="fa-solid fa-book"></i> Major: Data Science</p>
-                  <div class="education-info">
-                      <p><i class="fa-solid fa-location-dot"></i> Chicago, Illinois</p>
-                      <p><i class="fa-solid fa-book"></i> Focus on Machine Learning and Statistical Analysis</p>
-                  </div>
-              </div>
-          </div>
-      </div>
-  </section>
-
-    <section id="Contact", class="section-bg">
-      <h2>Get In Touch</h2>
-      <div class="contact-info">
-        <p><i class="fa-solid fa-envelope"></i> vravu3@uic.edu</p>
-        <p><i class="fa-solid fa-phone"></i> +1 (630) 632-7037</p>
-      </div>
-
-      <iframe 
-            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d190255.33858125397!2d-87.87240611091851!3d41.83359482048457!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x880e2c3cd0f4cbed%3A0xafe0a6ad09c0c000!2sChicago%2C%20IL!5e0!3m2!1sen!2sus!4v1703912161317!5m2!1sen!2sus"
-            width="100%" 
-            height="250" 
-            style="border:0;" 
-            allowfullscreen="" 
-            loading="lazy" 
-            referrerpolicy="no-referrer-when-downgrade">
-        </iframe>
     </section>
 
-    <section id="Contact", class="section-bg">
-      <h2>Message Me</h2>
-      <form action="https://formspree.io/f/xjkkerbj" method="POST" class="contact-form">
-        <input type="text" name="name" placeholder="Your Name" required>
-        <input type="email" name="email" placeholder="Your Email" required>
-        <textarea name="message" rows="5" placeholder="Your Message" required></textarea>
-        <button type="submit" class="btn">Send Message</button>
-      </form>
-    </section>    
-    
+    <!-- About -->
+    <section id="About" class="px-6 py-16">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8 items-start">
+        <div class="md:col-span-1">
+          <img src="IMG_2769.jpg" alt="Mithil" class="rounded-lg shadow-lg w-full object-cover h-64">
+        </div>
+        <div class="md:col-span-2">
+          <h2 class="text-2xl font-semibold text-gray-900">About Me</h2>
+          <p class="mt-4 text-gray-700">Born on 23rd July 2001, I am currently pursuing Data Science at the University of Illinois at Chicago (UIC). I convert complex datasets into strategic insights and build data-driven solutions that help teams make better decisions.</p>
+
+          <div class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="bg-white p-4 rounded-lg shadow">
+              <h3 class="font-semibold text-primary">Background</h3>
+              <p class="text-sm text-gray-600 mt-2">Raised across India (Hyderabad, Bangalore, Himachal Pradesh and the Northeast) — adaptability and a global mindset are core strengths.</p>
+            </div>
+            <div class="bg-white p-4 rounded-lg shadow">
+              <h3 class="font-semibold text-primary">Professional Focus</h3>
+              <p class="text-sm text-gray-600 mt-2">I build recommendation systems, predictive models and analytics pipelines using Python, R, SQL and cloud-friendly tooling.</p>
+            </div>
+            <div class="bg-white p-4 rounded-lg shadow">
+              <h3 class="font-semibold text-primary">Goals</h3>
+              <p class="text-sm text-gray-600 mt-2">I aim to develop responsible AI solutions that combine business value with ethical considerations and social impact.</p>
+            </div>
+          </div>
+
+          <!-- AI / Synthetic Intelligence paragraph (user asked to add these topics) -->
+          <div class="mt-6 bg-gradient-to-r from-white to-gray-50 p-4 rounded-lg shadow">
+            <h3 class="font-semibold text-primary">AI & Synthetic Intelligence</h3>
+            <p class="text-gray-700 mt-2">I've studied modern AI approaches including Generative AI (GenAI), Retrieval-Augmented Generation (RAG), Large Language Models (LLMs) and agent-based systems. These technologies enable fast knowledge synthesis, automated workflows, and conversational interfaces. Synthetic Intelligence — engineering AI systems end-to-end — can automate manual processes, personalize customer interactions at scale, and surface actionable insights from business data, improving efficiency and decision-making across operations.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Skills -->
+    <section id="Skills" class="px-6 py-12 bg-white">
+      <h2 class="text-2xl font-semibold text-gray-900">Skills</h2>
+      <div class="mt-6 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <div class="p-4 bg-gray-50 rounded-lg shadow">
+          <h4 class="font-semibold text-primary">Programming</h4>
+          <p class="mt-2 text-sm text-gray-600">Python, R, SQL, C++, Java, C, SAS</p>
+        </div>
+        <div class="p-4 bg-gray-50 rounded-lg shadow">
+          <h4 class="font-semibold text-primary">Data Analysis</h4>
+          <p class="mt-2 text-sm text-gray-600">Exploratory Data Analysis, Hypothesis Testing, Business Analytics</p>
+        </div>
+        <div class="p-4 bg-gray-50 rounded-lg shadow">
+          <h4 class="font-semibold text-primary">Machine Learning</h4>
+          <p class="mt-2 text-sm text-gray-600">Decision Trees, Random Forests, Neural Networks, Deep Learning, Predictive Modeling</p>
+        </div>
+        <div class="p-4 bg-gray-50 rounded-lg shadow">
+          <h4 class="font-semibold text-primary">Libraries</h4>
+          <p class="mt-2 text-sm text-gray-600">NumPy, Pandas, Scikit-learn, TensorFlow, Matplotlib, Seaborn</p>
+        </div>
+        <div class="p-4 bg-gray-50 rounded-lg shadow">
+          <h4 class="font-semibold text-primary">Databases & Tools</h4>
+          <p class="mt-2 text-sm text-gray-600">MySQL, MariaDB, PowerBI, Tableau, GitHub, VS Code</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Projects -->
+    <section id="Projects" class="px-6 py-12">
+      <h2 class="text-2xl font-semibold text-gray-900">Featured Projects</h2>
+      <div class="mt-6 grid gap-6 md:grid-cols-2">
+
+        <!-- Tata -->
+        <article class="bg-white rounded-lg shadow overflow-hidden">
+          <img src="project images/tata.jpg" alt="Tata Data Visualization" class="w-full h-56 object-cover">
+          <div class="p-4">
+            <h3 class="font-semibold text-primary">Tata Data Visualization</h3>
+            <p class="text-sm text-gray-600 mt-2">Created executive-level dashboards and visual narratives to help leadership make data-driven decisions during a Forage simulation with Tata Consultancy Services.</p>
+            <div class="mt-3 flex gap-2">
+              <a href="https://public.tableau.com/app/profile/venkata.sai.mithil.ravulapalli/viz/BuisnessAnalysisVisuals/Dashboard1" class="text-sm bg-gray-800 text-white px-3 py-1 rounded">Visualizations</a>
+              <button data-target="tata" class="details-toggle text-sm bg-primary text-white px-3 py-1 rounded">Show More</button>
+            </div>
+            <div class="mt-3 hidden details-content text-sm text-gray-700" id="tata">Empowered decision making by translating complex datasets into concise dashboards for executive review. Focused on clarity, KPI design, and storytelling through visuals.</div>
+          </div>
+        </article>
+
+        <!-- DSA -->
+        <article class="bg-white rounded-lg shadow overflow-hidden">
+          <img src="project images/DSA.png" alt="DSA Projects" class="w-full h-56 object-cover">
+          <div class="p-4">
+            <h3 class="font-semibold text-primary">Data Structure Algorithms</h3>
+            <p class="text-sm text-gray-600 mt-2">Implemented BSTs, graph algorithms, encryption techniques and efficient data structures in C++ for performance-critical tasks.</p>
+            <div class="mt-3 flex gap-2">
+              <a href="https://github.com/Mithil0723/DSA" class="text-sm bg-gray-800 text-white px-3 py-1 rounded">Source Code</a>
+              <button data-target="dsa" class="details-toggle text-sm bg-primary text-white px-3 py-1 rounded">Show More</button>
+            </div>
+            <div class="mt-3 hidden details-content text-sm text-gray-700" id="dsa">Projects include a priority queue using BSTs, cipher systems combining Caesar and Vigenère, and a graph-based campus navigation using OpenStreetMap.</div>
+          </div>
+        </article>
+
+        <!-- Recommendation -->
+        <article class="bg-white rounded-lg shadow overflow-hidden">
+          <img src="project images/Recommendation.png" alt="Recommendation System" class="w-full h-56 object-cover">
+          <div class="p-4">
+            <h3 class="font-semibold text-primary">Recommendation System</h3>
+            <p class="text-sm text-gray-600 mt-2">Built SVD-based and deep-learning recommendation approaches; addressed bias, cold-start and scaled models for production-ready pipelines.</p>
+            <div class="mt-3 flex gap-2">
+              <a href="https://github.com/Mithil0723/Recommendation-System/blob/main/Recommendation_Systems_Learner_Notebook_Full_Code.ipynb" class="text-sm bg-gray-800 text-white px-3 py-1 rounded">Source Code</a>
+              <button data-target="reco" class="details-toggle text-sm bg-primary text-white px-3 py-1 rounded">Show More</button>
+            </div>
+            <div class="mt-3 hidden details-content text-sm text-gray-700" id="reco">Used TF-IDF, matrix factorization (SVD) and TensorFlow experiments to create and evaluate recommender systems with focus on fairness and scalability.</div>
+          </div>
+        </article>
+
+        <!-- Predictive Analysis -->
+        <article class="bg-white rounded-lg shadow overflow-hidden">
+          <img src="project images/Predictive analysis.png" alt="Predictive Analysis" class="w-full h-56 object-cover">
+          <div class="p-4">
+            <h3 class="font-semibold text-primary">Customer Prediction Model</h3>
+            <p class="text-sm text-gray-600 mt-2">Built classification models (Decision Trees, Random Forests) with careful preprocessing and hyperparameter tuning to identify high-potential customers.</p>
+            <div class="mt-3 flex gap-2">
+              <a href="https://github.com/Mithil0723/Predicting-Potential-Customers/blob/main/Learner%2BNotebook%2B-%2BFull%2BCode%2BVersion%2B-%2BPotential%2BCustomers%2BPrediction.ipynb" class="text-sm bg-gray-800 text-white px-3 py-1 rounded">Source Code</a>
+              <button data-target="pred" class="details-toggle text-sm bg-primary text-white px-3 py-1 rounded">Show More</button>
+            </div>
+            <div class="mt-3 hidden details-content text-sm text-gray-700" id="pred">Work focused on data cleaning, feature engineering and evaluation using cross-validation, confusion matrices and ROC analysis to improve model robustness.</div>
+          </div>
+        </article>
+
+        <!-- Projects -->
+    <section id="Projects" class="px-6 py-12">
+      <h2 class="text-2xl font-semibold text-gray-900">Featured Projects</h2>
+      <div class="mt-6 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+
+        <!-- Project Card 1: Tata -->
+        <div class="project-card bg-white rounded-lg shadow-lg overflow-hidden transform hover:-translate-y-2 transition-transform duration-300">
+          <img src="project images/tata.jpg" alt="Tata Data Visualization" class="w-full h-56 object-cover">
+          <div class="p-6">
+            <h3 class="font-semibold text-xl text-primary">Tata Data Visualization</h3>
+            <p class="text-sm text-gray-600 mt-2">Executive-level dashboards for data-driven decisions.</p>
+            <button class="modal-open mt-4 text-sm bg-primary text-white px-4 py-2 rounded-full hover:bg-primary-dark transition-colors duration-300" data-modal="modal-tata">View Case Study</button>
+          </div>
+        </div>
+
+        <!-- Project Card 2: DSA -->
+        <div class="project-card bg-white rounded-lg shadow-lg overflow-hidden transform hover:-translate-y-2 transition-transform duration-300">
+          <img src="project images/DSA.png" alt="DSA Projects" class="w-full h-56 object-cover">
+          <div class="p-6">
+            <h3 class="font-semibold text-xl text-primary">Data Structure Algorithms</h3>
+            <p class="text-sm text-gray-600 mt-2">Performance-critical data structures in C++.</p>
+            <button class="modal-open mt-4 text-sm bg-primary text-white px-4 py-2 rounded-full hover:bg-primary-dark transition-colors duration-300" data-modal="modal-dsa">View Case Study</button>
+          </div>
+        </div>
+
+        <!-- Project Card 3: Recommendation System -->
+        <div class="project-card bg-white rounded-lg shadow-lg overflow-hidden transform hover:-translate-y-2 transition-transform duration-300">
+          <img src="project images/Recommendation.png" alt="Recommendation System" class="w-full h-56 object-cover">
+          <div class="p-6">
+            <h3 class="font-semibold text-xl text-primary">Recommendation System</h3>
+            <p class="text-sm text-gray-600 mt-2">SVD-based and deep-learning recommendation models.</p>
+            <button class="modal-open mt-4 text-sm bg-primary text-white px-4 py-2 rounded-full hover:bg-primary-dark transition-colors duration-300" data-modal="modal-reco">View Case Study</button>
+          </div>
+        </div>
+
+        <!-- Project Card 4: Predictive Analysis -->
+        <div class="project-card bg-white rounded-lg shadow-lg overflow-hidden transform hover:-translate-y-2 transition-transform duration-300">
+          <img src="project images/Predictive analysis.png" alt="Predictive Analysis" class="w-full h-56 object-cover">
+          <div class="p-6">
+            <h3 class="font-semibold text-xl text-primary">Customer Prediction Model</h3>
+            <p class="text-sm text-gray-600 mt-2">Classification models to identify high-potential customers.</p>
+            <button class="modal-open mt-4 text-sm bg-primary text-white px-4 py-2 rounded-full hover:bg-primary-dark transition-colors duration-300" data-modal="modal-pred">View Case Study</button>
+          </div>
+        </div>
+
+        <!-- Project Card 5: FoodHub -->
+        <div class="project-card bg-white rounded-lg shadow-lg overflow-hidden transform hover:-translate-y-2 transition-transform duration-300">
+          <img src="project images/FoodHub.png" alt="FoodHub Order Analysis" class="w-full h-56 object-cover">
+          <div class="p-6">
+            <h3 class="font-semibold text-xl text-primary">FoodHub Order Analysis</h3>
+            <p class="text-sm text-gray-600 mt-2">EDA and visualizations for operational decisions.</p>
+            <button class="modal-open mt-4 text-sm bg-primary text-white px-4 py-2 rounded-full hover:bg-primary-dark transition-colors duration-300" data-modal="modal-foodhub">View Case Study</button>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Modals -->
+    <!-- Modal Tata -->
+    <div id="modal-tata" class="modal-container hidden">
+      <div class="modal-content bg-white rounded-lg shadow-xl p-8 max-w-2xl w-full">
+        <button class="modal-close absolute top-4 right-4 text-gray-500 hover:text-gray-800">&times;</button>
+        <h3 class="text-2xl font-bold text-primary mb-4">Tata Data Visualization</h3>
+        <p><strong>Objective:</strong> To create executive-level dashboards and visual narratives that empower leadership to make data-driven decisions during a Forage simulation with Tata Consultancy Services.</p>
+        <p class="mt-4"><strong>Technologies Used:</strong> Tableau, SQL</p>
+        <p class="mt-4"><strong>Process:</strong> I translated complex datasets into concise and intuitive dashboards. The focus was on Key Performance Indicator (KPI) design, clarity, and creating compelling visual stories that would resonate with an executive audience. The process involved understanding the business requirements, identifying key metrics, and iterating on the dashboard design to ensure maximum impact.</p>
+        <p class="mt-4"><strong>Outcome:</strong> The final dashboards provided a clear and actionable overview of the business, enabling stakeholders to quickly grasp trends and make informed decisions. The project demonstrated my ability to bridge the gap between raw data and strategic insights.</p>
+        <a href="https://public.tableau.com/app/profile/venkata.sai.mithil.ravulapalli/viz/BuisnessAnalysisVisuals/Dashboard1" class="mt-6 inline-block bg-gray-800 text-white px-4 py-2 rounded hover:bg-gray-700">View Visualizations</a>
+      </div>
+    </div>
+
+    <!-- Modal DSA -->
+    <div id="modal-dsa" class="modal-container hidden">
+      <div class="modal-content bg-white rounded-lg shadow-xl p-8 max-w-2xl w-full">
+        <button class="modal-close absolute top-4 right-4 text-gray-500 hover:text-gray-800">&times;</button>
+        <h3 class="text-2xl font-bold text-primary mb-4">Data Structure Algorithms</h3>
+        <p><strong>Objective:</strong> To implement and apply fundamental data structures and algorithms in C++ for performance-critical tasks, demonstrating a strong understanding of computational efficiency.</p>
+        <p class="mt-4"><strong>Technologies Used:</strong> C++, OpenStreetMap</p>
+        <p class="mt-4"><strong>Process:</strong> This collection of projects involved implementing various data structures from scratch, including Binary Search Trees (BSTs) for priority queues, and graph algorithms for a campus navigation system using OpenStreetMap data. I also developed encryption techniques by combining Caesar and Vigenère ciphers, focusing on the trade-offs between security and performance.</p>
+        <p class="mt-4"><strong>Outcome:</strong> These projects solidified my understanding of algorithmic complexity and data structure optimization. The campus navigation system, for example, efficiently found the shortest path between two points, showcasing the practical application of graph theory. The encryption project provided insights into building secure and efficient systems.</p>
+        <a href="https://github.com/Mithil0723/DSA" class="mt-6 inline-block bg-gray-800 text-white px-4 py-2 rounded hover:bg-gray-700">View Source Code</a>
+      </div>
+    </div>
+
+    <!-- Modal Recommendation System -->
+    <div id="modal-reco" class="modal-container hidden">
+      <div class="modal-content bg-white rounded-lg shadow-xl p-8 max-w-2xl w-full">
+        <button class="modal-close absolute top-4 right-4 text-gray-500 hover:text-gray-800">&times;</button>
+        <h3 class="text-2xl font-bold text-primary mb-4">Recommendation System</h3>
+        <p><strong>Objective:</strong> To build and evaluate both traditional and deep-learning-based recommendation systems, addressing common challenges such as bias, the cold-start problem, and scalability.</p>
+        <p class="mt-4"><strong>Technologies Used:</strong> Python, TensorFlow, Scikit-learn, Pandas</p>
+        <p class="mt-4"><strong>Process:</strong> I experimented with various recommendation approaches, including TF-IDF for content-based filtering, Singular Value Decomposition (SVD) for collaborative filtering, and deep learning models using TensorFlow. A significant part of the project was dedicated to evaluating the models for fairness and accuracy, and designing them to be scalable for production environments.</p>
+        <p class="mt-4"><strong>Outcome:</strong> The project resulted in a comprehensive understanding of different recommendation techniques and their trade-offs. I developed a robust pipeline for preprocessing data, training models, and evaluating their performance, with a strong focus on creating fair and scalable systems.</p>
+        <a href="https://github.com/Mithil0723/Recommendation-System/blob/main/Recommendation_Systems_Learner_Notebook_Full_Code.ipynb" class="mt-6 inline-block bg-gray-800 text-white px-4 py-2 rounded hover:bg-gray-700">View Source Code</a>
+      </div>
+    </div>
+
+    <!-- Modal Predictive Analysis -->
+    <div id="modal-pred" class="modal-container hidden">
+      <div class="modal-content bg-white rounded-lg shadow-xl p-8 max-w-2xl w-full">
+        <button class="modal-close absolute top-4 right-4 text-gray-500 hover:text-gray-800">&times;</button>
+        <h3 class="text-2xl font-bold text-primary mb-4">Customer Prediction Model</h3>
+        <p><strong>Objective:</strong> To build classification models that identify high-potential customers, enabling targeted marketing efforts and improving conversion rates.</p>
+        <p class="mt-4"><strong>Technologies Used:</strong> Python, Scikit-learn, Pandas</p>
+        <p class="mt-4"><strong>Process:</strong> The project involved extensive data cleaning and feature engineering to prepare the dataset for modeling. I then trained and tuned Decision Tree and Random Forest models, using techniques like cross-validation, confusion matrices, and ROC analysis to evaluate and enhance their performance and robustness.</p>
+        <p class="mt-4"><strong>Outcome:</strong> The final model was able to predict with high accuracy which customers were most likely to make a purchase. This project highlighted my skills in the entire machine learning workflow, from data preprocessing and model selection to evaluation and interpretation.</p>
+        <a href="https://github.com/Mithil0723/Predicting-Potential-Customers/blob/main/Learner%2BNotebook%2B-%2BFull%2BCode%2BVersion%2B-%2BPotential%2BCustomers%2BPrediction.ipynb" class="mt-6 inline-block bg-gray-800 text-white px-4 py-2 rounded hover:bg-gray-700">View Source Code</a>
+      </div>
+    </div>
+
+    <!-- Modal FoodHub -->
+    <div id="modal-foodhub" class="modal-container hidden">
+      <div class="modal-content bg-white rounded-lg shadow-xl p-8 max-w-2xl w-full">
+        <button class="modal-close absolute top-4 right-4 text-gray-500 hover:text-gray-800">&times;</button>
+        <h3 class="text-2xl font-bold text-primary mb-4">FoodHub Order Analysis</h3>
+        <p><strong>Objective:</strong> To perform Exploratory Data Analysis (EDA) and create visualizations that guide operational decisions and reveal customer preferences for a food delivery service.</p>
+        <p class="mt-4"><strong>Technologies Used:</strong> Python, Pandas, Seaborn, Matplotlib</p>
+        <p class="mt-4"><strong>Process:</strong> I analyzed a large dataset of food orders to identify patterns and trends. This included exploring order dynamics, identifying peak order times, and analyzing restaurant-level performance. I used Pandas for data manipulation and Seaborn/Matplotlib to create a variety of visualizations to communicate the findings.</p>
+        <p class="mt-4"><strong>Outcome:</strong> The analysis provided valuable insights that could be used to optimize operations, such as staffing during peak hours and promoting popular menu items. The project demonstrated my ability to extract actionable insights from raw data and present them in a clear and compelling way.</p>
+        <a href="https://github.com/Mithil0723/Food-Hub-Order-Analysis/blob/main/FDS_Project_LearnerNotebook_FullCode.ipynb" class="mt-6 inline-block bg-gray-800 text-white px-4 py-2 rounded hover:bg-gray-700">View Source Code</a>
+      </div>
+    </div>
+
+      </div>
+    </section>
+
+    <!-- Education -->
+    <section id="Education" class="px-6 py-12 bg-white">
+      <h2 class="text-2xl font-semibold text-gray-900">Education</h2>
+      <div class="mt-6 bg-gray-50 p-6 rounded-lg shadow">
+        <h3 class="font-semibold text-primary">University of Illinois at Chicago</h3>
+        <p class="text-sm text-gray-600 mt-1">Bachelors — Data Science. Focus on Machine Learning and Statistical Analysis. Chicago, Illinois.</p>
+      </div>
+    </section>
+
+    <!-- Contact -->
+    <section id="Contact" class="px-6 py-12">
+      <h2 class="text-2xl font-semibold text-gray-900">Get in touch</h2>
+      <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="bg-white p-6 rounded-lg shadow">
+          <h4 class="font-semibold text-primary">Contact Info</h4>
+          <p class="mt-3 text-sm text-gray-600"><i class="fa-solid fa-envelope mr-2 text-primary"></i> vravu3@uic.edu</p>
+          <p class="mt-1 text-sm text-gray-600"><i class="fa-solid fa-phone mr-2 text-primary"></i> +1 (630) 632-7037</p>
+          <div class="mt-3 flex gap-3">
+            <a href="https://www.linkedin.com/in/mithil-ravulapalli-24999127a" class="text-sm text-gray-800 hover:text-primary"><i class="fa-brands fa-linkedin mr-2"></i>LinkedIn</a>
+            <a href="https://github.com/Mithil0723" class="text-sm text-gray-800 hover:text-primary"><i class="fa-brands fa-github mr-2"></i>GitHub</a>
+          </div>
+        </div>
+
+        <form action="https://formspree.io/f/xjkkerbj" method="POST" class="bg-white p-6 rounded-lg shadow" id="contactForm">
+          <h4 class="font-semibold text-primary">Message Me</h4>
+          <label class="block mt-3 text-sm text-gray-600">Name <input required name="name" class="w-full mt-1 p-2 border rounded" placeholder="Your name"></label>
+          <label class="block mt-3 text-sm text-gray-600">Email <input required type="email" name="email" class="w-full mt-1 p-2 border rounded" placeholder="you@example.com"></label>
+          <label class="block mt-3 text-sm text-gray-600">Message <textarea required name="message" rows="4" class="w-full mt-1 p-2 border rounded" placeholder="Tell me about your project"></textarea></label>
+          <button type="submit" class="mt-4 bg-primary text-white px-4 py-2 rounded">Send Message</button>
+        </form>
+      </div>
+
+      <div class="mt-8">
+        <div class="map rounded-lg overflow-hidden shadow">
+          <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d190255.33858125397!2d-87.87240611091851!3d41.83359482048457!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x880e2c3cd0f4cbed%3A0xafe0a6ad09c0c000!2sChicago%2C%20IL!5e0!3m2!1sen!2sus!4v1703912161317!5m2!1sen!2sus" width="100%" height="300" style="border:0;" allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+        </div>
+      </div>
+    </section>
   </main>
 
-  <script src="main.js"></script>
+  <footer class="mt-12 py-6 bg-gray-800 text-gray-200">
+    <div class="max-w-6xl mx-auto px-6 text-center">
+      <p>&copy; 2024 Mithil Ravulapalli — Portfolio</p>
+    </div>
+  </footer>
+
+  <!-- Inline JavaScript (scoped inside an IIFE) -->
+  <script>
+    (function () {
+      'use strict';
+
+      /* Particle background for hero canvas */
+      (function initHeroParticles() {
+        const canvas = document.getElementById('heroCanvas');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        let w = canvas.width = window.innerWidth;
+        let h = canvas.height = window.innerHeight;
+        const particles = [];
+        // More particles for denser effect
+        const PARTICLE_COUNT = Math.round((w * h) / 40000) + 60;
+        const mouse = { x: w / 2, y: h / 2, vx: 0, vy: 0, active: false };
+
+        function rand(min, max) { return Math.random() * (max - min) + min; }
+
+        function createParticles() {
+          particles.length = 0;
+          for (let i = 0; i < PARTICLE_COUNT; i++) {
+            particles.push({
+              x: Math.random() * w,
+              y: Math.random() * h,
+              r: rand(1.2, 2.8),
+              vx: rand(-0.18, 0.18),
+              vy: rand(-0.18, 0.18),
+              hue: rand(220, 285),
+              alpha: rand(0.32, 0.95)
+            });
+          }
+        }
+
+        function resize() {
+          w = canvas.width = window.innerWidth;
+          h = canvas.height = window.innerHeight;
+          createParticles();
+        }
+
+        function draw() {
+          ctx.clearRect(0, 0, w, h);
+          // blue-purple background gradient
+          const g = ctx.createLinearGradient(0, 0, w, h);
+          g.addColorStop(0, 'rgba(30,34,60,0.7)');
+          g.addColorStop(1, 'rgba(40,20,70,0.7)');
+          ctx.fillStyle = g;
+          ctx.fillRect(0, 0, w, h);
+
+          // update & draw particles
+          particles.forEach(p => {
+            // simple attraction to mouse when active
+            if (mouse.active) {
+              const dx = mouse.x - p.x;
+              const dy = mouse.y - p.y;
+              const dist = Math.sqrt(dx * dx + dy * dy) + 0.001;
+              const force = Math.min(120 / dist, 0.8);
+              p.vx += (dx / dist) * force * 0.018;
+              p.vy += (dy / dist) * force * 0.018;
+            }
+
+            // gentle friction and movement
+            p.vx *= 0.97;
+            p.vy *= 0.97;
+            p.x += p.vx;
+            p.y += p.vy;
+
+            // wrap edges
+            if (p.x < -10) p.x = w + 10;
+            if (p.x > w + 10) p.x = -10;
+            if (p.y < -10) p.y = h + 10;
+            if (p.y > h + 10) p.y = -10;
+
+            // draw with glow
+            ctx.save();
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+            ctx.shadowColor = `hsla(${p.hue}, 90%, 70%, 0.7)`;
+            ctx.shadowBlur = 12;
+            ctx.fillStyle = `hsla(${p.hue}, 80%, 70%, ${p.alpha})`;
+            ctx.fill();
+            ctx.restore();
+          });
+
+          // connect nearby particles with colored lines
+          for (let i = 0; i < particles.length; i++) {
+            for (let j = i + 1; j < particles.length; j++) {
+              const a = particles[i];
+              const b = particles[j];
+              const dx = a.x - b.x;
+              const dy = a.y - b.y;
+              const d2 = dx * dx + dy * dy;
+              if (d2 < 12000) {
+                const alpha = 0.16 - (d2 / 12000) * 0.13;
+                ctx.save();
+                ctx.strokeStyle = `hsla(260,80%,80%,${Math.max(0, alpha)})`;
+                ctx.lineWidth = 0.7;
+                ctx.beginPath();
+                ctx.moveTo(a.x, a.y);
+                ctx.lineTo(b.x, b.y);
+                ctx.stroke();
+                ctx.restore();
+              }
+            }
+          }
+
+          requestAnimationFrame(draw);
+        }
+
+        // mouse handlers
+        window.addEventListener('mousemove', (e) => {
+          const rect = canvas.getBoundingClientRect();
+          mouse.x = e.clientX - rect.left;
+          mouse.y = e.clientY - rect.top;
+          mouse.active = true;
+        }, { passive: true });
+
+        window.addEventListener('mouseleave', () => { mouse.active = false; }, { passive: true });
+        window.addEventListener('resize', resize, { passive: true });
+
+        createParticles();
+        draw();
+      })();
+
+      // Typing animation
+      const roles = ['Data Science Student', 'Machine Learning Enthusiast', 'Problem Solver'];
+      let roleIndex = 0, charIndex = 0, isDeleting = false;
+      const typedTextElement = document.getElementById('typed-text');
+
+      function typeText() {
+        if (!typedTextElement) return;
+        const current = roles[roleIndex];
+        if (!isDeleting) {
+          typedTextElement.textContent = current.substring(0, charIndex + 1);
+          charIndex++;
+        } else {
+          typedTextElement.textContent = current.substring(0, charIndex - 1);
+          charIndex--;
+        }
+
+        if (!isDeleting && charIndex === current.length) {
+          setTimeout(() => isDeleting = true, 1800);
+        } else if (isDeleting && charIndex === 0) {
+          isDeleting = false;
+          roleIndex = (roleIndex + 1) % roles.length;
+        }
+
+        const speed = isDeleting ? 80 : 160;
+        setTimeout(typeText, speed);
+      }
+      typeText();
+
+      // Mobile menu toggle
+      const menuToggle = document.getElementById('menuToggle');
+      const mobileMenu = document.getElementById('mobileMenu');
+      menuToggle && menuToggle.addEventListener('click', () => {
+        mobileMenu.classList.toggle('hidden');
+      });
+
+      // Smooth scrolling for anchor links
+      document.querySelectorAll('a[href^="#"]').forEach(a => {
+        a.addEventListener('click', function (e) {
+          const href = this.getAttribute('href');
+          if (href && href.startsWith('#')) {
+            e.preventDefault();
+            const el = document.querySelector(href);
+            if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            if (mobileMenu && !mobileMenu.classList.contains('hidden')) mobileMenu.classList.add('hidden');
+          }
+        });
+      });
+
+      // Project modal system
+      const modalData = {
+        tata: {
+          title: 'Tata Data Visualization',
+          role: 'Data Visualization Engineer',
+          duration: '4 weeks',
+          tech: ['Tableau', 'SQL', 'Excel', 'Data Analysis'],
+          objective: 'Create executive-level dashboards that enable data-driven decision making at Tata Consultancy Services.',
+          process: [
+            'Analyzed raw retail data to identify key performance indicators',
+            'Designed intuitive visualizations for complex sales patterns',
+            'Built interactive Tableau dashboards with drill-down capabilities',
+            'Implemented narrative-driven data storytelling techniques'
+          ],
+          outcome: 'Delivered a suite of interactive dashboards that helped leadership track KPIs and identify growth opportunities.',
+          link: 'https://public.tableau.com/app/profile/venkata.sai.mithil.ravulapalli/viz/BuisnessAnalysisVisuals/Dashboard1'
+        },
+        dsa: {
+          title: 'Data Structure Algorithms',
+          role: 'Algorithm Developer',
+          duration: '12 weeks',
+          tech: ['C++', 'BST', 'Graph Algorithms', 'OpenStreetMap'],
+          objective: 'Implement efficient data structures and algorithms for performance-critical applications.',
+          process: [
+            'Developed a priority queue system using Binary Search Trees',
+            'Created hybrid encryption combining Caesar and Vigenère ciphers',
+            'Built a graph-based navigation system using OpenStreetMap data',
+            'Optimized algorithms for space and time complexity'
+          ],
+          outcome: 'Successfully implemented and documented a suite of optimized data structures with practical applications.',
+          link: 'https://github.com/Mithil0723/DSA'
+        },
+        reco: {
+          title: 'Recommendation System',
+          role: 'ML Engineer',
+          duration: '8 weeks',
+          tech: ['Python', 'TensorFlow', 'SVD', 'scikit-learn'],
+          objective: 'Design and implement a scalable recommendation system with bias handling and cold-start mitigation.',
+          process: [
+            'Implemented Singular Value Decomposition (SVD) for collaborative filtering',
+            'Built deep learning models for content-based recommendations',
+            'Addressed algorithmic bias in recommendation outputs',
+            'Developed strategies for cold-start problem'
+          ],
+          outcome: 'Created a production-ready recommendation engine with 92% user satisfaction rate in testing.',
+          link: 'https://github.com/Mithil0723/Recommendation-System'
+        },
+        pred: {
+          title: 'Customer Prediction Model',
+          role: 'Data Scientist',
+          duration: '6 weeks',
+          tech: ['Python', 'Random Forests', 'sklearn', 'Feature Engineering'],
+          objective: 'Build ML models to identify high-potential customers for targeted marketing.',
+          process: [
+            'Performed extensive data cleaning and feature engineering',
+            'Implemented and tuned various classification models',
+            'Conducted cross-validation and hyperparameter optimization',
+            'Created evaluation metrics and ROC analysis'
+          ],
+          outcome: 'Delivered a model with 88% accuracy in identifying high-value customer prospects.',
+          link: 'https://github.com/Mithil0723/Predicting-Potential-Customers'
+        },
+        foodhub: {
+          title: 'FoodHub Order Analysis',
+          role: 'Data Analyst',
+          duration: '4 weeks',
+          tech: ['Python', 'Pandas', 'Seaborn', 'Statistical Analysis'],
+          objective: 'Analyze order patterns and customer behavior to optimize restaurant operations.',
+          process: [
+            'Cleaned and processed large-scale order data',
+            'Identified peak ordering times and popular cuisines',
+            'Created visualizations for customer preferences',
+            'Generated actionable insights for restaurants'
+          ],
+          outcome: 'Provided data-backed recommendations that increased average order value by 15%.',
+          link: 'https://github.com/Mithil0723/Food-Hub-Order-Analysis'
+        }
+      };
+
+      let currentModal = null;
+      
+      function createModal(data) {
+        const modal = document.createElement('div');
+        modal.className = 'fixed inset-0 z-50 flex items-center justify-center p-4 opacity-0 transition-opacity duration-300';
+        modal.innerHTML = `
+          <div class="fixed inset-0 bg-black/70 backdrop-blur-sm"></div>
+          <div class="relative bg-white rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-auto">
+            <button class="absolute right-4 top-4 text-gray-500 hover:text-gray-700 focus:outline-none" aria-label="Close modal">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+            <div class="p-8">
+              <h2 class="text-3xl font-bold text-gray-900">${data.title}</h2>
+              
+              <div class="mt-6 grid gap-6 md:grid-cols-3 text-sm">
+                <div>
+                  <h4 class="font-semibold text-gray-900">Role</h4>
+                  <p class="mt-1 text-gray-600">${data.role}</p>
+                </div>
+                <div>
+                  <h4 class="font-semibold text-gray-900">Duration</h4>
+                  <p class="mt-1 text-gray-600">${data.duration}</p>
+                </div>
+                <div>
+                  <h4 class="font-semibold text-gray-900">Technologies</h4>
+                  <p class="mt-1 text-gray-600">${data.tech.join(', ')}</p>
+                </div>
+              </div>
+
+              <div class="mt-8">
+                <h3 class="text-xl font-semibold text-gray-900">Project Objective</h3>
+                <p class="mt-2 text-gray-600">${data.objective}</p>
+              </div>
+
+              <div class="mt-8">
+                <h3 class="text-xl font-semibold text-gray-900">Development Process</h3>
+                <ul class="mt-4 space-y-3">
+                  ${data.process.map(step => `
+                    <li class="flex items-start">
+                      <svg class="w-5 h-5 text-primary mt-1 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                      </svg>
+                      <span class="text-gray-600">${step}</span>
+                    </li>
+                  `).join('')}
+                </ul>
+              </div>
+
+              <div class="mt-8">
+                <h3 class="text-xl font-semibold text-gray-900">Outcome</h3>
+                <p class="mt-2 text-gray-600">${data.outcome}</p>
+              </div>
+
+              <div class="mt-8 flex justify-end">
+                <a href="${data.link}" target="_blank" rel="noopener" class="inline-flex items-center px-4 py-2 bg-primary text-white rounded-lg hover:bg-opacity-90 transition-colors">
+                  View Project
+                  <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                  </svg>
+                </a>
+              </div>
+            </div>
+          </div>
+        `;
+
+        document.body.appendChild(modal);
+        requestAnimationFrame(() => modal.classList.add('opacity-100'));
+
+        // Close handlers
+        const closeModal = () => {
+          modal.classList.remove('opacity-100');
+          setTimeout(() => {
+            document.body.removeChild(modal);
+            currentModal = null;
+          }, 300);
+        };
+
+        modal.querySelector('button').addEventListener('click', closeModal);
+        modal.querySelector('.fixed').addEventListener('click', (e) => {
+          if (e.target === e.currentTarget) closeModal();
+        });
+
+        document.addEventListener('keydown', function closeOnEscape(e) {
+          if (e.key === 'Escape') {
+            closeModal();
+            document.removeEventListener('keydown', closeOnEscape);
+          }
+        });
+
+        currentModal = modal;
+      }
+
+      // Project card click handlers
+      document.querySelectorAll('[data-modal]').forEach(card => {
+        card.addEventListener('click', () => {
+          const modalId = card.getAttribute('data-modal');
+          if (modalData[modalId]) {
+            if (currentModal) currentModal.querySelector('button').click();
+            createModal(modalData[modalId]);
+          }
+        });
+      });
+
+      // Contact form validation (client side)
+      const contactForm = document.getElementById('contactForm');
+      contactForm && contactForm.addEventListener('submit', function (e) {
+        const name = this.querySelector('[name="name"]').value.trim();
+        const email = this.querySelector('[name="email"]').value.trim();
+        const message = this.querySelector('[name="message"]').value.trim();
+        if (!name || !email || !message) {
+          e.preventDefault();
+          alert('Please fill out all fields before submitting.');
+        }
+      });
+
+      // Accessibility: close mobile menu on escape
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && mobileMenu && !mobileMenu.classList.contains('hidden')) {
+          mobileMenu.classList.add('hidden');
+        }
+      });
+
+      // Hide-on-scroll header behavior
+      (function () {
+        const nav = document.getElementById('topNav');
+        if (!nav) return;
+        let lastScroll = window.scrollY || 0;
+        let ticking = false;
+        window.addEventListener('scroll', () => {
+          const current = window.scrollY || 0;
+          if (!ticking) {
+            window.requestAnimationFrame(() => {
+              if (current > lastScroll && current > 80) {
+                nav.classList.add('nav-hidden');
+              } else {
+                nav.classList.remove('nav-hidden');
+              }
+              lastScroll = current <= 0 ? 0 : current;
+              ticking = false;
+            });
+            ticking = true;
+          }
+        }, { passive: true });
+      })();
+
+    })();
+  </script>
+
 </body>
 
 </html>

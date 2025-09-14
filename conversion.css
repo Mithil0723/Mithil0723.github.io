@@ -1,0 +1,98 @@
+/* Conversion-optimized styles */
+
+/* Hero CTAs */
+.cta-container {
+    margin-top: 2rem;
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.primary-cta, .secondary-cta {
+    padding: 1rem 2rem;
+    border-radius: 5px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+
+.primary-cta {
+    background: #007bff;
+    color: white;
+}
+
+.secondary-cta {
+    border: 2px solid #007bff;
+    color: #007bff;
+}
+
+.primary-cta:hover {
+    background: #0056b3;
+    transform: translateY(-2px);
+}
+
+.secondary-cta:hover {
+    background: #f8f9fa;
+    transform: translateY(-2px);
+}
+
+/* Solution Section */
+.solution-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    margin: 2rem 0;
+}
+
+.challenge-card, .solution-card {
+    background: var(--sidebgColor);
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.challenge-card h3, .solution-card h3 {
+    color: #007bff;
+    margin-bottom: 1.5rem;
+}
+
+.challenge-card ul, .solution-card ul {
+    list-style: none;
+    padding: 0;
+}
+
+.challenge-card li, .solution-card li {
+    margin-bottom: 1rem;
+    padding-left: 1.5rem;
+    position: relative;
+}
+
+.challenge-card li:before {
+    content: "✗";
+    color: #dc3545;
+    position: absolute;
+    left: 0;
+}
+
+.solution-card li:before {
+    content: "✓";
+    color: #28a745;
+    position: absolute;
+    left: 0;
+}
+
+.solution-cta {
+    display: inline-block;
+    margin-top: 1.5rem;
+    padding: 0.75rem 1.5rem;
+    background: #007bff;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    transition: all 0.3s ease;
+}
+
+.solution-cta:hover {
+    background: #0056b3;
+    transform: translateY(-2px);
+}
