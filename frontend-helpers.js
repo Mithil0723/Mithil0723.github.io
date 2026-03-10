@@ -7,7 +7,7 @@
 
 const CONFIG = {
     // Change this to your deployed backend URL in production
-    BACKEND_URL: 'https://mithilravulapalli-com.onrender.com',
+    BACKEND_URL: 'http://localhost:8000',
 
     // Timeouts and limits
     REQUEST_TIMEOUT: 30000, // 30 seconds
