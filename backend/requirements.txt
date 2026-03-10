@@ -1,0 +1,13 @@
+fastapi
+uvicorn
+langchain
+langchain-community
+langchain-huggingface
+langchain-openai
+langchain-text-splitters
+langgraph
+langsmith
+openai
+sentence-transformers
+supabase
+python-dotenv

@@ -3,9 +3,9 @@ RAG Chatbot
 project_id: "2026-02-13_RAGChatbot"
 title: "AI Portfolio Chatbot with Retrieval-Augmented Generation (RAG)"
 status: "completed"
-confidence_level: 0.92
-analysis_date: "2026-02-13"
-analysis_version: "1.0"
+confidence_level: 0.95
+analysis_date: "2026-03-09"
+analysis_version: "2.0"
 
 # ACADEMIC CONTEXT
 course_context: "Personal Project"
@@ -16,10 +16,10 @@ primary_role: "Full-Stack AI Developer"
 
 # TECHNICAL STACK - Arrays Only
 primary_languages: ["Python", "JavaScript"]
-frameworks: ["FastAPI", "Groq SDK", "Ollama"]
+frameworks: ["FastAPI", "LangGraph", "LangChain", "LangSmith"]
 databases: ["Supabase (PostgreSQL + pgvector)"]
-tools: ["Uvicorn", "Groq Cloud Console", "Supabase Dashboard"]
-cloud_platforms: ["Supabase", "Render"]
+tools: ["Uvicorn", "HuggingFace sentence-transformers", "OpenRouter", "LangSmith Dashboard", "Supabase Dashboard"]
+cloud_platforms: ["Supabase", "OpenRouter", "Render"]
 
 # SKILLS ASSESSMENT - Integers 1-10 Only
 programming_fundamentals: 8
@@ -30,7 +30,7 @@ database_design: 7
 api_development: 9
 frontend_dev: 7
 backend_dev: 9
-testing: 6
+testing: 7
 version_control: 7
 
 # ADVANCED SKILLS - Boolean Only
@@ -42,27 +42,27 @@ deployment_automated: false
 documentation_comprehensive: true
 
 # PROJECT METRICS - Integers Only
-estimated_loc: 350
+estimated_loc: 400
 files_created: 4
-complexity_score: 8
-portfolio_score: 9
+complexity_score: 9
+portfolio_score: 10
 market_relevance: 10
 
 # CAREER INTELLIGENCE
-salary_range_low: 85000
-salary_range_high: 130000
-relevant_job_titles: ["AI/ML Engineer", "Full-Stack Developer", "GenAI Developer", "Backend Engineer"]
+salary_range_low: 90000
+salary_range_high: 140000
+relevant_job_titles: ["AI/ML Engineer", "Full-Stack Developer", "GenAI Developer", "Backend Engineer", "LLM Engineer"]
 target_companies: ["AI startups", "tech companies", "consulting firms", "SaaS companies"]
-next_learning_priorities: ["Multi-turn Conversation Memory", "Authentication & Rate Limiting", "Production Caching Strategies", "LLM Evaluation & Monitoring"]
+next_learning_priorities: ["Multi-turn Conversation Memory", "Authentication & Rate Limiting", "Production Caching Strategies", "LangSmith Evaluations & Datasets", "Cross-Encoder Reranking"]
 
 # PROFESSIONAL OUTPUTS - Single Strings
-resume_bullet_technical: "Engineered a high-performance RAG chatbot using Groq's LPU Inference Engine (GPT-OSS 120B), FastAPI, and Supabase pgvector, achieving <200ms latency for grounded question answering."
-resume_bullet_impact: "Built an AI-powered portfolio assistant that delivers instant, context-aware answers to visitor questions, leveraging open-source models for cost-effective scale."
-resume_bullet_behavioral: "Independently designed, implemented, and deployed a full-stack AI application end-to-end — from vector database schema design and embedding pipeline to REST API development and frontend chat integration — demonstrating strong initiative and rapid prototyping skills."
+resume_bullet_technical: "Engineered an agentic RAG chatbot using LangGraph, LangChain, HuggingFace embeddings, and DeepSeek V3.2 via OpenRouter, with full LangSmith observability for every request trace."
+resume_bullet_impact: "Built an AI-powered portfolio assistant that delivers context-aware answers to visitor questions, leveraging local HuggingFace embeddings and structured LangGraph orchestration for cost-effective, traceable AI workflows."
+resume_bullet_behavioral: "Independently designed, implemented, and deployed a full-stack AI application end-to-end — from vector database schema design and embedding pipeline to agentic LangGraph orchestration, LangSmith tracing, and frontend chat integration — demonstrating strong initiative and rapid prototyping skills."
 
 # SEARCHABLE KEYWORDS - Space Separated
-technical_keywords: "python javascript fastapi google-genai gemini supabase pgvector rag retrieval-augmented-generation embeddings vector-search llm chatbot rest-api cors pydantic"
-skill_keywords: "ai-engineering full-stack-development api-design vector-databases prompt-engineering system-design document-chunking semantic-search"
+technical_keywords: "python javascript fastapi langgraph langchain langsmith langchain-huggingface huggingface sentence-transformers deepseek openrouter supabase pgvector rag retrieval-augmented-generation embeddings vector-search llm chatbot rest-api cors pydantic agentic-ai"
+skill_keywords: "ai-engineering full-stack-development api-design vector-databases prompt-engineering system-design document-chunking semantic-search llm-orchestration observability tracing"
 ---
 
 # AI Portfolio Chatbot with Retrieval-Augmented Generation (RAG)
@@ -72,48 +72,52 @@ skill_keywords: "ai-engineering full-stack-development api-design vector-databas
 Visitors to a personal portfolio website often have specific questions about skills, projects, and experience that static content doesn't efficiently surface. This project addresses that gap by providing an intelligent, conversational AI assistant that can answer questions grounded in real portfolio data — bridging the gap between a traditional resume and a natural conversation.
 
 ### Technical Solution Delivered
-### Technical Solution Delivered
-A hybrid RAG system was built using **Groq** for ultra-fast LLM inference, **Ollama** for local embedding generation, and **Supabase** for vector storage. The system ingests portfolio content, generates 768-dimensional embeddings using `nomic-embed-text`, and retrieves relevant context via cosine similarity. The final answer is generated by the **GPT-OSS 120B** model running on Groq's LPU (Language Processing Unit), delivering responses in real-time.
+An agentic RAG system was built using **LangGraph** for explicit stateful orchestration, **LangChain** for the prompt pipeline, **HuggingFace** for local embeddings, and **Supabase** for vector storage. The system ingests portfolio content using LangChain's `RecursiveCharacterTextSplitter`, generates 384-dimensional embeddings locally with `sentence-transformers/all-MiniLM-L6-v2`, and retrieves relevant context via cosine similarity. The final answer is generated by **DeepSeek V3.2** via **OpenRouter**, with every request automatically traced end-to-end in **LangSmith** for full observability.
 
 ### Key Professional Achievement
-Designed and implemented a production-ready AI pipeline that demonstrates mastery of modern GenAI engineering: vector databases, embedding models, prompt construction, and REST API development — without relying on heavyweight frameworks like LangChain.
+Designed and implemented a production-ready agentic AI pipeline that demonstrates mastery of modern GenAI engineering: LangGraph state management, LangChain prompt chains, vector databases, local embedding models, LLM orchestration, and full-stack observability with LangSmith.
 
 ## 🛠️ TECHNICAL_IMPLEMENTATION
 ### Technology Stack Analysis
-**Primary Languages**: [`Python`](../backend/server.py) powers the entire backend — from the FastAPI server and ingestion pipeline to all GenAI SDK interactions. [`JavaScript`](../assets/js/script.js) handles the frontend chat UI integration.
+**Primary Languages**: [`Python`](../backend/server.py) powers the entire backend — from the FastAPI server, LangGraph agent, and LangChain pipeline to all embedding and generation interactions. [`JavaScript`](../assets/js/script.js) handles the frontend chat UI integration.
 
 **Frameworks & Libraries**:
-**Frameworks & Libraries**:
-- **Groq SDK**: Provides the interface for the high-speed LPU inference engine, enabling sub-second response generation.
-- **Ollama (Local)**: Handles the embedding generation (`nomic-embed-text`) for both ingestion and query processing, keeping the vector pipeline cost-effective and local.
+- **LangGraph**: Provides the `StateGraph` orchestration framework with typed `AgentState`, enabling an explicit three-node pipeline (`retrieve → grade → generate`) where each step is independently inspectable and traceable.
+- **LangChain**: Handles the prompt template (`ChatPromptTemplate`), output parsing (`StrOutputParser`), text splitting (`RecursiveCharacterTextSplitter`), and HuggingFace embedding integration — all composable via the LCEL pipe operator.
+- **HuggingFace sentence-transformers**: `all-MiniLM-L6-v2` runs entirely locally — no API key, no rate limits, no quota to monitor. Produces 384-dimensional normalized embeddings.
+- **LangSmith**: Zero-config observability via `@traceable` decorator and `LANGCHAIN_TRACING_V2=true` env var. Traces every request with node-level timing, inputs/outputs, and token usage.
+- **DeepSeek V3.2 via OpenRouter**: Frontier-quality instruction following at ~$0.25/$0.38 per 1M tokens. OpenAI-compatible API via `ChatOpenAI`.
 - **FastAPI + Pydantic**: Provides the REST API layer with automatic request validation, CORS middleware, and structured error handling. Input validation uses Pydantic's [`field_validator`](../backend/server.py) to enforce message length limits and empty-string checks.
 - **Supabase Client**: The `supabase-py` client interfaces with a PostgreSQL database enhanced with the `pgvector` extension, enabling vector similarity search via a custom [`match_documents`](../rag_agent_guide.md) RPC function.
 
 ### Architecture & Design Assessment
-**System Architecture**: The application follows a clean, linear RAG pipeline:
+**System Architecture**: The application follows an explicit agentic RAG pipeline using LangGraph's `StateGraph`:
 
 ```
 User Query → FastAPI Backend
-  → Step A: Embed query with nomic-embed-text (Ollama)
-  → Step B: Vector search in Supabase via match_documents RPC
-  → Step C: Construct prompt with retrieved context
-  → Step D: Generate answer with gpt-oss-120b (Groq LPU)
+  → LangGraph StateGraph:
+    → Node 1 (retrieve): Embed query with HuggingFace → vector search in Supabase
+    → Node 2 (grade): Check if documents were retrieved → set fallback if empty
+    → Node 3 (generate): Build LangChain prompt chain → call DeepSeek V3.2
   → Return JSON response to frontend
+  → Full trace sent to LangSmith automatically
 ```
 
 **Key Technical Decisions**:
-- **[Hybrid Inference]**: Combined the speed of Groq's cloud LPU for generation with the cost-efficiency of local Ollama embeddings, optimizing for both performance and operating costs.
-- **[Chunking Strategy]**: Implemented paragraph-aware text splitting with configurable overlap (default: 1000 chars, 200 char overlap) to preserve sentence boundaries and avoid cutting mid-thought.
+- **[LangGraph Orchestration]**: Used `StateGraph` with typed `AgentState` instead of a monolithic function. Each node is independently testable, traceable in LangSmith, and extensible (e.g., adding a `rewrite_query` or `hallucination_check` node requires no changes to existing nodes).
+- **[Local Embeddings]**: Chose HuggingFace `all-MiniLM-L6-v2` over cloud APIs (Google GenAI, OpenAI) to eliminate API rate limits, reduce latency, and achieve zero embedding cost. The model runs on CPU and is cached after first download (~90 MB).
+- **[LangSmith Observability]**: Every `/chat` call is traced via the `@traceable` decorator, providing full visibility into each LangGraph node's inputs, outputs, latency, and token usage — critical for debugging retrieval quality and generation issues.
+- **[LangChain Pipeline]**: Used `ChatPromptTemplate | ChatOpenAI | StrOutputParser` (LCEL chain) for composable, version-controllable prompt construction. `RecursiveCharacterTextSplitter` for semantically coherent chunking.
+- **[Graceful Degradation]**: The `grade` node checks for empty retrieval results and sets a sentinel answer, allowing the `generate` node to return a friendly fallback without calling the LLM unnecessarily.
 - **[Idempotent Ingestion]**: The `ingest.py` script deletes existing documents by source metadata before re-inserting, preventing duplicate entries on re-runs.
-- **[Graceful Degradation]**: When no matching documents are found (similarity below threshold), the system returns a friendly fallback message instead of hallucinating an answer.
-- **[Vector Indexing]**: An IVFFlat index with cosine similarity is applied to the embedding column for fast approximate nearest-neighbor search at scale.
 
 ### File Structure
 ```
 backend/
-├── server.py        # FastAPI app with /chat and /health endpoints
-├── ingest.py        # One-time data ingestion pipeline
-└── .env             # API keys (gitignored)
+├── server.py        # FastAPI app with LangGraph agent, LangChain pipeline, LangSmith tracing
+├── ingest.py        # Data ingestion with HuggingFace embeddings + LangChain text splitter
+├── requirements.txt # All dependencies (langchain, langgraph, langsmith, sentence-transformers, etc.)
+└── .env             # API keys and LangSmith config (gitignored)
 frontend/
 ├── script.js        # Chat UI integration (handleUserMessage)
 └── frontend-helpers.js  # Markdown rendering, message utilities
@@ -122,32 +126,34 @@ frontend/
 ## 💡 COMPREHENSIVE_SKILLS_ANALYSIS
 ### Technical Competency Assessment
 - **API Development**: 9/10 — Clean REST API design with proper CORS configuration, structured error handling, input validation, and health-check endpoints. Demonstrates production-level backend engineering.
-- **Database Design**: 7/10 — Designed a vector-enabled schema with pgvector, implemented a custom similarity search function in PL/pgSQL, and created an appropriate IVFFlat index.
-- **AI/ML Engineering**: 8/10 — Demonstrates strong applied understanding of embedding models, vector similarity search, prompt engineering with system instructions, and RAG pipeline design.
+- **Database Design**: 7/10 — Designed a vector-enabled schema with pgvector, implemented a custom similarity search function in PL/pgSQL, and configured appropriate vector indexing.
+- **AI/ML Engineering**: 9/10 — Demonstrates strong applied understanding of agentic orchestration (LangGraph), embedding models, vector similarity search, prompt engineering, RAG pipeline design, and production observability (LangSmith).
 - **Programming Fundamentals**: 8/10 — Well-structured, readable code with logging, error handling, environment variable management, and clear separation of concerns between ingestion and serving.
 
 ### Professional Development Demonstrated
-**Problem-Solving Sophistication**: Rather than using a monolithic framework, the project demonstrates the ability to architect a system from first principles — selecting the right tool for each layer (GenAI SDK for AI, Supabase for vectors, FastAPI for API) and composing them into a cohesive pipeline.
+**Problem-Solving Sophistication**: Rather than using ad-hoc scripting, the project demonstrates the ability to architect a system using industry-standard frameworks — selecting LangGraph for orchestration, LangChain for pipeline composition, HuggingFace for embeddings, and LangSmith for observability — and composing them into a cohesive, debuggable pipeline.
 
-**Learning Agility**: Rapidly adopted emerging technologies (Gemini API, pgvector, RAG patterns) and integrated them into a working product, showcasing the ability to learn and ship quickly in the fast-moving GenAI landscape.
+**Learning Agility**: Rapidly adopted emerging technologies (LangGraph, LangSmith, HuggingFace embeddings, OpenRouter) and integrated them into a working product, showcasing the ability to learn and ship quickly in the fast-moving GenAI landscape.
 
 ## 🚀 PROFESSIONAL_VALUE_TRANSLATION
 ### Resume Bullets (Optimized for ATS and Human Reviewers)
-• **Technical Focus**: Engineered a high-performance RAG chatbot using Groq's LPU Inference Engine (GPT-OSS 120B), FastAPI, and Supabase pgvector, achieving <200ms latency for grounded question answering.
+• **Technical Focus**: Engineered an agentic RAG chatbot using LangGraph StateGraph orchestration, LangChain prompt pipelines, HuggingFace local embeddings, and DeepSeek V3.2 via OpenRouter, with full LangSmith tracing for every request.
 • **Impact Focus**: Built an AI-powered portfolio assistant that answers visitor questions grounded in real project data, improving user engagement and providing an interactive alternative to static resume content.
-• **Growth Focus**: Independently designed, implemented, and deployed a full-stack AI application end-to-end — from vector database schema design and embedding pipeline to REST API development and frontend chat integration.
+• **Growth Focus**: Independently designed, implemented, and deployed a full-stack AI application end-to-end — from vector database schema design and embedding pipeline to agentic LangGraph orchestration, LangSmith observability, and frontend chat integration.
 
 ### Interview Preparation Arsenal
 **Technical Discussion Points**:
-- "Explain how your RAG pipeline works — from user query to generated answer."
-- "Why did you choose the Google GenAI SDK over LangChain? What are the trade-offs?"
+- "Explain how your LangGraph RAG pipeline works — from user query to generated answer, and how LangSmith traces each step."
+- "Why did you choose LangGraph for orchestration? How does the StateGraph pattern help with testing and extensibility?"
+- "Why HuggingFace local embeddings instead of a cloud embedding API? What are the trade-offs?"
+- "How does LangSmith tracing work with the @traceable decorator? What can you inspect in the dashboard?"
 - "How does the vector similarity search work in Supabase? What is the role of pgvector and the match_documents function?"
-- "Walk me through your chunking strategy. How did you handle overlap and why?"
+- "Walk me through your chunking strategy with RecursiveCharacterTextSplitter. How did you handle overlap and why?"
 
 **Behavioral Interview Stories (STAR Format)**:
-- **Challenge**: "Tell me about a time you chose a simpler solution over a complex one." (Choosing the raw GenAI SDK over LangChain — simpler, faster, more debuggable, with fewer dependencies.)
-- **Learning**: "Describe a project where you had to learn a new technology quickly." (Adopting Gemini embeddings, pgvector, and Supabase RPC functions within a short development cycle to build a working RAG pipeline.)
-- **Impact**: "How did you make your portfolio stand out?" (Built an interactive AI chatbot that turns a static website into a conversational experience, demonstrating both technical depth and product thinking.)
+- **Challenge**: "Tell me about a time you chose the right tools for the job." (Choosing LangGraph for explicit state management, LangChain for composable pipelines, HuggingFace for cost-free local embeddings, and LangSmith for observability — each tool selected for a specific architectural purpose.)
+- **Learning**: "Describe a project where you had to learn a new technology quickly." (Adopting LangGraph, LangSmith, HuggingFace sentence-transformers, and OpenRouter within a short development cycle to build a production-ready agentic RAG pipeline.)
+- **Impact**: "How did you make your portfolio stand out?" (Built an interactive AI chatbot that turns a static website into a conversational experience, with full observability — demonstrating both technical depth and product thinking.)
 
 # STUDENT_PROJECT_RECALL_SECTION
 
@@ -155,25 +161,28 @@ frontend/
 *This section is your personal reference to quickly remember the specific details of your work.*
 
 ### What You Actually Built (Feature Breakdown)
-- **RAG Pipeline**: Full end-to-end pipeline — embed query → vector search → context retrieval → grounded LLM generation.
-- **Data Ingestion**: A standalone `ingest.py` script that reads `About_me.md`, splits it into overlapping chunks, generates embeddings, and upserts to Supabase.
-- **REST API**: Two endpoints — `POST /chat` for question answering and `GET /health` for monitoring.
+- **Agentic RAG Pipeline**: LangGraph StateGraph with three nodes — `retrieve` (embed + search), `grade` (check results), `generate` (LangChain chain → DeepSeek V3.2).
+- **Full Observability**: Every request traced in LangSmith via `@traceable` — node-level timing, inputs, outputs, token counts.
+- **Data Ingestion**: A standalone `ingest.py` script that reads `About_me.md`, splits it with LangChain's `RecursiveCharacterTextSplitter`, batch-embeds with HuggingFace, and upserts to Supabase.
+- **REST API**: Two endpoints — `POST /chat` for question answering (with LangSmith tracing) and `GET /health` for monitoring.
 - **Input Validation**: Pydantic validators enforce non-empty messages and a 1000-character limit.
-- **Graceful Fallbacks**: Returns a friendly message when no relevant documents are found instead of hallucinating.
+- **Graceful Fallbacks**: The `grade` node returns a sentinel when no relevant documents are found; the `generate` node returns a friendly message without calling the LLM.
 - **Frontend Chat UI**: JavaScript integration that sends user messages to the backend, displays loading states, and renders AI responses.
 
 ### Technical Implementation Details You Might Forget
-- **Embedding Model**: `nomic-embed-text` (Ollama) — produces 768-dimensional vectors.
-- **LLM Model**: `gpt-oss-120b` (Groq) — chosen for its reasoning capabilities and open weights.
-- **Chunk Config**: Default 1000 chars max, 200 char overlap, paragraph-aware splitting.
-- **Match Threshold**: Set to 0.5 for development (higher recall); increase to 0.7+ for production (higher precision).
+- **Embedding Model**: `sentence-transformers/all-MiniLM-L6-v2` (HuggingFace, local) — produces 384-dimensional normalized vectors. Downloaded once (~90 MB), cached in `~/.cache/huggingface/`.
+- **LLM Model**: `deepseek/deepseek-v3.2` via OpenRouter — ~$0.25/$0.38 per 1M tokens. Uses `ChatOpenAI` with `openai_api_base="https://openrouter.ai/api/v1"`.
+- **Orchestration**: LangGraph `StateGraph` with typed `AgentState(TypedDict)`. Nodes: `retrieve → grade → generate → END`.
+- **Prompt Chain**: `ChatPromptTemplate | ChatOpenAI | StrOutputParser` (LCEL pipe operator).
+- **Chunk Config**: `RecursiveCharacterTextSplitter` with `chunk_size=1000`, `chunk_overlap=200`, separators `["\n\n", "\n", ". ", " ", ""]`.
+- **Match Threshold**: Set to 0.1 (HuggingFace MiniLM embeddings produce lower cosine similarity scores than Google GenAI — ~0.23 for relevant matches). Increase if getting irrelevant results.
 - **Match Count**: Retrieves top 3 most similar chunks per query.
-- **Vector Index**: IVFFlat with `vector_cosine_ops` and `lists = 100`. Must be created after data insertion.
-- **Rate Limits (Free Tier)**: Embedding API — 1,500 req/day. Generation API — 15 req/min. Monitor at Google AI Studio.
+- **LangSmith Config**: `LANGCHAIN_TRACING_V2=true`, `LANGCHAIN_API_KEY`, `LANGCHAIN_PROJECT=rag-agent`. Free tier: 5,000 traces/month.
+- **No Rate Limits on Embeddings**: HuggingFace model runs 100% locally — no API calls, no quota.
 - **CORS**: Defaults to `*` in development; set `ALLOWED_ORIGINS` env var for production.
 - **Idempotent Ingestion**: `ingest.py` deletes documents matching `metadata->>source = 'About_me.md'` before inserting, so re-runs don't create duplicates.
 
 ## ✅ ANALYSIS_CONFIDENCE_METADATA
-- **Overall Assessment Confidence**: 0.92/1.0
-- **Reasoning**: High confidence. The implementation is well-documented in `rag_agent_guide.md`, the code is clean and self-explanatory, and the architecture follows established RAG best practices. Minor deduction because authentication and caching are not yet implemented for production hardening.
+- **Overall Assessment Confidence**: 0.95/1.0
+- **Reasoning**: High confidence. The implementation uses industry-standard frameworks (LangGraph, LangChain, LangSmith, HuggingFace), the code is clean and well-documented in `rag_agent_guide.md`, and the architecture follows established agentic RAG best practices with full observability. Minor deduction because authentication and caching are not yet implemented for production hardening.
 - **Structure Guarantee**: Bulletproof Consistency for Database Integration
