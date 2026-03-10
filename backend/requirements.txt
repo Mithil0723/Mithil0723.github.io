@@ -10,4 +10,5 @@ langsmith
 openai
 sentence-transformers
 supabase
+pydantic
 python-dotenv

@@ -56,7 +56,7 @@ llm = ChatOpenAI(
     model="deepseek/deepseek-v3.2",
     openai_api_key=os.getenv("OPENROUTER_API_KEY"),
     openai_api_base="https://openrouter.ai/api/v1",
-    temperature=0.9,
+    temperature=0.7,
     max_tokens=512,
 )
 
@@ -124,7 +124,7 @@ def retrieve(state: AgentState) -> AgentState:
     # Increase to 0.7+ if getting irrelevant results.
     response = supabase.rpc("match_documents", {
         "query_embedding": query_vector,
-        "match_threshold": 0.1,
+        "match_threshold": 0.35,
         "match_count": 5,
     }).execute()
 
@@ -207,7 +207,7 @@ async def health_check():
 
 @app.post("/chat")
 @traceable(name="chat_endpoint")  # LangSmith: traces this function as a top-level run
-async def chat_endpoint(request: ChatRequest):
+def chat_endpoint(request: ChatRequest):
     """
     Runs the LangGraph RAG pipeline for a user question.
     The @traceable decorator sends the full execution trace (inputs,

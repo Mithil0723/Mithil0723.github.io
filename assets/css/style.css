@@ -1300,11 +1300,60 @@ button {
     border-bottom-left-radius: 0.25rem;
 }
 
-.user-message {
+.user-message,
+.message.user {
     align-self: flex-end;
     background: var(--primary-color);
     color: var(--white);
     border-bottom-right-radius: 0.25rem;
+}
+
+.message.assistant {
+    align-self: flex-start;
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-color);
+    border-bottom-left-radius: 0.25rem;
+}
+
+.message.error {
+    background: rgba(239, 68, 68, 0.2);
+    border: 1px solid rgba(239, 68, 68, 0.4);
+    color: #fca5a5;
+}
+
+.message.loading {
+    padding: 1rem;
+}
+
+.message.loading .dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    margin: 0 3px;
+    background: var(--text-color);
+    border-radius: 50%;
+    animation: loadingDots 1.4s infinite ease-in-out both;
+}
+
+.message.loading .dot:nth-child(1) {
+    animation-delay: -0.32s;
+}
+
+.message.loading .dot:nth-child(2) {
+    animation-delay: -0.16s;
+}
+
+@keyframes loadingDots {
+
+    0%,
+    80%,
+    100% {
+        transform: scale(0);
+    }
+
+    40% {
+        transform: scale(1);
+    }
 }
 
 .chat-input-area {
