@@ -348,7 +348,7 @@ function sleep(ms) {
  */
 function initializeChat() {
     const chatInput = document.getElementById('chat-input');
-    const sendButton = document.getElementById('send-button');
+    const sendButton = document.getElementById('send-btn');
     const clearButton = document.getElementById('clear-button');
 
     // Send message on button click
@@ -377,8 +377,23 @@ function initializeChat() {
         clearButton.addEventListener('click', clearChat);
     }
 
-    // Add welcome message
-    appendMessage('assistant', 'Hi! I\'m Mithil\'s AI assistant. Ask me about his projects, skills, or experience!');
+    // Toggle chatbot open/closed
+    const chatToggle = document.getElementById('chatbot-toggle');
+    const chatContainer = document.getElementById('chatbot-container');
+    const closeChatBtn = document.getElementById('close-chat-btn');
+
+    if (chatToggle && chatContainer) {
+        chatToggle.addEventListener('click', () => {
+            chatContainer.classList.toggle('active');
+        });
+    }
+    if (closeChatBtn && chatContainer) {
+        closeChatBtn.addEventListener('click', () => {
+            chatContainer.classList.remove('active');
+        });
+    }
+
+    // Welcome message is already in the HTML markup — no duplicate needed
 }
 
 // Auto-initialize when DOM is ready

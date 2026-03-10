@@ -19,7 +19,7 @@
 
 .modal-content {
     position: relative;
-    background-color: var(--bg-color);
+    background-color: var(--background-color);
     margin: 5% auto;
     padding: 2rem;
     width: 90%;
