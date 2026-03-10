@@ -9,7 +9,15 @@ document.addEventListener('DOMContentLoaded', function () {
 
         function type() {
             if (charIndex < texts[textIndex].length) {
-                typingText.textContent += texts[textIndex].charAt(charIndex);
+                const char = texts[textIndex].charAt(charIndex);
+                if (char === ' ') {
+                    typingText.appendChild(document.createTextNode(' '));
+                } else {
+                    const span = document.createElement('span');
+                    span.className = 'char-in';
+                    span.textContent = char;
+                    typingText.appendChild(span);
+                }
                 charIndex++;
                 setTimeout(type, 100);
             } else {
@@ -19,7 +27,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
         function erase() {
             if (charIndex > 0) {
-                typingText.textContent = texts[textIndex].substring(0, charIndex - 1);
+                if (typingText.lastChild) {
+                    typingText.removeChild(typingText.lastChild);
+                }
                 charIndex--;
                 setTimeout(erase, 50);
             } else {
@@ -28,41 +38,54 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
 
+        typingText.innerHTML = '';
         type();
     }
 
-    // Video control
-    const video = document.querySelector('.hero-video');
-    const videoControl = document.querySelector('.video-control');
-    if (video && videoControl) {
-        let isPlaying = true;
-        videoControl.addEventListener('click', function () {
-            if (isPlaying) {
-                video.pause();
-                videoControl.textContent = '▶';
-                videoControl.setAttribute('aria-label', 'Play background video');
-            } else {
-                video.play();
-                videoControl.textContent = '⏸';
-                videoControl.setAttribute('aria-label', 'Pause background video');
-            }
-            isPlaying = !isPlaying;
-        });
-    }
+    // Magnetic Cursor
+    const cursor = document.querySelector('.magnetic-cursor');
+    const cursorFollower = document.querySelector('.magnetic-cursor-follower');
 
-    // Intersection Observer for video performance
-    const heroSection = document.querySelector('.hero-section');
-    if (video && heroSection) {
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    video.play();
-                } else {
-                    video.pause();
-                }
+    // Only run on non-touch devices
+    if (cursor && cursorFollower && window.matchMedia('(pointer: fine)').matches) {
+        let mouseX = window.innerWidth / 2;
+        let mouseY = window.innerHeight / 2;
+        let cursorX = mouseX;
+        let cursorY = mouseY;
+        let followerX = mouseX;
+        let followerY = mouseY;
+
+        document.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+        });
+
+        const render = () => {
+            cursorX += (mouseX - cursorX) * 1;
+            cursorY += (mouseY - cursorY) * 1;
+
+            followerX += (mouseX - followerX) * 0.15;
+            followerY += (mouseY - followerY) * 0.15;
+
+            cursor.style.transform = `translate3d(${cursorX}px, ${cursorY}px, 0) translate(-50%, -50%)`;
+            cursorFollower.style.transform = `translate3d(${followerX}px, ${followerY}px, 0) translate(-50%, -50%)`;
+
+            requestAnimationFrame(render);
+        };
+        requestAnimationFrame(render);
+
+        // Hover effects
+        const interactables = document.querySelectorAll('a, button, .skill-card, .project-card, input, textarea');
+        interactables.forEach(el => {
+            el.addEventListener('mouseenter', () => {
+                cursor.classList.add('hover');
+                cursorFollower.classList.add('hover');
             });
-        }, { threshold: 0.5 });
-        observer.observe(heroSection);
+            el.addEventListener('mouseleave', () => {
+                cursor.classList.remove('hover');
+                cursorFollower.classList.remove('hover');
+            });
+        });
     }
 
     // Sticky header
@@ -92,7 +115,111 @@ document.addEventListener('DOMContentLoaded', function () {
         }));
     }
 
-    // Project filter
+    // Reveal Animations
+    const revealElements = document.querySelectorAll('.reveal');
+    if (revealElements.length > 0) {
+        const revealObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('revealed');
+
+                    // Animate skill bars if they exist inside this revealed element
+                    const bars = entry.target.querySelectorAll('.skill-bar');
+                    bars.forEach(bar => {
+                        // slight delay to let the card fade in first
+                        setTimeout(() => {
+                            bar.style.width = bar.getAttribute('data-level');
+                        }, 500);
+                    });
+                }
+            });
+        }, {
+            threshold: 0.1,
+            rootMargin: "0px 0px -50px 0px"
+        });
+
+        revealElements.forEach(el => {
+            revealObserver.observe(el);
+        });
+    }
+
+
+    // Parallax Depth on Cards
+    const tiltCards = document.querySelectorAll('.project-card, .skill-card');
+    tiltCards.forEach(card => {
+        card.addEventListener('mousemove', (e) => {
+            // Only apply tilt on non-touch devices
+            if (!window.matchMedia('(pointer: fine)').matches) return;
+
+            const rect = card.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            const centerX = rect.width / 2;
+            const centerY = rect.height / 2;
+
+            const rotateX = ((y - centerY) / centerY) * -10;
+            const rotateY = ((x - centerX) / centerX) * 10;
+
+            card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
+        });
+
+        card.addEventListener('mouseleave', () => {
+            if (!window.matchMedia('(pointer: fine)').matches) return;
+            card.style.transform = `perspective(1000px) rotateX(0) rotateY(0) scale3d(1, 1, 1)`;
+            card.style.transition = 'transform 0.5s ease, box-shadow 0.5s ease';
+        });
+
+        card.addEventListener('mouseenter', () => {
+            if (!window.matchMedia('(pointer: fine)').matches) return;
+            card.style.transition = 'none';
+        });
+    });
+
+    // Button Ripple Effect
+    const buttons = document.querySelectorAll('.btn');
+    buttons.forEach(btn => {
+        btn.addEventListener('click', function (e) {
+            const x = e.clientX - e.target.getBoundingClientRect().left;
+            const y = e.clientY - e.target.getBoundingClientRect().top;
+
+            const ripples = document.createElement('span');
+            ripples.style.left = x + 'px';
+            ripples.style.top = y + 'px';
+            ripples.classList.add('ripple');
+
+            this.appendChild(ripples);
+
+            setTimeout(() => {
+                ripples.remove();
+            }, 600);
+        });
+    });
+
+    // Nav underline morph
+    const navLinks = document.querySelectorAll('.nav-link');
+    const navMenuMorph = document.querySelector('.nav-menu');
+
+    if (navMenuMorph && window.innerWidth > 768) {
+        const marker = document.createElement('div');
+        marker.classList.add('nav-marker');
+        navMenuMorph.appendChild(marker);
+
+        function indicator(e) {
+            marker.style.left = e.offsetLeft + 'px';
+            marker.style.width = e.offsetWidth + 'px';
+        }
+
+        navLinks.forEach(link => {
+            link.addEventListener('mouseenter', (e) => {
+                indicator(e.target);
+            });
+        });
+
+        navMenuMorph.addEventListener('mouseleave', () => {
+            marker.style.width = '0px';
+        });
+    }
     const filterBtns = document.querySelectorAll('.filter-btn');
     const projectCards = document.querySelectorAll('.project-card');
 
@@ -105,12 +232,22 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 const filter = btn.getAttribute('data-filter');
 
-                // Show/hide projects
+                // Show/hide projects with animation
                 projectCards.forEach(card => {
                     if (filter === 'all' || card.getAttribute('data-category') === filter) {
-                        card.style.display = 'block';
+                        card.style.display = 'flex'; // It's a flex container
+                        setTimeout(() => {
+                            card.style.opacity = '1';
+                            card.style.transform = 'scale(1)';
+                        }, 10);
                     } else {
-                        card.style.display = 'none';
+                        card.style.opacity = '0';
+                        card.style.transform = 'scale(0.8)';
+                        setTimeout(() => {
+                            if (card.style.opacity === '0') {
+                                card.style.display = 'none';
+                            }
+                        }, 300);
                     }
                 });
             });
@@ -118,106 +255,6 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     /*-----------------------------------*\
-     * #CHATBOT
+     * #CHATBOT logic is now handled by frontend-helpers.js
     \*-----------------------------------*/
-
-    // Backend URL — change this to your deployed URL for production
-    const API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.hostname === ''
-        ? 'http://localhost:8000'
-        : 'https://your-backend.onrender.com'; // TODO: replace with your production URL
-
-    const chatbotToggle = document.getElementById('chatbot-toggle');
-    const chatbotContainer = document.getElementById('chatbot-container');
-    const closeChatBtn = document.getElementById('close-chat-btn');
-    const chatInput = document.getElementById('chat-input');
-    const sendBtn = document.getElementById('send-btn');
-    const chatMessages = document.getElementById('chat-messages');
-
-    if (chatbotToggle && chatbotContainer && closeChatBtn && chatInput && sendBtn && chatMessages) {
-        function toggleChat() {
-            chatbotContainer.classList.toggle('active');
-            const isActive = chatbotContainer.classList.contains('active');
-
-            // Toggle icon
-            const icon = chatbotToggle.querySelector('.toggle-icon');
-            const closeIcon = chatbotToggle.querySelector('.toggle-icon-close');
-
-            if (isActive) {
-                icon.style.display = 'none';
-                closeIcon.style.display = 'block';
-                setTimeout(() => chatInput.focus(), 300);
-            } else {
-                icon.style.display = 'block';
-                closeIcon.style.display = 'none';
-            }
-        }
-
-        chatbotToggle.addEventListener('click', toggleChat);
-        closeChatBtn.addEventListener('click', toggleChat);
-
-        function addMessage(text, isUser = false) {
-            const messageDiv = document.createElement('div');
-            messageDiv.classList.add('message');
-            messageDiv.classList.add(isUser ? 'user-message' : 'bot-message');
-
-            const contentDiv = document.createElement('div');
-            contentDiv.classList.add('message-content');
-            contentDiv.textContent = text;
-
-            messageDiv.appendChild(contentDiv);
-            chatMessages.appendChild(messageDiv);
-
-            // Auto scroll to bottom
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-            return messageDiv;
-        }
-
-        async function handleUserMessage() {
-            const text = chatInput.value.trim();
-            if (!text) return;
-
-            addMessage(text, true);
-            chatInput.value = '';
-
-            // Disable input while waiting
-            chatInput.disabled = true;
-            sendBtn.disabled = true;
-
-            // Show loading message
-            const loadingMsg = addMessage('Thinking...', false);
-
-            try {
-                const response = await fetch(`${API_URL}/chat`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ message: text })
-                });
-
-                if (!response.ok) {
-                    throw new Error(`Server error: ${response.status}`);
-                }
-
-                const data = await response.json();
-                // Replace loading message with actual reply
-                loadingMsg.querySelector('.message-content').textContent = data.reply;
-
-            } catch (error) {
-                console.error('Chat error:', error);
-                loadingMsg.querySelector('.message-content').textContent =
-                    'Sorry, I couldn\'t connect to the server. Please try again later.';
-            } finally {
-                // Re-enable input
-                chatInput.disabled = false;
-                sendBtn.disabled = false;
-                chatInput.focus();
-            }
-        }
-
-        sendBtn.addEventListener('click', handleUserMessage);
-        chatInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                handleUserMessage();
-            }
-        });
-    }
 });

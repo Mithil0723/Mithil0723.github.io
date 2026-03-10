@@ -41,10 +41,13 @@
 
     <main>
         <section id="hero" class="hero-section">
-            <video class="hero-video" autoplay muted loop playsinline>
-                <source src="project images/Background_video.mp4" type="video/mp4">
-                Your browser does not support video backgrounds.
-            </video>
+            <div class="mesh-bg">
+                <div class="mesh-blob mesh-blob-1"></div>
+                <div class="mesh-blob mesh-blob-2"></div>
+                <div class="mesh-blob mesh-blob-3"></div>
+                <div class="mesh-blob mesh-blob-4"></div>
+            </div>
+            <div class="noise-overlay"></div>
 
             <div class="hero-overlay"></div>
 
@@ -58,27 +61,24 @@
                     <a href="#projects" class="btn btn-primary">View Projects</a>
                     <a href="#contact" class="btn btn-secondary">Let's Build Something</a>
                 </div>
-                <div class="scroll-indicator">
-                    <span>Scroll</span>
-                    <span class="scroll-arrow">↓</span>
-                </div>
             </div>
 
-            <button class="video-control" aria-label="Pause background video">⏸</button>
         </section>
+
+
 
         <section id="about" class="about-section">
             <div class="container">
-                <h2 class="section-title">About Me</h2>
+                <h2 class="section-title reveal">About Me</h2>
                 <div class="about-content-grid">
                     <div class="about-image-container">
-                        <div class="about-image-wrapper">
+                        <div class="about-image-wrapper reveal">
                             <img src="project images/avatar.png" alt="Mithil Ravulapalli" class="about-image">
                         </div>
                         <a href="assets/documents/resume.pdf" class="btn btn-primary" target="_blank">Download
                             Resume</a>
                     </div>
-                    <div class="about-text-content">
+                    <div class="about-text-content reveal">
                         <h3>Hi, I'm Mithil Ravulapalli!</h3>
                         <p>
                             I'm a Data Science student at the University of Illinois at Chicago focused on building
@@ -115,7 +115,7 @@
         </section>
         <section id="projects" class="projects-section">
             <div class="container">
-                <h2 class="section-title">My Projects</h2>
+                <h2 class="section-title reveal">My Projects</h2>
                 <div class="project-filters">
                     <button class="filter-btn active" data-filter="all">All</button>
                     <button class="filter-btn" data-filter="ai">AI</button>
@@ -126,7 +126,7 @@
                 </div>
                 <div class="projects-grid">
                     <!-- Project: RAG AI Chatbot -->
-                    <div class="project-card" data-category="ai" data-project-id="rag-chatbot">
+                    <div class="project-card reveal" data-category="ai" data-project-id="rag-chatbot">
                         <div class="project-image">
                             <img src="project images/RAG.png" alt="RAG AI Chatbot" class="project-thumbnail">
                             <div class="project-overlay">
@@ -147,7 +147,7 @@
                         </div>
                     </div>
                     <!-- Project 1: Tata Data Visualization -->
-                    <div class="project-card" data-category="data-visualization">
+                    <div class="project-card reveal" data-category="data-visualization">
                         <div class="project-image">
                             <img src="project images/tata.jpg" alt="Tata Data Visualization" class="project-thumbnail">
                             <div class="project-overlay">
@@ -169,7 +169,8 @@
                         </div>
                     </div>
                     <!-- Project 2: Recommendation System -->
-                    <div class="project-card" data-category="machine-learning" data-project-id="recommendation-system">
+                    <div class="project-card reveal" data-category="machine-learning"
+                        data-project-id="recommendation-system">
                         <div class="project-image">
                             <img src="project images/Recommendation.png" alt="Recommendation System"
                                 class="project-thumbnail">
@@ -192,7 +193,8 @@
                         </div>
                     </div>
                     <!-- Project 3: Predictive Analysis -->
-                    <div class="project-card" data-category="machine-learning" data-project-id="predictive-analysis">
+                    <div class="project-card reveal" data-category="machine-learning"
+                        data-project-id="predictive-analysis">
                         <div class="project-image">
                             <img src="project images/Predictive analysis.png" alt="Predictive Analysis"
                                 class="project-thumbnail">
@@ -215,7 +217,7 @@
                         </div>
                     </div>
                     <!-- Project 4: FoodHub Analysis -->
-                    <div class="project-card" data-category="data-analysis" data-project-id="foodhub-analysis">
+                    <div class="project-card reveal" data-category="data-analysis" data-project-id="foodhub-analysis">
                         <div class="project-image">
                             <img src="project images/FoodHub.png" alt="FoodHub Analysis" class="project-thumbnail">
                             <div class="project-overlay">
@@ -237,7 +239,7 @@
                         </div>
                     </div>
                     <!-- Project 5: DSA -->
-                    <div class="project-card" data-category="dsa">
+                    <div class="project-card reveal" data-category="dsa">
                         <div class="project-image">
                             <img src="project images/DSA.png" alt="DSA" class="project-thumbnail">
                             <div class="project-overlay">
@@ -263,55 +265,79 @@
         </section>
         <section id="skills" class="skills-section">
             <div class="container">
-                <h2 class="section-title">Skills & Technologies</h2>
+                <h2 class="section-title reveal">Skills & Technologies</h2>
                 <div class="skill-groups-container">
-                    <div class="skill-group">
+                    <div class="skill-group reveal">
                         <h3 class="skill-group-title">AI & Agents</h3>
                         <div class="skills-grid">
                             <div class="skill-card">
                                 <div class="skill-icon">🤖</div>
                                 <h3 class="skill-name">Agentic AI</h3>
                                 <p class="skill-level">Advanced</p>
+                                <div class="skill-bar-container">
+                                    <div class="skill-bar" data-level="95%"></div>
+                                </div>
                             </div>
                             <div class="skill-card">
                                 <div class="skill-icon">🔗</div>
                                 <h3 class="skill-name">RAG Pipelines</h3>
                                 <p class="skill-level">Advanced</p>
+                                <div class="skill-bar-container">
+                                    <div class="skill-bar" data-level="90%"></div>
+                                </div>
                             </div>
                             <div class="skill-card">
                                 <div class="skill-icon">🧠</div>
                                 <h3 class="skill-name">LLM Orchestration</h3>
                                 <p class="skill-level">Advanced</p>
+                                <div class="skill-bar-container">
+                                    <div class="skill-bar" data-level="90%"></div>
+                                </div>
                             </div>
                             <div class="skill-card">
                                 <div class="skill-icon">✨</div>
                                 <h3 class="skill-name">Generative AI</h3>
                                 <p class="skill-level">Advanced</p>
+                                <div class="skill-bar-container">
+                                    <div class="skill-bar" data-level="85%"></div>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <div class="skill-group">
+                    <div class="skill-group reveal">
                         <h3 class="skill-group-title">Core ML & Data</h3>
                         <div class="skills-grid">
                             <div class="skill-card">
                                 <div class="skill-icon">🐍</div>
                                 <h3 class="skill-name">Python</h3>
                                 <p class="skill-level">Expert</p>
+                                <div class="skill-bar-container">
+                                    <div class="skill-bar" data-level="95%"></div>
+                                </div>
                             </div>
                             <div class="skill-card">
                                 <div class="skill-icon">📊</div>
                                 <h3 class="skill-name">Machine Learning</h3>
                                 <p class="skill-level">Expert</p>
+                                <div class="skill-bar-container">
+                                    <div class="skill-bar" data-level="90%"></div>
+                                </div>
                             </div>
                             <div class="skill-card">
                                 <div class="skill-icon">🗄️</div>
                                 <h3 class="skill-name">SQL</h3>
                                 <p class="skill-level">Advanced</p>
+                                <div class="skill-bar-container">
+                                    <div class="skill-bar" data-level="85%"></div>
+                                </div>
                             </div>
                             <div class="skill-card">
                                 <div class="skill-icon">🐼</div>
                                 <h3 class="skill-name">Pandas</h3>
                                 <p class="skill-level">Advanced</p>
+                                <div class="skill-bar-container">
+                                    <div class="skill-bar" data-level="85%"></div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -322,21 +348,33 @@
                                 <div class="skill-icon">📈</div>
                                 <h3 class="skill-name">Tableau</h3>
                                 <p class="skill-level">Advanced</p>
+                                <div class="skill-bar-container">
+                                    <div class="skill-bar" data-level="80%"></div>
+                                </div>
                             </div>
                             <div class="skill-card">
                                 <div class="skill-icon">📉</div>
                                 <h3 class="skill-name">Matplotlib</h3>
                                 <p class="skill-level">Advanced</p>
+                                <div class="skill-bar-container">
+                                    <div class="skill-bar" data-level="80%"></div>
+                                </div>
                             </div>
                             <div class="skill-card">
                                 <div class="skill-icon">⚙️</div>
                                 <h3 class="skill-name">C++</h3>
                                 <p class="skill-level">Intermediate</p>
+                                <div class="skill-bar-container">
+                                    <div class="skill-bar" data-level="70%"></div>
+                                </div>
                             </div>
                             <div class="skill-card">
                                 <div class="skill-icon">🔀</div>
                                 <h3 class="skill-name">Git</h3>
                                 <p class="skill-level">Advanced</p>
+                                <div class="skill-bar-container">
+                                    <div class="skill-bar" data-level="85%"></div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -346,7 +384,7 @@
         <section id="contact" class="contact-section">
             <div class="container">
                 <h2 class="section-title">Get In Touch</h2>
-                <div class="contact-grid">
+                <div class="contact-grid reveal">
                     <div class="contact-info">
                         <h3>Let's Build Something</h3>
                         <p>
@@ -418,6 +456,10 @@
         <span class="toggle-icon-close" style="display: none;">×</span>
     </button>
 
+    <div class="magnetic-cursor"></div>
+    <div class="magnetic-cursor-follower"></div>
+
+    <script src="frontend-helpers.js"></script>
     <script src="assets/js/script.js"></script>
     <script src="assets/js/projectDetails.js"></script>
 </body>
