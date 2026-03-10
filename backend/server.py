@@ -39,15 +39,27 @@ app.add_middleware(
 )
 
 # ─────────────────────────────────────────────
-# 1. HuggingFace Embeddings (runs locally)
+# 1. HuggingFace Embeddings (lazy-loaded)
 # ─────────────────────────────────────────────
 # Model is downloaded once (~90 MB) and cached in ~/.cache/huggingface/
 # No API key needed — no rate limits, no quota.
-embeddings = HuggingFaceEmbeddings(
-    model_name="sentence-transformers/all-MiniLM-L6-v2",
-    model_kwargs={"device": "cpu"},
-    encode_kwargs={"normalize_embeddings": True},
-)
+# Lazy-loaded on first request so uvicorn binds the port immediately
+# and Render doesn't time out waiting for a port.
+_embeddings = None
+
+
+def get_embeddings():
+    """Lazy singleton — loads the HuggingFace model on first call."""
+    global _embeddings
+    if _embeddings is None:
+        logger.info("Loading HuggingFace embeddings model (first request)...")
+        _embeddings = HuggingFaceEmbeddings(
+            model_name="sentence-transformers/all-MiniLM-L6-v2",
+            model_kwargs={"device": "cpu"},
+            encode_kwargs={"normalize_embeddings": True},
+        )
+        logger.info("Embeddings model loaded successfully")
+    return _embeddings
 
 # ─────────────────────────────────────────────
 # 2. OpenRouter LLM (DeepSeek V3.2)
@@ -118,7 +130,7 @@ def retrieve(state: AgentState) -> AgentState:
     """
     logger.info("Node: retrieve — embedding query and searching Supabase")
 
-    query_vector = embeddings.embed_query(state["question"])
+    query_vector = get_embeddings().embed_query(state["question"])
 
     # Start with lower threshold (0.5) for better recall.
     # Increase to 0.7+ if getting irrelevant results.
@@ -197,6 +209,12 @@ class ChatRequest(BaseModel):
         if len(v) > 1000:
             raise ValueError('Message too long (max 1000 characters)')
         return v.strip()
+
+
+@app.get("/")
+async def root():
+    """Root route — basic service info."""
+    return {"service": "RAG Agent", "docs": "/docs"}
 
 
 @app.get("/health")
