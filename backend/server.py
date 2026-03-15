@@ -78,11 +78,19 @@ llm = ChatOpenAI(
 SYSTEM_INSTRUCTION = (
     "You are Mithil Ravulapalli's portfolio AI assistant — sharp, personable, "
     "and a little bit enthusiastic about what Mithil has built. "
-    "Answer questions about Mithil's skills, projects, and Agentic AI work "
+    "Answer questions about Mithil's data science skills, machine learning projects, and his strong interest in Agentic AI. "
+    "IMPORTANT: Be completely truthful. Do NOT hallucinate that Mithil has built AI agents unless explicitly stated in the context. "
+    "His past built projects focus on Machine Learning, Data Analysis, and Amazon Recommendation Systems. "
     "using ONLY the context provided in each message. "
     "IMPORTANT: The context below DOES contain real information about Mithil. "
     "Always mine the context thoroughly for relevant details before responding. "
     "Never say information is unavailable or missing if the context contains ANY relevant details. "
+    "If the context is empty, and the user is just saying hello or asking a generic conversational question, "
+    "greet them naturally as Mithil's AI assistant and ask how you can help. "
+    "If they ask an out-of-bounds question (like 'What is the capital of France?' or 'Write me a poem'), "
+    "politely explain that your only job is to discuss Mithil's professional portfolio. "
+    "Context chunks are tagged with [Source] and [Section] markers — use these to "
+    "reference specific projects by name (e.g. 'In the FoodHub project...'). "
     "Vary how you open and structure each response — avoid starting with the same phrase twice. "
     "Use concrete details from the context rather than generic summaries. "
     "Show genuine interest: if something in the context is impressive, it's okay to say so. "
@@ -127,49 +135,56 @@ def retrieve(state: AgentState) -> AgentState:
     """
     Node 1 — Embed the question and retrieve matching documents from Supabase.
     Uses HuggingFace embeddings (local, no API quota).
+    Each retrieved chunk is prefixed with its source file and section
+    so the LLM can reference specific projects by name.
     """
     logger.info("Node: retrieve — embedding query and searching Supabase")
 
     query_vector = get_embeddings().embed_query(state["question"])
 
-    # Start with lower threshold (0.5) for better recall.
-    # Increase to 0.7+ if getting irrelevant results.
+    # Threshold 0.45 works well with expanded content across 5 source files.
+    # Lower to 0.35 if too few results; raise to 0.55+ if irrelevant hits.
     response = supabase.rpc("match_documents", {
         "query_embedding": query_vector,
-        "match_threshold": 0.35,
+        "match_threshold": 0.45,
         "match_count": 5,
     }).execute()
 
     docs = response.data or []
     logger.info(f"Retrieved {len(docs)} documents")
-    return {**state, "context": [doc["content"] for doc in docs]}
+
+    # Build context strings with source attribution
+    context_chunks = []
+    for doc in docs:
+        meta = doc.get("metadata") or {}
+        source = meta.get("source", "Unknown")
+        section = meta.get("section", "")
+        prefix = f"[Source: {source}]"
+        if section:
+            prefix += f" [Section: {section}]"
+        context_chunks.append(f"{prefix}\n{doc['content']}")
+
+    return {**state, "context": context_chunks}
 
 
 def grade(state: AgentState) -> AgentState:
     """
     Node 2 — Check whether any documents were retrieved.
-    Sets a sentinel answer if the retrieval step returned nothing,
-    which the generate node will pass through unchanged.
+    Logs a warning if the retrieval step returned nothing,
+    but no longer short-circuits the LLM generation.
     """
     if not state["context"]:
-        logger.warning("No matching documents found — returning fallback")
-        return {**state, "answer": "__NO_CONTEXT__"}
+        logger.warning("No matching documents found — proceeding to LLM without context")
     return state
 
 
 def generate(state: AgentState) -> AgentState:
     """
     Node 3 — Build the prompt and call the LLM via the LangChain chain.
-    Skipped if the grade node set the fallback sentinel.
+    Now dynamically responds even if context is empty.
     """
-    if state.get("answer") == "__NO_CONTEXT__":
-        return {
-            **state,
-            "answer": "I don't have enough info to answer that. Try emailing Mithil!"
-        }
-
     logger.info("Node: generate — calling DeepSeek V3.2 via OpenRouter")
-    context_text = "\n\n".join(state["context"])
+    context_text = "\n\n".join(state["context"]) if state["context"] else ""
 
     answer = rag_chain.invoke({
         "context": context_text,
