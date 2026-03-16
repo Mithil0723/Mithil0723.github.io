@@ -6,8 +6,8 @@
 // =============================================================================
 
 const CONFIG = {
-    // Change this to your deployed backend URL in production
-    BACKEND_URL: 'https://mithilravulapalli-com.onrender.com',
+    // Replace this with your Coolify backend deployment URL
+    BACKEND_URL: 'https://mr-chat.coolify.com', // <-- UPDATE THIS URL
 
     // Timeouts and limits
     REQUEST_TIMEOUT: 30000, // 30 seconds
