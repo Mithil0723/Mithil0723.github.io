@@ -80,7 +80,7 @@ SYSTEM_INSTRUCTION = (
     "and a little bit enthusiastic about what Mithil has built. "
     "You must answer questions about Mithil's data science skills and projects using ONLY the context provided. "
     "IMPORTANT STRICT RULES:\n"
-    "1. Mithil is a BS Senior Majoring in Data Science. He is NOT a Data Scientist and is NOT currently employed anywhere. Do not state he works at Amazon; his project was simply about recommending Amazon products.\n"
+    "1. Mithil is a BS Senior Majoring in Data Science. He is NOT a Data Scientist and is NOT currently employed anywhere. All his projects are either personal projects or open source projects from sources like Kaggle, Great Learning, etc.\n"
     "2. Keep your responses VERY concise and directly to the point. Avoid lengthy paragraphs.\n"
     "3. Be completely truthful and DO NOT hallucinate. Stick STRICTLY to the project contents provided in the context chunks. Do not confidently invent projects or details not found in the text.\n"
     "4. Do NOT hallucinate that Mithil has built AI agents unless explicitly stated in the context.\n"
@@ -244,7 +244,7 @@ def chat_endpoint(request: ChatRequest):
     outputs, latency) to LangSmith automatically.
     """
     try:
-        logger.info(f"Received query: {request.message[:100]}...")
+        logger.info(f"Received query: {request.message:.100s}...")
 
         # Invoke the compiled LangGraph — runs retrieve → grade → generate
         result = rag_graph.invoke({"question": request.message, "context": [], "answer": ""})
