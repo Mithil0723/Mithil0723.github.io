@@ -7,7 +7,7 @@
 
 const CONFIG = {
     // Replace this with your Coolify backend deployment URL
-    BACKEND_URL: 'http://rasz0u0lbdrbo1ph851hxlyw.72.61.6.35.sslip.io', // <-- UPDATE THIS URL
+    BACKEND_URL: 'https://chatbot.visionpair.cloud', // <-- UPDATE THIS URL
 
     // Timeouts and limits
     REQUEST_TIMEOUT: 30000, // 30 seconds
