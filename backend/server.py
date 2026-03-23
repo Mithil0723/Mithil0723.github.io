@@ -68,7 +68,7 @@ llm = ChatOpenAI(
     model="deepseek/deepseek-v3.2",
     openai_api_key=os.getenv("OPENROUTER_API_KEY"),
     openai_api_base="https://openrouter.ai/api/v1",
-    temperature=0.7,
+    temperature=0.3,   # CHANGED from 0.7 — reduce creative wandering
     max_tokens=512,
 )
 
@@ -76,26 +76,34 @@ llm = ChatOpenAI(
 # 3. LangChain Prompt Template
 # ─────────────────────────────────────────────
 SYSTEM_INSTRUCTION = (
-    "You are Mithil Ravulapalli's portfolio AI assistant — sharp, personable, "
-    "and a little bit enthusiastic about what Mithil has built. "
-    "You must answer questions about Mithil's data science skills and projects using ONLY the context provided. "
-    "IMPORTANT STRICT RULES:\n"
-    "1. Mithil is a BS Senior Majoring in Data Science. He is NOT a Data Scientist and is NOT currently employed anywhere. All his projects are either personal projects or open source projects from sources like Kaggle, Great Learning, etc.\n"
-    "2. Keep your responses VERY concise and directly to the point. Avoid lengthy paragraphs.\n"
-    "3. Be completely truthful and DO NOT hallucinate. Stick STRICTLY to the project contents provided in the context chunks. Do not confidently invent projects or details not found in the text.\n"
-    "4. Do NOT hallucinate that Mithil has built AI agents unless explicitly stated in the context.\n"
-    "5. Always mine the context thoroughly for relevant details before responding. "
-    "Never say information is unavailable or missing if the context contains ANY relevant details. "
-    "If the context is empty, and the user is just saying hello or asking a generic conversational question, "
-    "greet them naturally as Mithil's AI assistant and ask how you can help. "
-    "If they ask an out-of-bounds question (like 'What is the capital of France?' or 'Write me a poem'), "
-    "politely explain that your only job is to discuss Mithil's professional portfolio. "
-    "Context chunks are tagged with [Source] and [Section] markers — use these to "
-    "reference specific projects by name. "
-    "If the answer truly isn't in the context at all, say so naturally — something like "
-    "'That one's outside my knowledge, but Mithil's email is always open!' "
-    "Never use bullet points unless explicitly asked. "
-    "Prefer flowing, conversational prose, but ensure it remains brief."
+    "You are the AI assistant for Mithil Ravulapalli's portfolio — sharp, friendly, and concise.\n\n"
+    "Mithil is a BS Senior majoring in Data Science at UIC. He is NOT a Data Scientist, "
+    "NOT employed, and NOT a graduate student.\n\n"
+    "---\n\n"
+    "CORE RULES (follow strictly):\n\n"
+    "1. GROUND EVERYTHING. Only state facts that are explicitly present in the provided "
+    "context chunks. If a fact is not in the context, do not state it — not even as a guess, "
+    "inference, or extrapolation.\n\n"
+    "2. WHEN CONTEXT IS EMPTY. If no context chunks are provided, say exactly: "
+    "\"That one's outside my knowledge, but Mithil's email is always open!\"\n\n"
+    "3. WHEN CONTEXT IS PARTIAL. If context chunks exist but do not fully answer the question, "
+    "state only what the context confirms, then append: "
+    "\"For more detail, Mithil's email is always open!\"\n\n"
+    "4. BE BRIEF. Match your response length to the question's complexity:\n"
+    "   - Simple / conversational question → 1–2 sentences MAX\n"
+    "   - Factual question about a project or skill → 2–4 sentences MAX\n"
+    "   - Only use bullet points if explicitly asked\n\n"
+    "5. EXAMPLE OF GOOD BREVITY:\n"
+    "   User: \"What's Mithil's main project?\"\n"
+    "   Good: \"Mithil's flagship project is an agentic RAG chatbot — a LangGraph-orchestrated "
+    "pipeline that answers visitor questions grounded in his portfolio data, powered by "
+    "DeepSeek V3.2 via OpenRouter.\"\n"
+    "   Bad: \"Great question! Mithil has worked on several exciting projects. Let me walk you "
+    "through his main one...[4 paragraphs]\"\n\n"
+    "6. NEVER hallucinate skills, job titles, employment status, or project features not "
+    "explicitly stated in the context. Do not infer. Do not extrapolate.\n\n"
+    "7. NEVER use bullet points unless the user explicitly asks for a list.\n\n"
+    "8. Context chunks are tagged [Source] and [Section] — mine them thoroughly before responding.\n\n"
 )
 
 prompt_template = ChatPromptTemplate.from_messages([
@@ -128,6 +136,45 @@ class AgentState(TypedDict):
     answer: str
 
 
+# NEW — Intent classifier to short-circuit trivial inputs
+import re
+
+def classify_intent(message: str) -> str:
+    """
+    Classifies user input into one of three buckets:
+    - 'greeting'          : hi, hello, hey, thanks, bye, etc.
+    - 'out_of_scope'      : clearly unrelated to portfolio (weather, math, etc.)
+    - 'portfolio_question' : anything else — run full RAG pipeline
+    """
+    msg = message.lower().strip()
+
+    greeting_patterns = [
+        r"^(hi|hey|hello|howdy|sup|what'?s up|yo)(\s.*)?([\.!\?]*)$",
+        r"^(good (morning|afternoon|evening|night))([\.!\?]*)$",
+        r"^(thanks|thank you|thx|ty)([\.!\?\s]*)$",
+        r"^(bye|goodbye|see you|cya|take care)([\.!\?]*)$",
+        r"^(nice|cool|great|awesome|ok|okay|got it|sounds good)([\.!\?]*)$",
+    ]
+
+    out_of_scope_patterns = [
+        r"\b(weather|forecast|temperature|rain|snow)\b",
+        r"\b(stock|crypto|bitcoin|price of)\b",
+        r"\b(recipe|cook|bake|food)\b",
+        r"\b(translate|what does .+ mean in)\b",
+        r"\b(capital of|population of|how far is)\b",
+    ]
+
+    for pattern in greeting_patterns:
+        if re.match(pattern, msg):
+            return "greeting"
+
+    for pattern in out_of_scope_patterns:
+        if re.search(pattern, msg):
+            return "out_of_scope"
+
+    return "portfolio_question"
+
+
 def retrieve(state: AgentState) -> AgentState:
     """
     Node 1 — Embed the question and retrieve matching documents from Supabase.
@@ -139,11 +186,9 @@ def retrieve(state: AgentState) -> AgentState:
 
     query_vector = get_embeddings().embed_query(state["question"])
 
-    # Threshold 0.45 works well with expanded content across 5 source files.
-    # Lower to 0.35 if too few results; raise to 0.55+ if irrelevant hits.
     response = supabase.rpc("match_documents", {
         "query_embedding": query_vector,
-        "match_threshold": 0.45,
+        "match_threshold": 0.45,  # Calibrated for all-MiniLM-L6-v2; grade node catches empty results
         "match_count": 5,
     }).execute()
 
@@ -167,11 +212,15 @@ def retrieve(state: AgentState) -> AgentState:
 def grade(state: AgentState) -> AgentState:
     """
     Node 2 — Check whether any documents were retrieved.
-    Logs a warning if the retrieval step returned nothing,
-    but no longer short-circuits the LLM generation.
+    Short-circuits to fallback when context is empty (hallucination prevention).
     """
     if not state["context"]:
-        logger.warning("No matching documents found — proceeding to LLM without context")
+        logger.warning("No matching documents found — short-circuiting to fallback")
+        return {
+            **state,
+            "answer": "That one's outside my knowledge, but Mithil's email is always open!"
+        }
+    logger.info(f"Grade node: {len(state['context'])} chunks retrieved")
     return state
 
 
@@ -201,7 +250,14 @@ builder.add_node("generate", generate)
 
 builder.set_entry_point("retrieve")
 builder.add_edge("retrieve", "grade")
-builder.add_edge("grade", "generate")
+
+# CHANGED — conditional routing: skip generate if grade already set a fallback answer
+def route_after_grade(state: AgentState) -> str:
+    if state.get("answer"):
+        return "__end__"
+    return "generate"
+
+builder.add_conditional_edges("grade", route_after_grade, {"generate": "generate", "__end__": END})
 builder.add_edge("generate", END)
 
 rag_graph = builder.compile()
@@ -237,16 +293,25 @@ async def health_check():
 
 @app.post("/chat")
 @traceable(name="chat_endpoint")  # LangSmith: traces this function as a top-level run
-def chat_endpoint(request: ChatRequest):
+async def chat_endpoint(request: ChatRequest):
     """
     Runs the LangGraph RAG pipeline for a user question.
-    The @traceable decorator sends the full execution trace (inputs,
-    outputs, latency) to LangSmith automatically.
+    Intent classifier short-circuits greetings and out-of-scope queries.
+    The @traceable decorator sends the full execution trace to LangSmith.
     """
     try:
         logger.info(f"Received query: {request.message:.100s}...")
 
-        # Invoke the compiled LangGraph — runs retrieve → grade → generate
+        # NEW — classify intent before running the full pipeline
+        intent = classify_intent(request.message)
+
+        if intent == "greeting":
+            return {"reply": "Hey! I'm Mithil's portfolio assistant. Ask me about his projects, skills, or background!"}
+
+        if intent == "out_of_scope":
+            return {"reply": "That's a bit outside my expertise! I'm here to talk about Mithil's work — projects, skills, experience. What would you like to know?"}
+
+        # portfolio_question — run full RAG pipeline
         result = rag_graph.invoke({"question": request.message, "context": [], "answer": ""})
         return {"reply": result["answer"]}
 
@@ -254,8 +319,5 @@ def chat_endpoint(request: ChatRequest):
         logger.error(f"Validation error: {e}")
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
-        # Use logger.exception to capture the full traceback — critical for debugging
-        # transient issues (rate limits, timeouts) vs real bugs.
-        # The failed run will also appear in LangSmith with its full trace.
         logger.exception(f"Error in /chat endpoint: {e}")
         return {"reply": "Sorry, something went wrong. Please try again later."}
