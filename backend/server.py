@@ -62,14 +62,14 @@ def get_embeddings():
     return _embeddings
 
 # ─────────────────────────────────────────────
-# 2. OpenRouter LLM (DeepSeek V3.2)
+# 2. OpenRouter LLM (Gemma 4 31B)
 # ─────────────────────────────────────────────
 llm = ChatOpenAI(
-    model="deepseek/deepseek-v3.2",
+    model="google/gemma-4-31b-it",
     openai_api_key=os.getenv("OPENROUTER_API_KEY"),
     openai_api_base="https://openrouter.ai/api/v1",
-    temperature=0.3,   # CHANGED from 0.7 — reduce creative wandering
-    max_tokens=512,
+    temperature=0.3,
+    max_tokens=600,
 )
 
 # ─────────────────────────────────────────────
