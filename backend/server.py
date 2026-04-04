@@ -144,11 +144,15 @@ import re
 def classify_intent(message: str) -> str:
     """
     Classifies user input into one of three buckets:
-    - 'greeting'          : hi, hello, hey, thanks, bye, etc.
-    - 'out_of_scope'      : clearly unrelated to portfolio (weather, math, etc.)
+    - 'greeting'           : hi, hello, bot-identity questions, single chars, etc.
+    - 'out_of_scope'       : clearly unrelated to portfolio (weather, math, etc.)
     - 'portfolio_question' : anything else — run full RAG pipeline
     """
     msg = message.lower().strip()
+
+    # Single character or punctuation-only input
+    if len(msg) <= 2 and not msg.isalpha() or len(msg) == 1:
+        return "greeting"
 
     greeting_patterns = [
         r"^(hi|hey|hello|howdy|sup|what'?s up|yo)(\s.*)?([\.!\?]*)$",
@@ -156,6 +160,8 @@ def classify_intent(message: str) -> str:
         r"^(thanks|thank you|thx|ty)([\.!\?\s]*)$",
         r"^(bye|goodbye|see you|cya|take care)([\.!\?]*)$",
         r"^(nice|cool|great|awesome|ok|okay|got it|sounds good)([\.!\?]*)$",
+        r"^(who are you|what are you|what can you do|help|what do you do)([\.!\?]*)$",
+        r"^(tell me about yourself)([\.!\?]*)$",
     ]
 
     out_of_scope_patterns = [
@@ -308,7 +314,7 @@ async def chat_endpoint(request: ChatRequest):
         intent = classify_intent(request.message)
 
         if intent == "greeting":
-            return {"reply": "Hey! I'm Mithil's portfolio assistant. Ask me about his projects, skills, or background!"}
+            return {"reply": "Hey! I'm Mithil's portfolio assistant — ask me about his projects, skills, or background!"}
 
         if intent == "out_of_scope":
             return {"reply": "That's a bit outside my expertise! I'm here to talk about Mithil's work — projects, skills, experience. What would you like to know?"}
