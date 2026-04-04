@@ -62,22 +62,22 @@ def test_classify_is_mithil_employed():
 import numpy as np
 from server import rerank, AgentState
 
-def test_rerank_filters_irrelevant_chunks():
-    """Chunks with score <= 0.0 should be removed; relevant chunk kept."""
-    mock_scores = np.array([0.8, -0.3])  # first chunk relevant, second not
+def test_rerank_orders_by_score():
+    """Highest-scoring chunk should come first regardless of input order."""
+    mock_scores = np.array([-0.3, 0.8])  # second chunk scores higher
     with patch("server.get_reranker") as mock_get:
         mock_get.return_value.predict.return_value = mock_scores
         state: AgentState = {
             "question": "What is Mithil's RAG chatbot project?",
             "context": [
-                "[Source: RAG Chatbot.md]\nMithil built an agentic RAG chatbot using LangGraph.",
                 "[Source: About_me.md]\nThe capital of France is Paris.",
+                "[Source: RAG Chatbot.md]\nMithil built an agentic RAG chatbot using LangGraph.",
             ],
             "answer": "",
         }
         result = rerank(state)
-        assert len(result["context"]) == 1
-        assert "RAG" in result["context"][0]
+        assert len(result["context"]) == 2
+        assert "RAG" in result["context"][0]  # higher-scored chunk is first
 
 def test_rerank_returns_at_most_3_chunks():
     """Never passes more than 3 chunks to the LLM, even with 8 candidates."""

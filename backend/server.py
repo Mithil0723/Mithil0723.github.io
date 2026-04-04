@@ -238,8 +238,9 @@ def rerank(state: AgentState) -> AgentState:
     """
     Node 2 — Cross-encoder reranking.
     Scores each retrieved chunk against the question using ms-marco-MiniLM-L-6-v2.
-    Keeps only chunks with score > 0.0, capped at top-3.
-    Eliminates noisy retrievals before they reach the LLM.
+    Returns the top-3 highest-scoring chunks. No hard score threshold — ms-marco
+    scores are not normalized around 0, so relevant portfolio content can score
+    negative. The grade node handles truly empty retrieval.
     """
     if not state["context"]:
         return state
@@ -250,9 +251,9 @@ def rerank(state: AgentState) -> AgentState:
     scores = get_reranker().predict(pairs)
 
     scored = sorted(zip(scores, state["context"]), key=lambda x: x[0], reverse=True)
-    filtered = [chunk for score, chunk in scored if score > 0.0][:3]
+    filtered = [chunk for _, chunk in scored][:3]
 
-    logger.info(f"Rerank: {len(state['context'])} → {len(filtered)} chunks after filtering")
+    logger.info(f"Rerank: {len(state['context'])} → {len(filtered)} chunks after reranking")
     return {**state, "context": filtered}
 
 
