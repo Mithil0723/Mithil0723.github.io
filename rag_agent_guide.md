@@ -1,6 +1,6 @@
 # Building a RAG Agent with LangChain, LangGraph, LangSmith & HuggingFace
 
-This guide details how to build a production-ready RAG (Retrieval-Augmented Generation) agent using **LangGraph** for orchestration, **LangChain** for the retrieval pipeline, **HuggingFace** for embeddings, and **LangSmith** for observability. Generation is handled by **DeepSeek V3.2 via OpenRouter**, keeping costs near zero while giving you full tracing and debuggability.
+This guide details how to build a production-ready RAG (Retrieval-Augmented Generation) agent using **LangGraph** for orchestration, **LangChain** for the retrieval pipeline, **HuggingFace** for embeddings, a **cross-encoder** for reranking, and **LangSmith** for observability. Generation is handled by **Gemma 4 31B via OpenRouter**, keeping costs near zero while giving you full tracing and debuggability.
 
 > [!TIP]
 > **New to RAG?** RAG combines document search with AI generation. Your AI retrieves relevant context from your documents, then uses that context to generate accurate, grounded answers. LangGraph makes the flow explicit — each step is a named node you can inspect and trace in LangSmith.
@@ -14,24 +14,26 @@ graph LR
     Graph --> Embed[HuggingFace: embed_query]
     Embed --> Supabase[Supabase: match_documents]
     Supabase -- Retrieved Context --> Graph
-    Graph -- Prompt + Context --> LLM[OpenRouter: DeepSeek V3.2]
+    Graph -- Reranked Context --> LLM[OpenRouter: Gemma 4 31B]
     LLM -- Answer --> API
     API --> Frontend[Website Chatbot]
     Graph -.->|Traces| LangSmith[LangSmith Dashboard]
 ```
 
-The LangGraph `StateGraph` contains three nodes executed in sequence: **retrieve → grade → generate**. Every run is automatically traced in LangSmith, so you can inspect inputs, outputs, latency, and token usage for each node individually.
+The LangGraph `StateGraph` contains four nodes executed in sequence: **retrieve → rerank → grade → generate**. The `rerank` node uses a local `cross-encoder/ms-marco-MiniLM-L-6-v2` to re-score retrieved chunks against the question, passing only the top-3 most relevant to the LLM. Every run is automatically traced in LangSmith, so you can inspect inputs, outputs, latency, and token usage for each node individually.
 
 ## 2. Technology Stack
 
 *   **Orchestration:** `LangGraph` — explicit stateful graph with typed `AgentState`
 *   **RAG Pipeline:** `LangChain` — retriever, prompt templates, output parsing
 *   **Embedding Model:** `sentence-transformers/all-MiniLM-L6-v2` via HuggingFace (384 dimensions, runs locally — no API quota)
-*   **Generation Model:** `deepseek/deepseek-chat-v3-2` via [OpenRouter](https://openrouter.ai) — ~$0.25/$0.38 per 1M tokens
+*   **Reranking Model:** `cross-encoder/ms-marco-MiniLM-L-6-v2` via `sentence-transformers` (local, no API) — re-scores retrieved chunks with bidirectional attention
+*   **Generation Model:** `google/gemma-4-31b-it` via [OpenRouter](https://openrouter.ai)
 *   **Vector Database:** `Supabase` (PostgreSQL + `pgvector` extension)
 *   **Observability:** `LangSmith` — traces, run inspection, prompt versioning
 *   **Backend Framework:** `FastAPI` (Python)
 *   **Dependencies:** `fastapi`, `uvicorn`, `langchain`, `langchain-community`, `langchain-huggingface`, `langgraph`, `langsmith`, `openai`, `supabase`, `sentence-transformers`, `python-dotenv`
+    *(sentence-transformers covers both the HuggingFace embedding model and the CrossEncoder reranker)*
 
 > [!NOTE]
 > **Why HuggingFace for embeddings?** `sentence-transformers/all-MiniLM-L6-v2` runs entirely locally — no API calls, no rate limits, no quota to monitor. It produces 384-dimensional vectors that are fast and accurate for semantic search. Your Supabase schema just needs to use `vector(384)` instead of `vector(768)`.
@@ -39,7 +41,8 @@ The LangGraph `StateGraph` contains three nodes executed in sequence: **retrieve
 > [!WARNING]
 > **Cost Considerations:**
 > - **HuggingFace Embeddings:** Free — runs locally via `sentence-transformers`. First run downloads the model (~90 MB). Subsequent runs load it from cache.
-> - **OpenRouter / DeepSeek V3.2:** ~$0.25 input / $0.38 output per 1M tokens — effectively free for a personal portfolio.
+> - **OpenRouter / Gemma 4 31B:** Low cost per 1M tokens via OpenRouter — effectively free for a personal portfolio.
+> - **CrossEncoder Reranking:** Free — runs locally via `sentence-transformers`. First run downloads the model (~70 MB). Subsequent runs load from cache.
 > - **LangSmith:** Free tier includes 5,000 traces/month. Monitor at [smith.langchain.com](https://smith.langchain.com).
 
 ---
@@ -52,7 +55,7 @@ Create a `.env` file in your `backend/` folder:
 # HuggingFace (optional — only needed if using the HuggingFace Inference API instead of local model)
 HF_API_TOKEN=your_huggingface_token_here
 
-# OpenRouter — for DeepSeek V3.2 generation
+# OpenRouter — for Gemma 4 31B generation
 OPENROUTER_API_KEY=your_openrouter_api_key_here
 
 # Supabase — vector database
