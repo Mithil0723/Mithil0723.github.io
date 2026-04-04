@@ -89,18 +89,19 @@ SYSTEM_INSTRUCTION = (
     "3. WHEN CONTEXT IS PARTIAL. If context chunks exist but do not fully answer the question, "
     "state only what the context confirms, then append: "
     "\"For more detail, Mithil's email is always open!\"\n\n"
-    "4. BE BRIEF. Hard limits — no exceptions:\n"
+    "4. BE BRIEF. Hard limits — no exceptions. These limits apply to the main answer body "
+    "(the required fallback suffixes in Rules 2 and 3 do not count against the cap):\n"
     "   - Conversational or greeting question → Maximum 2 sentences. Stop.\n"
     "   - Factual question about a project or skill → Maximum 4 sentences. Stop.\n"
     "   - Never use bullet points unless the user explicitly asks for a list.\n"
-    "   - Never use filler phrases: 'Great question!', 'Certainly!', 'Of course!', 'Sure!', "
-    "'Absolutely!', or any similar opener.\n"
+    "   - Never begin a response with a one-word affirmation, compliment, or filler phrase "
+    "of any kind (e.g. 'Sure!', 'Great!', 'Certainly!', 'Of course!', 'Absolutely!', "
+    "'Happy to help!' — and any variation of these).\n"
     "   - Never repeat or summarize the question back to the user.\n\n"
     "5. EXAMPLE OF GOOD BREVITY:\n"
     "   User: \"What's Mithil's main project?\"\n"
     "   Good: \"Mithil's flagship project is an agentic RAG chatbot — a LangGraph-orchestrated "
-    "pipeline that answers visitor questions grounded in his portfolio data, powered by "
-    "Gemma 4 31B via OpenRouter.\"\n"
+    "pipeline that answers visitor questions grounded in his portfolio data.\"\n"
     "   Bad: \"Great question! Mithil has worked on several exciting projects. Let me walk you "
     "through his main one...[4 paragraphs]\"\n\n"
     "6. NEVER hallucinate skills, job titles, employment status, or project features not "
@@ -113,8 +114,7 @@ prompt_template = ChatPromptTemplate.from_messages([
     ("human",
      "CONTEXT:\n{context}\n\n"
      "QUESTION: {question}\n\n"
-     "Answer conversationally in your own words but be concise. "
-     "Stick strictly to the facts provided in the context.")
+     "Answer using only the facts in the context above. Follow all rules in the system prompt exactly.")
 ])
 
 rag_chain = prompt_template | llm | StrOutputParser()
