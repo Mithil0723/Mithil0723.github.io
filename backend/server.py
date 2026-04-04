@@ -258,7 +258,7 @@ def rerank(state: AgentState) -> AgentState:
 
 def grade(state: AgentState) -> AgentState:
     """
-    Node 2 — Check whether any documents were retrieved.
+    Node 3 — Check whether any documents were retrieved.
     Short-circuits to fallback when context is empty (hallucination prevention).
     """
     if not state["context"]:
@@ -273,7 +273,7 @@ def grade(state: AgentState) -> AgentState:
 
 def generate(state: AgentState) -> AgentState:
     """
-    Node 3 — Build the prompt and call the LLM via the LangChain chain.
+    Node 4 — Build the prompt and call the LLM via the LangChain chain.
     Now dynamically responds even if context is empty.
     """
     logger.info("Node: generate — calling Gemma 4 31B via OpenRouter")

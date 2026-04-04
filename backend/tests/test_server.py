@@ -59,43 +59,51 @@ def test_classify_is_mithil_employed():
     assert classify_intent("is Mithil employed?") == "portfolio_question"
 
 
+import numpy as np
 from server import rerank, AgentState
 
 def test_rerank_filters_irrelevant_chunks():
-    """Chunks with score <= 0.0 should be removed."""
-    state: AgentState = {
-        "question": "What is Mithil's RAG chatbot project?",
-        "context": [
-            "[Source: RAG Chatbot.md]\nMithil built an agentic RAG chatbot using LangGraph and DeepSeek.",
-            "[Source: About_me.md]\nThe capital of France is Paris.",  # clearly irrelevant
-        ],
-        "answer": "",
-    }
-    result = rerank(state)
-    # The RAG chatbot chunk should survive; the Paris chunk should be filtered
-    assert len(result["context"]) >= 1
-    assert any("RAG" in c for c in result["context"])
+    """Chunks with score <= 0.0 should be removed; relevant chunk kept."""
+    mock_scores = np.array([0.8, -0.3])  # first chunk relevant, second not
+    with patch("server.get_reranker") as mock_get:
+        mock_get.return_value.predict.return_value = mock_scores
+        state: AgentState = {
+            "question": "What is Mithil's RAG chatbot project?",
+            "context": [
+                "[Source: RAG Chatbot.md]\nMithil built an agentic RAG chatbot using LangGraph.",
+                "[Source: About_me.md]\nThe capital of France is Paris.",
+            ],
+            "answer": "",
+        }
+        result = rerank(state)
+        assert len(result["context"]) == 1
+        assert "RAG" in result["context"][0]
 
 def test_rerank_returns_at_most_3_chunks():
-    """Never passes more than 3 chunks to the LLM."""
-    chunks = [
-        f"[Source: test.md]\nMithil worked on project {i} using Python and machine learning."
-        for i in range(8)
-    ]
-    state: AgentState = {
-        "question": "What projects did Mithil build?",
-        "context": chunks,
-        "answer": "",
-    }
-    result = rerank(state)
-    assert len(result["context"]) <= 3
+    """Never passes more than 3 chunks to the LLM, even with 8 candidates."""
+    mock_scores = np.array([0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2])
+    with patch("server.get_reranker") as mock_get:
+        mock_get.return_value.predict.return_value = mock_scores
+        chunks = [
+            f"[Source: test.md]\nMithil worked on project {i} using Python."
+            for i in range(8)
+        ]
+        state: AgentState = {
+            "question": "What projects did Mithil build?",
+            "context": chunks,
+            "answer": "",
+        }
+        result = rerank(state)
+        assert len(result["context"]) == 3
 
 def test_rerank_empty_context_passthrough():
-    """Empty context should pass through unchanged."""
-    state: AgentState = {
-        "question": "What is Mithil's GPA?",
-        "context": [],
-        "answer": "",
-    }
-    result = rerank(state)
-    assert result["context"] == []
+    """Empty context should pass through without calling the reranker."""
+    with patch("server.get_reranker") as mock_get:
+        state: AgentState = {
+            "question": "What is Mithil's GPA?",
+            "context": [],
+            "answer": "",
+        }
+        result = rerank(state)
+        assert result["context"] == []
+        mock_get.assert_not_called()
