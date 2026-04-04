@@ -9,6 +9,7 @@ from pydantic import BaseModel, field_validator
 
 # LangChain / LangGraph / LangSmith
 from langchain_huggingface import HuggingFaceEmbeddings
+from sentence_transformers import CrossEncoder
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 from langchain_openai import ChatOpenAI
@@ -60,6 +61,21 @@ def get_embeddings():
         )
         logger.info("Embeddings model loaded successfully")
     return _embeddings
+
+# ─────────────────────────────────────────────
+# 1b. CrossEncoder Reranker (lazy-loaded)
+# ─────────────────────────────────────────────
+_reranker = None
+
+
+def get_reranker():
+    """Lazy singleton — loads the CrossEncoder reranker on first call."""
+    global _reranker
+    if _reranker is None:
+        logger.info("Loading CrossEncoder reranker model (first request)...")
+        _reranker = CrossEncoder("cross-encoder/ms-marco-MiniLM-L-6-v2")
+        logger.info("Reranker model loaded successfully")
+    return _reranker
 
 # ─────────────────────────────────────────────
 # 2. OpenRouter LLM (Gemma 4 31B)
@@ -197,8 +213,8 @@ def retrieve(state: AgentState) -> AgentState:
 
     response = supabase.rpc("match_documents", {
         "query_embedding": query_vector,
-        "match_threshold": 0.45,  # Calibrated for all-MiniLM-L6-v2; grade node catches empty results
-        "match_count": 5,
+        "match_threshold": 0.40,
+        "match_count": 8,
     }).execute()
 
     docs = response.data or []
@@ -216,6 +232,28 @@ def retrieve(state: AgentState) -> AgentState:
         context_chunks.append(f"{prefix}\n{doc['content']}")
 
     return {**state, "context": context_chunks}
+
+
+def rerank(state: AgentState) -> AgentState:
+    """
+    Node 2 — Cross-encoder reranking.
+    Scores each retrieved chunk against the question using ms-marco-MiniLM-L-6-v2.
+    Keeps only chunks with score > 0.0, capped at top-3.
+    Eliminates noisy retrievals before they reach the LLM.
+    """
+    if not state["context"]:
+        return state
+
+    logger.info(f"Node: rerank — scoring {len(state['context'])} chunks")
+    question = state["question"]
+    pairs = [[question, chunk] for chunk in state["context"]]
+    scores = get_reranker().predict(pairs)
+
+    scored = sorted(zip(scores, state["context"]), key=lambda x: x[0], reverse=True)
+    filtered = [chunk for score, chunk in scored if score > 0.0][:3]
+
+    logger.info(f"Rerank: {len(state['context'])} → {len(filtered)} chunks after filtering")
+    return {**state, "context": filtered}
 
 
 def grade(state: AgentState) -> AgentState:
@@ -251,16 +289,17 @@ def generate(state: AgentState) -> AgentState:
 
 
 # Compile the LangGraph StateGraph
-# Nodes run in order: retrieve → grade → generate → END
+# Nodes run in order: retrieve → rerank → grade → generate → END
 builder = StateGraph(AgentState)
 builder.add_node("retrieve", retrieve)
+builder.add_node("rerank", rerank)
 builder.add_node("grade", grade)
 builder.add_node("generate", generate)
 
 builder.set_entry_point("retrieve")
-builder.add_edge("retrieve", "grade")
+builder.add_edge("retrieve", "rerank")
+builder.add_edge("rerank", "grade")
 
-# CHANGED — conditional routing: skip generate if grade already set a fallback answer
 def route_after_grade(state: AgentState) -> str:
     if state.get("answer"):
         return "__end__"

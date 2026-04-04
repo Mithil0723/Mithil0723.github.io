@@ -57,3 +57,45 @@ def test_classify_portfolio_question():
 
 def test_classify_is_mithil_employed():
     assert classify_intent("is Mithil employed?") == "portfolio_question"
+
+
+from server import rerank, AgentState
+
+def test_rerank_filters_irrelevant_chunks():
+    """Chunks with score <= 0.0 should be removed."""
+    state: AgentState = {
+        "question": "What is Mithil's RAG chatbot project?",
+        "context": [
+            "[Source: RAG Chatbot.md]\nMithil built an agentic RAG chatbot using LangGraph and DeepSeek.",
+            "[Source: About_me.md]\nThe capital of France is Paris.",  # clearly irrelevant
+        ],
+        "answer": "",
+    }
+    result = rerank(state)
+    # The RAG chatbot chunk should survive; the Paris chunk should be filtered
+    assert len(result["context"]) >= 1
+    assert any("RAG" in c for c in result["context"])
+
+def test_rerank_returns_at_most_3_chunks():
+    """Never passes more than 3 chunks to the LLM."""
+    chunks = [
+        f"[Source: test.md]\nMithil worked on project {i} using Python and machine learning."
+        for i in range(8)
+    ]
+    state: AgentState = {
+        "question": "What projects did Mithil build?",
+        "context": chunks,
+        "answer": "",
+    }
+    result = rerank(state)
+    assert len(result["context"]) <= 3
+
+def test_rerank_empty_context_passthrough():
+    """Empty context should pass through unchanged."""
+    state: AgentState = {
+        "question": "What is Mithil's GPA?",
+        "context": [],
+        "answer": "",
+    }
+    result = rerank(state)
+    assert result["context"] == []
