@@ -231,7 +231,7 @@ def generate(state: AgentState) -> AgentState:
     Node 3 — Build the prompt and call the LLM via the LangChain chain.
     Now dynamically responds even if context is empty.
     """
-    logger.info("Node: generate — calling DeepSeek V3.2 via OpenRouter")
+    logger.info("Node: generate — calling Gemma 4 31B via OpenRouter")
     context_text = "\n\n".join(state["context"]) if state["context"] else ""
 
     answer = rag_chain.invoke({
