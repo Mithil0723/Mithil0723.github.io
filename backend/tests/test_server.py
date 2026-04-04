@@ -46,7 +46,11 @@ def test_classify_single_char_is_greeting():
     assert classify_intent("?") == "greeting"
 
 def test_classify_weather_is_out_of_scope():
-    assert classify_intent("what's the weather today?") == "out_of_scope"
+    assert classify_intent("weather today") == "out_of_scope"
+
+def test_classify_greeting_prefix_portfolio_question_reaches_rag():
+    # "hi what projects..." must NOT be swallowed by the greeting pattern
+    assert classify_intent("hi what projects has Mithil built?") == "portfolio_question"
 
 def test_classify_portfolio_question():
     assert classify_intent("what projects has Mithil built?") == "portfolio_question"

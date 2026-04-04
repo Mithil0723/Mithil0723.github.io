@@ -150,24 +150,25 @@ def classify_intent(message: str) -> str:
     """
     msg = message.lower().strip()
 
-    # Single character or punctuation-only input
-    if len(msg) <= 2 and not msg.isalpha() or len(msg) == 1:
+    # Single character, or two non-alpha characters (e.g. "?", "!!")
+    if len(msg) == 1 or (len(msg) == 2 and not msg.isalpha()):
         return "greeting"
 
     greeting_patterns = [
-        r"^(hi|hey|hello|howdy|sup|what'?s up|yo)(\s.*)?([\.!\?]*)$",
-        r"^(good (morning|afternoon|evening|night))([\.!\?]*)$",
-        r"^(thanks|thank you|thx|ty)([\.!\?\s]*)$",
-        r"^(bye|goodbye|see you|cya|take care)([\.!\?]*)$",
-        r"^(nice|cool|great|awesome|ok|okay|got it|sounds good)([\.!\?]*)$",
-        r"^(who are you|what are you|what can you do|help|what do you do)([\.!\?]*)$",
-        r"^(tell me about yourself)([\.!\?]*)$",
+        # Only allow short social suffixes after greeting word — prevents "hi what projects..." matching
+        r"^(hi|hey|hello|howdy|sup|what'?s up|yo)(\s+(there|friend|bot|mate|everyone|all))?[.!?]*$",
+        r"^(good (morning|afternoon|evening|night))[.!?]*$",
+        r"^(thanks|thank you|thx|ty)[.!?\s]*$",
+        r"^(bye|goodbye|see you|cya|take care)[.!?]*$",
+        r"^(nice|cool|great|awesome|ok|okay|got it|sounds good)[.!?]*$",
+        r"^(who are you|what are you|what can you do|help|what do you do)[.!?]*$",
+        r"^(tell me about yourself)[.!?]*$",
     ]
 
     out_of_scope_patterns = [
-        r"\b(weather|forecast|temperature|rain|snow)\b",
+        r"\b(weather forecast|rain tomorrow|will it snow|weather today)\b",
         r"\b(stock|crypto|bitcoin|price of)\b",
-        r"\b(recipe|cook|bake|food)\b",
+        r"\b(recipe for|how to bake|how to cook)\b",
         r"\b(translate|what does .+ mean in)\b",
         r"\b(capital of|population of|how far is)\b",
     ]
