@@ -78,12 +78,11 @@ def get_reranker():
     return _reranker
 
 # ─────────────────────────────────────────────
-# 2. OpenRouter LLM (Gemma 4 31B)
+# 2. OpenAI LLM (GPT-4o-mini — fast, cost-efficient)
 # ─────────────────────────────────────────────
 llm = ChatOpenAI(
-    model="google/gemma-4-31b-it",
-    openai_api_key=os.getenv("OPENROUTER_API_KEY"),
-    openai_api_base="https://openrouter.ai/api/v1",
+    model="gpt-4o-mini",
+    openai_api_key=os.getenv("OPENAI_API_KEY"),
     temperature=0.3,
     max_tokens=600,
 )
