@@ -16,7 +16,7 @@ COPY backend/ .
 
 # Copy source documents for ingestion to match the relative paths (../) expected by ingest.py
 COPY About_me.md /About_me.md
-COPY "project contents" "/project contents"
+COPY ["project contents", "/project contents"]
 
 # Run ingestion at build time — bakes the SQLite vector DB into the image
 RUN python ingest.py
