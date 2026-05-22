@@ -1,13 +1,14 @@
 import os
 import re
 import glob
+import json
+import sqlite3
 import logging
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_text_splitters import (
     MarkdownHeaderTextSplitter,
     RecursiveCharacterTextSplitter,
 )
-from supabase import create_client, Client
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -24,10 +25,26 @@ embeddings = HuggingFaceEmbeddings(
     encode_kwargs={"normalize_embeddings": True},
 )
 
-supabase: Client = create_client(
-    os.getenv("SUPABASE_URL"),
-    os.getenv("SUPABASE_SERVICE_KEY"),
-)
+# ─────────────────────────────────────────────
+# SQLite Vector Store
+# ─────────────────────────────────────────────
+DB_PATH = os.getenv("VECTOR_DB_PATH", "vectors.db")
+
+
+def init_db():
+    """Create the documents table if it doesn't exist."""
+    conn = sqlite3.connect(DB_PATH)
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS documents (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            content TEXT NOT NULL,
+            metadata TEXT NOT NULL,
+            embedding TEXT NOT NULL
+        )
+    """)
+    conn.commit()
+    conn.close()
+    logger.info(f"SQLite database initialized at {DB_PATH}")
 
 
 # ─────────────────────────────────────────────
@@ -145,7 +162,7 @@ def chunk_simple(text: str, source_name: str) -> list[dict]:
 # ─────────────────────────────────────────────
 def ingest_file(file_path: str, source_name: str, use_markdown_splitting: bool = False):
     """
-    Load a file, chunk it, embed it, and upload to Supabase.
+    Load a file, chunk it, embed it, and upload to SQLite.
     Clears existing documents from this source before inserting.
     """
     # 1. Load file
@@ -169,9 +186,12 @@ def ingest_file(file_path: str, source_name: str, use_markdown_splitting: bool =
 
     # 4. Clear old data for this source
     logger.info(f"  Clearing existing documents for source: {source_name}")
-    supabase.table("documents").delete().eq(
-        "metadata->>source", source_name
-    ).execute()
+    conn = sqlite3.connect(DB_PATH)
+    conn.execute(
+        "DELETE FROM documents WHERE json_extract(metadata, '$.source') = ?",
+        (source_name,)
+    )
+    conn.commit()
 
     # 5. Chunk the text
     if use_markdown_splitting:
@@ -185,29 +205,37 @@ def ingest_file(file_path: str, source_name: str, use_markdown_splitting: bool =
     chunk_texts = [c["content"] for c in chunks]
     chunk_embeddings = embeddings.embed_documents(chunk_texts)
 
-    # 7. Upload to Supabase
+    # 7. Upload to SQLite
     successful = 0
     failed = 0
 
     for i, (chunk_data, embedding) in enumerate(zip(chunks, chunk_embeddings)):
         try:
-            data = {
-                "content": chunk_data["content"],
-                "metadata": chunk_data["metadata"],
-                "embedding": embedding,
-            }
-            supabase.table("documents").insert(data).execute()
+            conn.execute(
+                "INSERT INTO documents (content, metadata, embedding) VALUES (?, ?, ?)",
+                (
+                    chunk_data["content"],
+                    json.dumps(chunk_data["metadata"]),
+                    json.dumps(embedding),
+                )
+            )
             successful += 1
         except Exception as e:
-            logger.exception(f"  Failed to upload chunk {i+1}: {e}")
+            logger.exception(f"  Failed to insert chunk {i+1}: {e}")
             failed += 1
             continue
+
+    conn.commit()
+    conn.close()
 
     logger.info(f"  {source_name}: {successful} uploaded, {failed} failed")
     return successful, failed
 
 
 def main():
+    # Initialize the database
+    init_db()
+
     total_successful = 0
     total_failed = 0
 

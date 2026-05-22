@@ -1,4 +1,6 @@
 import os
+import json
+import sqlite3
 import logging
 from typing import TypedDict, List
 
@@ -16,8 +18,7 @@ from langchain_openai import ChatOpenAI
 from langgraph.graph import StateGraph, END
 from langsmith import traceable
 
-# Supabase
-from supabase import create_client, Client
+import numpy as np
 
 load_dotenv()
 
@@ -135,12 +136,45 @@ prompt_template = ChatPromptTemplate.from_messages([
 rag_chain = prompt_template | llm | StrOutputParser()
 
 # ─────────────────────────────────────────────
-# 4. Supabase client
+# 4. SQLite Vector Store (lazy-loaded into memory)
 # ─────────────────────────────────────────────
-supabase: Client = create_client(
-    os.getenv("SUPABASE_URL"),
-    os.getenv("SUPABASE_SERVICE_KEY"),
-)
+DB_PATH = os.getenv("VECTOR_DB_PATH", "vectors.db")
+_vectors_cache = None
+
+
+def load_vectors():
+    """Load all embeddings from SQLite into memory (one-time).
+    Returns (docs_list, embeddings_matrix) where embeddings_matrix
+    is a numpy array of shape (n_docs, 384)."""
+    global _vectors_cache
+    if _vectors_cache is not None:
+        return _vectors_cache
+
+    logger.info(f"Loading vectors from SQLite database: {DB_PATH}")
+    conn = sqlite3.connect(DB_PATH)
+    rows = conn.execute(
+        "SELECT id, content, metadata, embedding FROM documents"
+    ).fetchall()
+    conn.close()
+
+    if not rows:
+        logger.warning("No documents found in SQLite database")
+        _vectors_cache = ([], np.array([], dtype=np.float32))
+        return _vectors_cache
+
+    docs = []
+    embeddings_list = []
+    for row in rows:
+        docs.append({
+            "id": row[0],
+            "content": row[1],
+            "metadata": json.loads(row[2]),
+        })
+        embeddings_list.append(json.loads(row[3]))
+
+    _vectors_cache = (docs, np.array(embeddings_list, dtype=np.float32))
+    logger.info(f"Loaded {len(docs)} document vectors into memory")
+    return _vectors_cache
 
 
 # ─────────────────────────────────────────────
@@ -201,27 +235,42 @@ def classify_intent(message: str) -> str:
 
 def retrieve(state: AgentState) -> AgentState:
     """
-    Node 1 — Embed the question and retrieve matching documents from Supabase.
-    Uses HuggingFace embeddings (local, no API quota).
+    Node 1 — Embed the question and retrieve matching documents from SQLite.
+    Uses HuggingFace embeddings (local, no API quota) and numpy cosine
+    similarity for in-memory vector search.
     Each retrieved chunk is prefixed with its source file and section
     so the LLM can reference specific projects by name.
     """
-    logger.info("Node: retrieve — embedding query and searching Supabase")
+    logger.info("Node: retrieve — embedding query and searching SQLite")
 
-    query_vector = get_embeddings().embed_query(state["question"])
+    query_vector = np.array(
+        get_embeddings().embed_query(state["question"]), dtype=np.float32
+    )
 
-    response = supabase.rpc("match_documents", {
-        "query_embedding": query_vector,
-        "match_threshold": 0.40,
-        "match_count": 8,
-    }).execute()
+    docs, embeddings_matrix = load_vectors()
 
-    docs = response.data or []
-    logger.info(f"Retrieved {len(docs)} documents")
+    if len(docs) == 0:
+        logger.warning("Vector store is empty — no documents to search")
+        return {**state, "context": []}
+
+    # Cosine similarity (vectors are already normalized by HuggingFace)
+    similarities = embeddings_matrix @ query_vector
+
+    # Filter by threshold and get top-8
+    match_threshold = 0.25
+    match_count = 8
+    scored = [
+        (sim, doc) for sim, doc in zip(similarities, docs)
+        if sim >= match_threshold
+    ]
+    scored.sort(key=lambda x: x[0], reverse=True)
+    top_docs = scored[:match_count]
+
+    logger.info(f"Retrieved {len(top_docs)} documents (threshold={match_threshold})")
 
     # Build context strings with source attribution
     context_chunks = []
-    for doc in docs:
+    for sim, doc in top_docs:
         meta = doc.get("metadata") or {}
         source = meta.get("source", "Unknown")
         section = meta.get("section", "")

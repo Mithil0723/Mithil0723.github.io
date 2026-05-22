@@ -3,3 +3,6 @@ __pycache__/
 *.pyc
 backend/debug_test.py
 .agents/
+backend/vectors.db
+backend/test_results.json
+backend/test_results.txt

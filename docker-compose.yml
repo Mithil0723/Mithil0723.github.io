@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  rag-chatbot:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - OPENAI_API_KEY=$OPENAI_API_KEY
+      - VECTOR_DB_PATH=vectors.db
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-*}
+      - LANGCHAIN_TRACING_V2=${LANGCHAIN_TRACING_V2:-false}
+      - LANGCHAIN_API_KEY=${LANGCHAIN_API_KEY:-}
+      - LANGCHAIN_PROJECT=${LANGCHAIN_PROJECT:-rag-agent}
+    restart: always

@@ -3,7 +3,7 @@ FROM python:3.13-slim
 WORKDIR /app
 
 # Install dependencies first (cached layer — only re-runs if requirements.txt changes)
-COPY requirements.txt .
+COPY backend/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Pre-download the HuggingFace model during build (~90 MB)
@@ -12,9 +12,16 @@ RUN pip install --no-cache-dir -r requirements.txt
 RUN python -c "from sentence_transformers import SentenceTransformer; SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')"
 
 # Copy application code
-COPY . .
+COPY backend/ .
 
-# Expose port (Render will set PORT env var)
+# Copy source documents for ingestion to match the relative paths (../) expected by ingest.py
+COPY About_me.md /About_me.md
+COPY "project contents" "/project contents"
+
+# Run ingestion at build time — bakes the SQLite vector DB into the image
+RUN python ingest.py
+
+# Expose port (Coolify will route to this)
 EXPOSE 8000
 
 CMD ["uvicorn", "server:app", "--host", "0.0.0.0", "--port", "8000"]

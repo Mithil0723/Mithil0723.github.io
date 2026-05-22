@@ -9,6 +9,6 @@ langgraph
 langsmith
 openai
 sentence-transformers
-supabase
+numpy
 pydantic
 python-dotenv
