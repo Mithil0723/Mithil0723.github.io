@@ -21,7 +21,7 @@ COPY ["project contents", "/project contents"]
 # Run ingestion at build time — bakes the SQLite vector DB into the image
 RUN python ingest.py
 
-# Expose port (Coolify will route to this)
+# Expose port (Render/Coolify will route to this or override it)
 EXPOSE 8000
 
-CMD ["uvicorn", "server:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["sh", "-c", "uvicorn server:app --host 0.0.0.0 --port ${PORT:-8000}"]
