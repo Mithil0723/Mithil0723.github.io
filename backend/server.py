@@ -376,13 +376,13 @@ class ChatRequest(BaseModel):
         return v.strip()
 
 
-@app.api_route("/", methods=["GET", "HEAD"])
+@app.get("/")
 async def root():
     """Root route — basic service info."""
     return {"service": "RAG Agent", "docs": "/docs"}
 
 
-@app.api_route("/health", methods=["GET", "HEAD"])
+@app.get("/health")
 async def health_check():
     """Health check endpoint for monitoring."""
     return {"status": "healthy", "service": "RAG Agent"}
