@@ -12,7 +12,7 @@ course_context: "Data Science/Machine Learning Project"
 course_level: "intermediate" # beginner, intermediate, advanced
 assignment_type: "individual" # individual, group
 team_size: 1
-primary_role: "Data Scientist" # Infer from work done
+primary_role: "Classification Modeling & Predictive Analytics" # Infer from work done
 
 # TECHNICAL STACK - Arrays Only
 primary_languages: ["Python"]

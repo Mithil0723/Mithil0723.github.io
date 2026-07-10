@@ -1,6 +1,6 @@
 ## About Me
 
-I am a Data Science student at the University of Illinois at Chicago focused on building intelligent, agent-driven systems that move beyond static models toward dynamic decision-making architectures. My work centers on integrating machine learning, Retrieval-Augmented Generation (RAG), and Agentic AI into structured AI workflow integration pipelines that combine reasoning, tool orchestration, and state-aware execution.
+I am a Data Science graduate of the University of Illinois at Chicago focused on building intelligent, agent-driven systems that move beyond static models toward dynamic decision-making architectures. My work centers on integrating machine learning, Retrieval-Augmented Generation (RAG), and Agentic AI into structured AI workflow integration pipelines that combine reasoning, tool orchestration, and state-aware execution.
 
 Rather than viewing Large Language Models (LLMs) as standalone text generators, I approach them as components within broader AI systems — systems that require routing logic, memory management, structured tool invocation, and feedback-driven iteration. I am particularly interested in designing multi-step reasoning workflows where LLMs interact with external data sources, retrieval layers, and decision modules to produce reliable, context-aware outputs.
 
