@@ -6,3 +6,5 @@ backend/debug_test.py
 backend/vectors.db
 backend/test_results.json
 backend/test_results.txt
+.claude/settings.local.json
+.DS_Store

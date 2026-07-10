@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Design Mockup — Makeover Target (see DESIGN_BRIEF.md)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  /* ============ TOKENS (canonical — copy into style.css) ============ */
+  :root {
+    --bg: #FAF8F5;
+    --bg-raised: #F3EFE9;
+    --border: #E8E2DA;
+    --ink: #2A2521;
+    --ink-muted: #59524A;
+    --accent: #B4552D;
+    --accent-strong: #9C4526;
+    --tech: #1F4E5F;
+
+    --font-heading: 'Fraunces', Georgia, serif;
+    --font-body: 'Inter', system-ui, sans-serif;
+    --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+
+    --radius: 10px;
+    --maxw: 1080px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-body);
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 2rem; }
+
+  /* ============ NAV ============ */
+  header {
+    border-bottom: 1px solid var(--border);
+    position: sticky; top: 0; background: rgba(250,248,245,.92);
+    backdrop-filter: blur(6px); z-index: 10;
+  }
+  nav { display: flex; align-items: center; justify-content: space-between; height: 64px; }
+  .logo { font-family: var(--font-heading); font-weight: 700; font-size: 1.25rem; color: var(--ink); text-decoration: none; }
+  .logo span { color: var(--accent); }
+  .nav-links { display: flex; gap: 2rem; list-style: none; }
+  .nav-links a {
+    color: var(--ink-muted); text-decoration: none;
+    font-family: var(--font-mono); font-size: .85rem;
+  }
+  .nav-links a:hover, .nav-links a:focus-visible { color: var(--accent-strong); }
+  a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+  /* ============ HERO (asymmetric, editorial) ============ */
+  .hero { padding: 7rem 0 6rem; }
+  .kicker {
+    font-family: var(--font-mono); font-size: .85rem; color: var(--accent-strong);
+    display: block; margin-bottom: 1.25rem;
+  }
+  h1 {
+    font-family: var(--font-heading); font-weight: 600;
+    font-size: clamp(2.6rem, 6vw, 4.2rem); line-height: 1.08;
+    letter-spacing: -0.015em; max-width: 16ch;
+  }
+  .hero p {
+    margin: 1.75rem 0 2.5rem; max-width: 54ch;
+    font-size: 1.125rem; color: var(--ink-muted);
+  }
+  .btn {
+    display: inline-block; padding: .8rem 1.6rem; border-radius: var(--radius);
+    font-weight: 600; font-size: .95rem; text-decoration: none;
+    transition: transform .18s ease, box-shadow .18s ease;
+  }
+  .btn:hover { transform: translateY(-2px); }
+  .btn-primary { background: var(--accent); color: #FAF8F5; }
+  .btn-primary:hover { background: var(--accent-strong); box-shadow: 0 6px 18px rgba(180,85,45,.25); }
+  .btn-ghost { color: var(--ink); border: 1px solid var(--border); margin-left: .75rem; background: transparent; }
+  .btn-ghost:hover { border-color: var(--accent); color: var(--accent-strong); }
+
+  /* ============ SECTION HEADING PATTERN ============ */
+  section { padding: 5rem 0; }
+  .sec-head { display: flex; align-items: baseline; gap: 1rem; margin-bottom: 3rem; }
+  .sec-num { font-family: var(--font-mono); color: var(--accent); font-size: .95rem; }
+  h2 { font-family: var(--font-heading); font-weight: 600; font-size: clamp(1.7rem, 3.5vw, 2.3rem); }
+  .sec-head::after { content: ""; flex: 1; height: 1px; background: var(--border); }
+
+  /* ============ PROJECT ROW (replaces modal cards) ============ */
+  .project {
+    display: grid; grid-template-columns: 1.1fr 1fr; gap: 3rem;
+    align-items: center; padding: 2.5rem; border: 1px solid var(--border);
+    border-radius: var(--radius); background: var(--bg-raised);
+    transition: transform .18s ease, box-shadow .18s ease;
+  }
+  .project:hover { transform: translateY(-4px); box-shadow: 0 10px 28px rgba(42,37,33,.08); }
+  .project .shot {
+    aspect-ratio: 16/10; border-radius: 6px; border: 1px solid var(--border);
+    background: repeating-linear-gradient(45deg, #EDE7DF, #EDE7DF 12px, #F3EFE9 12px, #F3EFE9 24px);
+    display: grid; place-items: center; color: var(--ink-muted);
+    font-family: var(--font-mono); font-size: .8rem;
+  }
+  .project h3 { font-family: var(--font-heading); font-size: 1.4rem; margin-bottom: .6rem; }
+  .project p { color: var(--ink-muted); font-size: .98rem; margin-bottom: 1.2rem; }
+  .chips { display: flex; flex-wrap: wrap; gap: .5rem; margin-bottom: 1.4rem; }
+  .chip {
+    font-family: var(--font-mono); font-size: .75rem; color: var(--tech);
+    border: 1px solid var(--tech); border-radius: 999px; padding: .2rem .7rem;
+    opacity: .85;
+  }
+  .links a {
+    font-family: var(--font-mono); font-size: .85rem; color: var(--accent-strong);
+    text-decoration: none; margin-right: 1.25rem;
+  }
+  .links a:hover { text-decoration: underline; }
+
+  /* ============ CHAT DEMO FRAME (tech texture) ============ */
+  .terminal {
+    border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden;
+    max-width: 640px; box-shadow: 0 8px 24px rgba(42,37,33,.07);
+  }
+  .term-bar {
+    background: var(--ink); padding: .6rem 1rem;
+    font-family: var(--font-mono); font-size: .78rem; color: #D9CFC4;
+  }
+  .term-bar::before { content: "● ● ●  "; color: var(--accent); letter-spacing: 2px; }
+  .term-body { background: #201B17; padding: 1.4rem; font-family: var(--font-mono); font-size: .88rem; line-height: 1.8; }
+  .term-body .q { color: #7FB5C4; }
+  .term-body .a { color: #D9CFC4; }
+
+  footer { border-top: 1px solid var(--border); padding: 2.5rem 0; color: var(--ink-muted); font-family: var(--font-mono); font-size: .8rem; }
+
+  @media (max-width: 760px) {
+    .project { grid-template-columns: 1fr; }
+    .nav-links { display: none; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap"><nav>
+    <a class="logo" href="#">MR<span>.</span></a>
+    <ul class="nav-links">
+      <li><a href="#">01 — about</a></li>
+      <li><a href="#">02 — projects</a></li>
+      <li><a href="#">03 — chat</a></li>
+      <li><a href="#">04 — contact</a></li>
+    </ul>
+  </nav></div>
+</header>
+
+<main class="wrap">
+
+  <section class="hero">
+    <span class="kicker">// Chicago · UIC Data Science</span>
+    <h1>Mithil Ravulapalli builds agentic AI systems.</h1>
+    <p>Data scientist focused on RAG pipelines, tool-orchestrating agents, and ML systems that are architecturally coherent, debuggable, and production-aware.</p>
+    <a class="btn btn-primary" href="#">View projects</a>
+    <a class="btn btn-ghost" href="#">Resume</a>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="sec-num">02</span><h2>Selected projects</h2></div>
+    <article class="project">
+      <div class="shot">[ project screenshot ]</div>
+      <div>
+        <h3>Portfolio RAG Chatbot</h3>
+        <p>Retrieval-augmented chatbot over my project corpus — SQLite/numpy vector store, deployed live via Coolify. Ask it anything on this site.</p>
+        <div class="chips"><span class="chip">Python</span><span class="chip">RAG</span><span class="chip">SQLite</span><span class="chip">Docker</span></div>
+        <div class="links"><a href="#">github ↗</a><a href="#">live demo ↗</a></div>
+      </div>
+    </article>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="sec-num">03</span><h2>Chat with my portfolio</h2></div>
+    <div class="terminal">
+      <div class="term-bar">mithil — rag-agent</div>
+      <div class="term-body">
+        <div class="q">&gt; what did Mithil build for recommendations?</div>
+        <div class="a">A collaborative-filtering system over Amazon ratings using matrix factorization…</div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer><div class="wrap">© 2026 · designed as HTML-first, built by agents</div></footer>
+
+</body>
+</html>

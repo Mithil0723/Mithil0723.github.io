@@ -4,488 +4,388 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mithil Ravulapalli - Data Scientist</title>
+    <title>Mithil Ravulapalli — Data Scientist & Agentic AI Engineer</title>
+    <meta name="description"
+        content="Portfolio of Mithil Ravulapalli — Data scientist building agentic AI systems, RAG pipelines, and ML workflows at UIC Chicago.">
+
+    <!-- Fonts: Fraunces (headings), Inter (body), JetBrains Mono (tech details) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
-        href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700&family=Poppins:wght@400;500;600;700;800&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
         rel="stylesheet">
+
     <link rel="stylesheet" href="assets/css/style.css">
-    <link rel="stylesheet" href="assets/css/modal.css">
+
+    <!-- Social sharing -->
+    <meta property="og:title" content="Mithil Ravulapalli — Data Scientist & Agentic AI Engineer">
+    <meta property="og:description"
+        content="Portfolio of Mithil Ravulapalli — agentic AI systems, RAG pipelines, and ML workflows.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://mithil0723.github.io/">
+    <meta property="og:image" content="https://mithil0723.github.io/project%20images/CustomerIntel.png">
+    <meta name="twitter:card" content="summary_large_image">
 </head>
 
 <body>
-    <!-- Project Details Modal -->
-    <div id="project-modal" class="modal">
-        <div class="modal-content">
-            <span class="modal-close">&times;</span>
-            <h2 id="modal-title"></h2>
-            <div id="modal-description"></div>
-            <div class="modal-footer">
-                <a id="modal-source-link" href="#" class="btn btn-primary" target="_blank">View Project Source</a>
-            </div>
-        </div>
-    </div>
+    <!-- Skip to main content (a11y) -->
+    <a href="#main" class="skip-link">Skip to main content</a>
 
-    <header class="header">
-        <nav class="nav">
-            <a href="#" class="nav-logo">MR</a>
-            <ul class="nav-menu">
-                <li class="nav-item"><a href="#about" class="nav-link">About</a></li>
-                <li class="nav-item"><a href="#projects" class="nav-link">Projects</a></li>
-                <li class="nav-item"><a href="#skills" class="nav-link">Skills</a></li>
-                <li class="nav-item"><a href="#contact" class="nav-link">Contact</a></li>
-            </ul>
-            <div class="hamburger">
-                <span class="bar"></span>
-                <span class="bar"></span>
-                <span class="bar"></span>
-            </div>
-        </nav>
+    <!-- ============ NAV ============ -->
+    <header>
+        <div class="wrap">
+            <nav>
+                <a class="logo" href="#">MR<span>.</span></a>
+                <ul class="nav-links" id="nav-links">
+                    <li><a href="#about">01 — about</a></li>
+                    <li><a href="#projects">02 — projects</a></li>
+                    <li><a href="#chat">03 — chat</a></li>
+                    <li><a href="#skills">04 — skills</a></li>
+                    <li><a href="#contact">05 — contact</a></li>
+                </ul>
+                <div class="hamburger" id="hamburger" aria-label="Toggle navigation menu" role="button" tabindex="0">
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                </div>
+            </nav>
+        </div>
     </header>
 
-    <main>
-        <section id="hero" class="hero-section">
-            <div class="mesh-bg">
-                <div class="mesh-blob mesh-blob-1"></div>
-                <div class="mesh-blob mesh-blob-2"></div>
-                <div class="mesh-blob mesh-blob-3"></div>
-                <div class="mesh-blob mesh-blob-4"></div>
+    <!-- ============ MAIN ============ -->
+    <main id="main" class="wrap">
+
+        <!-- ============ HERO (asymmetric, editorial) ============ -->
+        <section class="hero" id="about">
+            <span class="kicker">// Chicago · UIC Data Science</span>
+            <h1>Mithil Ravulapalli builds agentic AI systems.</h1>
+            <p>Data scientist focused on RAG pipelines, tool-orchestrating agents, and ML systems
+                that are architecturally coherent, debuggable, and production-aware.</p>
+            <div class="hero-buttons">
+                <a class="btn btn-primary" href="#projects">View projects</a>
+                <a class="btn btn-ghost" href="assets/documents/resume.pdf" target="_blank">Resume</a>
             </div>
-            <div class="noise-overlay"></div>
+        </section>
 
-            <div class="hero-overlay"></div>
+        <!-- ============ 02 — PROJECTS (case-study rows) ============ -->
+        <section id="projects">
+            <div class="sec-head">
+                <span class="sec-num">02</span>
+                <h2>Selected projects</h2>
+            </div>
+            <div class="projects-stack">
 
-            <div class="hero-content">
-                <h1 class="hero-title">Mithil Ravulapalli</h1>
-                <p class="hero-subtitle">
-                    <span class="typing-text"
-                        data-texts='["Architecting Agentic AI Systems", "AI Workflow Engineer", "Building Intelligent Pipelines"]'></span>
+                <!-- Project 1: RAG Chatbot -->
+                <article class="project reveal">
+                    <div class="shot">
+                        <img loading="lazy" src="project images/RAG.png"
+                            alt="Screenshot of the RAG AI Chatbot showing retrieval-augmented generation pipeline">
+                    </div>
+                    <div>
+                        <h3>Portfolio RAG Chatbot</h3>
+                        <p>Agentic RAG system with a LangGraph four-node pipeline — retrieve → rerank → grade →
+                            generate. Local HuggingFace embeddings, cross-encoder reranking, Gemma 4 31B generation,
+                            full LangSmith observability. Ask it anything on this site.</p>
+                        <div class="chips">
+                            <span class="chip">Python</span>
+                            <span class="chip">LangGraph</span>
+                            <span class="chip">RAG</span>
+                            <span class="chip">FastAPI</span>
+                            <span class="chip">Docker</span>
+                        </div>
+                        <div class="links">
+                            <a href="#chat">live demo ↗</a>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Project 2: CustomerIntel -->
+                <article class="project reveal">
+                    <div class="shot">
+                        <img loading="lazy" src="project images/CustomerIntel.png"
+                            alt="Screenshot of CustomerIntel multi-agent system architecture showing five-agent LangGraph pipeline">
+                    </div>
+                    <div>
+                        <h3>CustomerIntel — Multi-Agent Feedback Analysis</h3>
+                        <p>Five-agent LangGraph pipeline that converts unstructured customer feedback into prioritized
+                            business recommendations. Built the Strategy → Critic adversarial loop — Socratic
+                            questioning forces up to three revision cycles before final synthesis. Mixed LLM routing
+                            (Claude Sonnet / Haiku / GPT-3.5) optimized per agent role.</p>
+                        <div class="chips">
+                            <span class="chip">Python</span>
+                            <span class="chip">LangGraph</span>
+                            <span class="chip">LangChain</span>
+                            <span class="chip">ChromaDB</span>
+                            <span class="chip">Claude</span>
+                        </div>
+                        <div class="links">
+                            <a href="https://github.com/Mithil0723/CustomerIntel" target="_blank"
+                                rel="noopener">github ↗</a>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Project 3: Recommendation System -->
+                <article class="project reveal">
+                    <div class="shot">
+                        <img loading="lazy" src="project images/Recommendation.png"
+                            alt="Screenshot of the Amazon Product Recommendation System showing collaborative filtering results">
+                    </div>
+                    <div>
+                        <h3>Amazon Product Recommendation System</h3>
+                        <p>Collaborative-filtering suite over Amazon ratings using rank-based, user-user, item-item,
+                            and SVD matrix factorization models. Optimized through hyperparameter tuning for improved
+                            predictive accuracy across the full dataset.</p>
+                        <div class="chips">
+                            <span class="chip">Python</span>
+                            <span class="chip">Surprise</span>
+                            <span class="chip">SVD</span>
+                            <span class="chip">Scikit-learn</span>
+                        </div>
+                        <div class="links">
+                            <a href="https://github.com/Mithil0723/Recommendation-System" target="_blank"
+                                rel="noopener">github ↗</a>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Project 4: Predictive Analysis -->
+                <article class="project reveal">
+                    <div class="shot">
+                        <img loading="lazy" src="project images/Predictive analysis.png"
+                            alt="Screenshot of the lead scoring model showing 84% accuracy with decision tree visualization">
+                    </div>
+                    <div>
+                        <h3>Predicting Potential Customers</h3>
+                        <p>Lead scoring model for EdTech startup ExtraaLearn — 84% accuracy using Decision Trees and
+                            Random Forests with GridSearchCV hyperparameter tuning. Identified key conversion drivers
+                            to optimize resource allocation.</p>
+                        <div class="chips">
+                            <span class="chip">Python</span>
+                            <span class="chip">Random Forest</span>
+                            <span class="chip">Classification</span>
+                            <span class="chip">Scikit-learn</span>
+                        </div>
+                        <div class="links">
+                            <a href="https://github.com/Mithil0723/Predicting-Potential-Customers" target="_blank"
+                                rel="noopener">github ↗</a>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Project 5: FoodHub Analysis -->
+                <article class="project reveal">
+                    <div class="shot">
+                        <img loading="lazy" src="project images/FoodHub.png"
+                            alt="Screenshot of the FoodHub order analysis showing data visualizations and insights">
+                    </div>
+                    <div>
+                        <h3>FoodHub Order Analysis</h3>
+                        <p>Exploratory data analysis on 1,898 customer orders — generated actionable insights on
+                            restaurant partnerships, delivery logistics, and promotional strategies for business
+                            optimization.</p>
+                        <div class="chips">
+                            <span class="chip">Python</span>
+                            <span class="chip">Pandas</span>
+                            <span class="chip">EDA</span>
+                            <span class="chip">Seaborn</span>
+                        </div>
+                        <div class="links">
+                            <a href="https://github.com/Mithil0723/Food-Hub-Order-Analysis" target="_blank"
+                                rel="noopener">github ↗</a>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Project 6: Tata Data Visualization -->
+                <article class="project reveal">
+                    <div class="shot">
+                        <img loading="lazy" src="project images/tata.jpg"
+                            alt="Screenshot of the Tata data visualization dashboard with executive insights">
+                    </div>
+                    <div>
+                        <h3>Tata Data Visualization</h3>
+                        <p>Executive-level data visualizations for Tata Consultancy Services — transformed complex
+                            datasets into clear, actionable dashboards that empowered senior leaders to make
+                            data-driven strategic decisions.</p>
+                        <div class="chips">
+                            <span class="chip">Tableau</span>
+                            <span class="chip">Data Analysis</span>
+                            <span class="chip">Dashboarding</span>
+                        </div>
+                        <div class="links">
+                            <a href="https://lookerstudio.google.com/reporting/f6717d30-9776-40eb-8e11-dbb543bf7399"
+                                target="_blank" rel="noopener">dashboard ↗</a>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Project 7: DSA -->
+                <article class="project reveal">
+                    <div class="shot">
+                        <img loading="lazy" src="project images/DSA.png"
+                            alt="Screenshot of data structures and algorithms implementations">
+                    </div>
+                    <div>
+                        <h3>Data Structures & Algorithms</h3>
+                        <p>Optimized systems using Binary Search Trees, graph-based pathfinding with OpenStreetMap
+                            data, and Caesar/Vigenère cipher encryption — focusing on O(log n) algorithmic efficiency
+                            and modular design.</p>
+                        <div class="chips">
+                            <span class="chip">C++</span>
+                            <span class="chip">Algorithms</span>
+                            <span class="chip">Graph Search</span>
+                        </div>
+                        <div class="links">
+                            <a href="https://github.com/Mithil0723/DSA" target="_blank" rel="noopener">github ↗</a>
+                        </div>
+                    </div>
+                </article>
+
+            </div>
+        </section>
+
+        <!-- ============ 03 — CHAT (terminal-framed live demo) ============ -->
+        <section id="chat">
+            <div class="sec-head">
+                <span class="sec-num">03</span>
+                <h2>Chat with my portfolio</h2>
+            </div>
+            <div class="chat-section-inner">
+                <p style="color: var(--ink-muted); margin-bottom: 1.5rem; font-size: .95rem;">
+                    Ask the RAG agent anything about my projects, skills, or experience — it retrieves answers
+                    grounded in real portfolio data.
                 </p>
-                <div class="hero-buttons">
-                    <a href="#projects" class="btn btn-primary">View Projects</a>
-                    <a href="#contact" class="btn btn-secondary">Let's Build Something</a>
+                <div class="terminal">
+                    <div class="term-bar">mithil — rag-agent</div>
+                    <div class="term-body">
+                        <div id="chat-messages" class="chat-messages">
+                            <div class="a">Hi! I'm Mithil's AI assistant. Ask me about his projects, skills, or
+                                agentic AI work.</div>
+                        </div>
+                        <div class="chat-input-wrap">
+                            <input type="text" id="chat-input" placeholder="Ask something…"
+                                aria-label="Type a message to the AI assistant">
+                            <button id="send-btn" aria-label="Send message">Send</button>
+                        </div>
+                    </div>
                 </div>
             </div>
+        </section>
 
+        <!-- ============ 04 — SKILLS (three columns, mono chips) ============ -->
+        <section id="skills">
+            <div class="sec-head">
+                <span class="sec-num">04</span>
+                <h2>Skills & technologies</h2>
+            </div>
+            <div class="skills-columns">
+                <div class="skill-col">
+                    <h3>ML & Data</h3>
+                    <div class="skill-chips">
+                        <span class="skill-chip">Python</span>
+                        <span class="skill-chip">Pandas</span>
+                        <span class="skill-chip">NumPy</span>
+                        <span class="skill-chip">Scikit-learn</span>
+                        <span class="skill-chip">Machine Learning</span>
+                        <span class="skill-chip">SQL</span>
+                        <span class="skill-chip">Matplotlib</span>
+                        <span class="skill-chip">Seaborn</span>
+                        <span class="skill-chip">Tableau</span>
+                    </div>
+                </div>
+                <div class="skill-col">
+                    <h3>Agentic AI & RAG</h3>
+                    <div class="skill-chips">
+                        <span class="skill-chip">LangGraph</span>
+                        <span class="skill-chip">LangChain</span>
+                        <span class="skill-chip">RAG Pipelines</span>
+                        <span class="skill-chip">LLM Orchestration</span>
+                        <span class="skill-chip">HuggingFace</span>
+                        <span class="skill-chip">Generative AI</span>
+                        <span class="skill-chip">LangSmith</span>
+                        <span class="skill-chip">Vector Stores</span>
+                    </div>
+                </div>
+                <div class="skill-col">
+                    <h3>Engineering</h3>
+                    <div class="skill-chips">
+                        <span class="skill-chip">FastAPI</span>
+                        <span class="skill-chip">Docker</span>
+                        <span class="skill-chip">Git</span>
+                        <span class="skill-chip">REST APIs</span>
+                        <span class="skill-chip">C++</span>
+                        <span class="skill-chip">Supabase</span>
+                        <span class="skill-chip">Coolify</span>
+                        <span class="skill-chip">CI/CD</span>
+                    </div>
+                </div>
+            </div>
         </section>
 
-        <div class="marquee-container">
-            <div class="marquee-content">
-                <span>Agentic AI</span> <span class="dot">•</span>
-                <span>RAG Pipelines</span> <span class="dot">•</span>
-                <span>LangGraph</span> <span class="dot">•</span>
-                <span>LLM Orchestration</span> <span class="dot">•</span>
-                <span>Python</span> <span class="dot">•</span>
-                <span>Machine Learning</span> <span class="dot">•</span>
-                <span>FastAPI</span> <span class="dot">•</span>
-                <span>Data Engineering</span> <span class="dot">•</span>
-                <span>Agentic AI</span> <span class="dot">•</span>
-                <span>RAG Pipelines</span> <span class="dot">•</span>
-                <span>LangGraph</span> <span class="dot">•</span>
-                <span>LLM Orchestration</span> <span class="dot">•</span>
-                <span>Python</span> <span class="dot">•</span>
-                <span>Machine Learning</span> <span class="dot">•</span>
-                <span>FastAPI</span> <span class="dot">•</span>
-                <span>Data Engineering</span> <span class="dot">•</span>
+        <!-- ============ 05 — CONTACT ============ -->
+        <section id="contact">
+            <div class="sec-head">
+                <span class="sec-num">05</span>
+                <h2>Get in touch</h2>
             </div>
-        </div>
+            <div class="contact-grid">
+                <div class="contact-info">
+                    <h3>Let's build something</h3>
+                    <p>
+                        I'm open to collaborations on agentic AI systems, RAG pipelines,
+                        and intelligent workflow architectures. If you have a challenging
+                        AI problem or want to explore what's possible — let's talk.
+                    </p>
+                    <div class="social-links">
+                        <a href="mailto:vsm.ravulapalli@gmail.com" class="social-link">📧 Email</a>
+                        <a href="https://www.linkedin.com/in/mithil-ravulapalli/" class="social-link"
+                            target="_blank" rel="noopener">💼 LinkedIn</a>
+                        <a href="https://github.com/Mithil0723" class="social-link" target="_blank"
+                            rel="noopener">🐙 GitHub</a>
+                    </div>
+                </div>
+                <div class="contact-form-container">
+                    <form action="https://formspree.io/f/xjkkerbj" method="POST" class="contact-form">
+                        <div class="form-group">
+                            <label for="contact-name">Name</label>
+                            <input type="text" id="contact-name" name="name" placeholder="Your name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="contact-email">Email</label>
+                            <input type="email" id="contact-email" name="email" placeholder="you@example.com"
+                                required>
+                        </div>
+                        <div class="form-group">
+                            <label for="contact-message">Message</label>
+                            <textarea id="contact-message" name="message" placeholder="Your message"
+                                required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Send message</button>
+                    </form>
+                </div>
+            </div>
+        </section>
 
-        <section id="about" class="about-section">
-            <div class="container">
-                <h2 class="section-title reveal">About Me</h2>
-                <div class="about-content-grid">
-                    <div class="about-image-container">
-                        <div class="about-image-wrapper reveal">
-                            <img src="project images/avatar.png" alt="Mithil Ravulapalli" class="about-image">
-                        </div>
-                        <a href="assets/documents/resume.pdf" class="btn btn-primary" target="_blank">Download
-                            Resume</a>
-                    </div>
-                    <div class="about-text-content reveal">
-                        <h3>Hi, I'm Mithil Ravulapalli!</h3>
-                        <p>
-                            I'm a Data Science student at the University of Illinois at Chicago focused on building
-                            intelligent, agent-driven systems that move beyond static models toward dynamic
-                            decision-making architectures. My work centers on integrating machine learning,
-                            Retrieval-Augmented Generation (RAG), and Agentic AI into structured workflow pipelines that
-                            combine reasoning, tool orchestration, and state-aware execution.
-                        </p>
-                        <p>
-                            Rather than viewing LLMs as standalone text generators, I approach them as components within
-                            broader AI systems — systems that require routing logic, memory management, structured tool
-                            invocation, and feedback-driven iteration. I design multi-step reasoning workflows where
-                            LLMs interact with external data sources, retrieval layers, and decision modules to produce
-                            reliable, context-aware outputs.
-                        </p>
-                        <p>
-                            Growing up across diverse regions of India as the child of an army officer cultivated
-                            resilience, adaptability, and structured discipline — traits that strongly influence how I
-                            design systems. I am driven by a vision of AI not as isolated models, but as orchestrated
-                            ecosystems where RAG pipelines, agentic reasoning loops, and tool integration frameworks
-                            operate cohesively.
-                        </p>
-                        <div class="skills-list">
-                            <span class="skill-badge">Agentic AI</span>
-                            <span class="skill-badge">RAG Pipelines</span>
-                            <span class="skill-badge">LLM Orchestration</span>
-                            <span class="skill-badge">Machine Learning</span>
-                            <span class="skill-badge">Python</span>
-                            <span class="skill-badge">Data Engineering</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-        <section id="projects" class="projects-section">
-            <div class="container">
-                <h2 class="section-title reveal">My Projects</h2>
-                <div class="project-filters">
-                    <button class="filter-btn active" data-filter="all">All</button>
-                    <button class="filter-btn" data-filter="ai">AI</button>
-                    <button class="filter-btn" data-filter="data-analysis">Data Analysis</button>
-                    <button class="filter-btn" data-filter="machine-learning">Machine Learning</button>
-                    <button class="filter-btn" data-filter="data-visualization">Data Visualization</button>
-                    <button class="filter-btn" data-filter="dsa">DSA</button>
-                </div>
-                <div class="projects-grid">
-                    <!-- Project: RAG AI Chatbot -->
-                    <div class="project-card reveal" data-category="ai" data-project-id="rag-chatbot">
-                        <div class="project-image">
-                            <img src="project images/RAG.png" alt="RAG AI Chatbot" class="project-thumbnail">
-                            <div class="project-overlay">
-                                <span class="project-impact">RAG + LangGraph</span>
-                            </div>
-                        </div>
-                        <div class="project-content">
-                            <h3 class="project-title">AI Chatbot</h3>
-                            <p class="project-description">Built an agentic RAG chatbot using LangGraph, LangChain,
-                                HuggingFace embeddings, cross-encoder reranking, and Gemma 4 31B with full LangSmith
-                                observability — answers visitor questions grounded in real portfolio data.</p>
-                            <div class="project-tags">
-                                <span class="tag">Python</span>
-                                <span class="tag">LangGraph</span>
-                                <span class="tag">RAG</span>
-                                <span class="tag">FastAPI</span>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- Project 1: Tata Data Visualization -->
-                    <div class="project-card reveal" data-category="data-visualization">
-                        <div class="project-image">
-                            <img src="project images/tata.jpg" alt="Tata Data Visualization" class="project-thumbnail">
-                            <div class="project-overlay">
-                                <span class="project-impact">Executive Insights</span>
-                                <a href="https://lookerstudio.google.com/reporting/f6717d30-9776-40eb-8e11-dbb543bf7399"
-                                    class="btn btn-small" target="_blank">View Project</a>
-                            </div>
-                        </div>
-                        <div class="project-content">
-                            <h3 class="project-title">Tata Data Visualization</h3>
-                            <p class="project-description">Created impactful data visualizations for Tata Consultancy
-                                Services, transforming complex datasets into clear, actionable insights that empowered
-                                senior executives to make data-driven strategic decisions.</p>
-                            <div class="project-tags">
-                                <span class="tag">Tableau</span>
-                                <span class="tag">Data Analysis</span>
-                                <span class="tag">Dashboarding</span>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- Project 2: Recommendation System -->
-                    <div class="project-card reveal" data-category="machine-learning"
-                        data-project-id="recommendation-system">
-                        <div class="project-image">
-                            <img src="project images/Recommendation.png" alt="Recommendation System"
-                                class="project-thumbnail">
-                            <div class="project-overlay">
-                                <span class="project-impact">SVD + Collaborative Filtering</span>
-                                <a href="https://github.com/Mithil0723/Recommendation-System" class="btn btn-small"
-                                    target="_blank">View on GitHub</a>
-                            </div>
-                        </div>
-                        <div class="project-content">
-                            <h3 class="project-title">Amazon Product Recommendation System</h3>
-                            <p class="project-description">Built a suite of recommendation models using collaborative
-                                filtering and matrix factorization (SVD), optimized through hyperparameter tuning for
-                                improved predictive accuracy.</p>
-                            <div class="project-tags">
-                                <span class="tag">Python</span>
-                                <span class="tag">Collaborative Filtering</span>
-                                <span class="tag">Matrix Factorization</span>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- Project 3: Predictive Analysis -->
-                    <div class="project-card reveal" data-category="machine-learning"
-                        data-project-id="predictive-analysis">
-                        <div class="project-image">
-                            <img src="project images/Predictive analysis.png" alt="Predictive Analysis"
-                                class="project-thumbnail">
-                            <div class="project-overlay">
-                                <span class="project-impact">84% Accuracy</span>
-                                <a href="https://github.com/Mithil0723/Predicting-Potential-Customers"
-                                    class="btn btn-small" target="_blank">View on GitHub</a>
-                            </div>
-                        </div>
-                        <div class="project-content">
-                            <h3 class="project-title">Predicting Potential Customers</h3>
-                            <p class="project-description">Built a lead scoring model for EdTech startup ExtraaLearn,
-                                achieving 84% accuracy using Decision Trees and Random Forests with hyperparameter
-                                tuning to optimize resource allocation.</p>
-                            <div class="project-tags">
-                                <span class="tag">Python</span>
-                                <span class="tag">Random Forest</span>
-                                <span class="tag">Classification</span>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- Project 4: FoodHub Analysis -->
-                    <div class="project-card reveal" data-category="data-analysis" data-project-id="foodhub-analysis">
-                        <div class="project-image">
-                            <img src="project images/FoodHub.png" alt="FoodHub Analysis" class="project-thumbnail">
-                            <div class="project-overlay">
-                                <span class="project-impact">1,898 Orders Analyzed</span>
-                                <a href="https://github.com/Mithil0723/Food-Hub-Order-Analysis" class="btn btn-small"
-                                    target="_blank">View on GitHub</a>
-                            </div>
-                        </div>
-                        <div class="project-content">
-                            <h3 class="project-title">FoodHub Order Analysis</h3>
-                            <p class="project-description">Conducted in-depth exploratory data analysis on 1,898
-                                customer orders, generating actionable insights and strategic recommendations for
-                                business optimization.</p>
-                            <div class="project-tags">
-                                <span class="tag">Python</span>
-                                <span class="tag">Pandas</span>
-                                <span class="tag">EDA</span>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- Project 5: DSA -->
-                    <div class="project-card reveal" data-category="dsa">
-                        <div class="project-image">
-                            <img src="project images/DSA.png" alt="DSA" class="project-thumbnail">
-                            <div class="project-overlay">
-                                <span class="project-impact">O(log n) Optimized</span>
-                                <a href="https://github.com/Mithil0723/DSA" class="btn btn-small" target="_blank">View
-                                    on GitHub</a>
-                            </div>
-                        </div>
-                        <div class="project-content">
-                            <h3 class="project-title">Data Structures & Algorithms</h3>
-                            <p class="project-description">Designed optimized systems using Binary Search Trees,
-                                graph-based pathfinding with OpenStreetMap data, and Caesar/Vigenère cipher encryption —
-                                focusing on algorithmic efficiency and modular design.</p>
-                            <div class="project-tags">
-                                <span class="tag">C++</span>
-                                <span class="tag">Algorithms</span>
-                                <span class="tag">Data Structures</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-        <section id="skills" class="skills-section">
-            <div class="container">
-                <h2 class="section-title reveal">Skills & Technologies</h2>
-                <div class="skill-groups-container">
-                    <div class="skill-group reveal">
-                        <h3 class="skill-group-title">AI & Agents</h3>
-                        <div class="skills-grid">
-                            <div class="skill-card">
-                                <div class="skill-icon">🤖</div>
-                                <h3 class="skill-name">Agentic AI</h3>
-                                <p class="skill-level">Advanced</p>
-                                <div class="skill-bar-container">
-                                    <div class="skill-bar" data-level="95%"></div>
-                                </div>
-                            </div>
-                            <div class="skill-card">
-                                <div class="skill-icon">🔗</div>
-                                <h3 class="skill-name">RAG Pipelines</h3>
-                                <p class="skill-level">Advanced</p>
-                                <div class="skill-bar-container">
-                                    <div class="skill-bar" data-level="90%"></div>
-                                </div>
-                            </div>
-                            <div class="skill-card">
-                                <div class="skill-icon">🧠</div>
-                                <h3 class="skill-name">LLM Orchestration</h3>
-                                <p class="skill-level">Advanced</p>
-                                <div class="skill-bar-container">
-                                    <div class="skill-bar" data-level="90%"></div>
-                                </div>
-                            </div>
-                            <div class="skill-card">
-                                <div class="skill-icon">✨</div>
-                                <h3 class="skill-name">Generative AI</h3>
-                                <p class="skill-level">Advanced</p>
-                                <div class="skill-bar-container">
-                                    <div class="skill-bar" data-level="85%"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="skill-group reveal">
-                        <h3 class="skill-group-title">Core ML & Data</h3>
-                        <div class="skills-grid">
-                            <div class="skill-card">
-                                <div class="skill-icon">🐍</div>
-                                <h3 class="skill-name">Python</h3>
-                                <p class="skill-level">Expert</p>
-                                <div class="skill-bar-container">
-                                    <div class="skill-bar" data-level="95%"></div>
-                                </div>
-                            </div>
-                            <div class="skill-card">
-                                <div class="skill-icon">📊</div>
-                                <h3 class="skill-name">Machine Learning</h3>
-                                <p class="skill-level">Expert</p>
-                                <div class="skill-bar-container">
-                                    <div class="skill-bar" data-level="90%"></div>
-                                </div>
-                            </div>
-                            <div class="skill-card">
-                                <div class="skill-icon">🗄️</div>
-                                <h3 class="skill-name">SQL</h3>
-                                <p class="skill-level">Advanced</p>
-                                <div class="skill-bar-container">
-                                    <div class="skill-bar" data-level="85%"></div>
-                                </div>
-                            </div>
-                            <div class="skill-card">
-                                <div class="skill-icon">🐼</div>
-                                <h3 class="skill-name">Pandas</h3>
-                                <p class="skill-level">Advanced</p>
-                                <div class="skill-bar-container">
-                                    <div class="skill-bar" data-level="85%"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="skill-group reveal">
-                        <h3 class="skill-group-title">Visualization & Tools</h3>
-                        <div class="skills-grid">
-                            <div class="skill-card">
-                                <div class="skill-icon">📈</div>
-                                <h3 class="skill-name">Tableau</h3>
-                                <p class="skill-level">Advanced</p>
-                                <div class="skill-bar-container">
-                                    <div class="skill-bar" data-level="80%"></div>
-                                </div>
-                            </div>
-                            <div class="skill-card">
-                                <div class="skill-icon">📉</div>
-                                <h3 class="skill-name">Matplotlib</h3>
-                                <p class="skill-level">Advanced</p>
-                                <div class="skill-bar-container">
-                                    <div class="skill-bar" data-level="80%"></div>
-                                </div>
-                            </div>
-                            <div class="skill-card">
-                                <div class="skill-icon">⚙️</div>
-                                <h3 class="skill-name">C++</h3>
-                                <p class="skill-level">Intermediate</p>
-                                <div class="skill-bar-container">
-                                    <div class="skill-bar" data-level="70%"></div>
-                                </div>
-                            </div>
-                            <div class="skill-card">
-                                <div class="skill-icon">🔀</div>
-                                <h3 class="skill-name">Git</h3>
-                                <p class="skill-level">Advanced</p>
-                                <div class="skill-bar-container">
-                                    <div class="skill-bar" data-level="85%"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-        <section id="contact" class="contact-section">
-            <div class="container">
-                <h2 class="section-title">Get In Touch</h2>
-                <div class="contact-grid reveal">
-                    <div class="contact-info">
-                        <h3>Let's Build Something</h3>
-                        <p>
-                            I'm open to collaborations on Agentic AI systems, RAG pipelines,
-                            and intelligent workflow architectures. If you have a challenging
-                            AI problem or want to explore what's possible — let's talk.
-                        </p>
-                        <div class="social-links">
-                            <a href="mailto:mithil.ravulapalli@example.com" class="social-link">📧 Email</a>
-                            <a href="https://www.linkedin.com/in/mithil-ravulapalli/" class="social-link"
-                                target="_blank">💼 LinkedIn</a>
-                            <a href="https://github.com/Mithil0723" class="social-link" target="_blank">🐙 GitHub</a>
-                        </div>
-                    </div>
-                    <div class="contact-form-container">
-                        <form action="https://formspree.io/f/xjkkerbj" method="POST" class="contact-form">
-                            <div class="form-group">
-                                <input type="text" name="name" placeholder="Your Name" required>
-                            </div>
-                            <div class="form-group">
-                                <input type="email" name="email" placeholder="Your Email" required>
-                            </div>
-                            <div class="form-group">
-                                <textarea name="message" placeholder="Your Message" required></textarea>
-                            </div>
-                            <button type="submit" class="btn btn-primary">Send Message</button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </section>
     </main>
 
-    <footer class="footer">
-        <div class="container">
-            <p>&copy; 2026 Mithil Ravulapalli. All rights reserved.</p>
-            <div class="footer-socials">
-                <a href="mailto:mithil.ravulapalli@example.com" class="social-link">📧</a>
-                <a href="https://www.linkedin.com/in/mithil-ravulapalli/" class="social-link" target="_blank">💼</a>
-                <a href="https://github.com/Mithil0723" class="social-link" target="_blank">🐙</a>
+    <!-- ============ FOOTER ============ -->
+    <footer>
+        <div class="wrap">
+            <div class="footer-inner">
+                <span>© 2026 Mithil Ravulapalli · designed as HTML-first, built by agents</span>
+                <div class="footer-socials">
+                    <a href="mailto:vsm.ravulapalli@gmail.com">email</a>
+                    <a href="https://www.linkedin.com/in/mithil-ravulapalli/" target="_blank"
+                        rel="noopener">linkedin</a>
+                    <a href="https://github.com/Mithil0723" target="_blank" rel="noopener">github</a>
+                </div>
             </div>
         </div>
     </footer>
 
-    <!-- Chatbot Widget -->
-    <div id="chatbot-container" class="chatbot-container">
-        <div class="chat-header">
-            <div class="chat-header-info">
-                <span class="chat-avatar">🤖</span>
-                <h3>AI Assistant</h3>
-            </div>
-            <button id="close-chat-btn" class="close-chat-btn">&times;</button>
-        </div>
-        <div id="chat-messages" class="chat-messages">
-            <div class="message bot-message">
-                <div class="message-content">
-                    Hi! I'm Mithil's AI Assistant. Ask me about his projects, skills, or Agentic AI!
-                </div>
-            </div>
-        </div>
-        <div class="chat-input-area">
-            <input type="text" id="chat-input" placeholder="Type a message..." aria-label="Type a message">
-            <button id="send-btn" class="send-btn">➤</button>
-        </div>
-    </div>
-
-    <button id="chatbot-toggle" class="chatbot-toggle" aria-label="Open Chat">
-        <span class="toggle-icon">💬</span>
-        <span class="toggle-icon-close" style="display: none;">×</span>
-    </button>
-
-    <div class="magnetic-cursor"></div>
-    <div class="magnetic-cursor-follower"></div>
-
     <script src="frontend-helpers.js"></script>
     <script src="assets/js/script.js"></script>
-    <script src="assets/js/projectDetails.js"></script>
 </body>
 
 </html>
