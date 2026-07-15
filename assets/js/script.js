@@ -110,10 +110,16 @@ document.addEventListener('DOMContentLoaded', function () {
                 const controller = new AbortController();
                 const timeout = setTimeout(() => controller.abort(), 30000);
 
+                const sessionId = sessionStorage.getItem('chat_session_id');
+                const bodyPayload = { message: message };
+                if (sessionId) {
+                    bodyPayload.session_id = sessionId;
+                }
+
                 const response = await fetch(`${backendUrl}/chat`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ message: message }),
+                    body: JSON.stringify(bodyPayload),
                     signal: controller.signal,
                 });
 
@@ -124,11 +130,16 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
 
                 const data = await response.json();
+                
+                if (data.session_id) {
+                    sessionStorage.setItem('chat_session_id', data.session_id);
+                }
+                
                 loadingDiv.remove();
 
                 const answerDiv = document.createElement('div');
                 answerDiv.className = 'a';
-                answerDiv.textContent = data.response || data.answer || 'No response received.';
+                answerDiv.textContent = data.reply || data.response || data.answer || 'No response received.';
                 chatMessages.appendChild(answerDiv);
             } catch (err) {
                 loadingDiv.remove();

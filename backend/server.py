@@ -1,24 +1,53 @@
+"""
+server.py — FastAPI RAG Agent for Mithil's portfolio chatbot.
+
+Architecture: LangGraph StateGraph (retrieve → rerank → generate → END)
+All models served via NVIDIA NIM API at integrate.api.nvidia.com.
+
+Tasks addressed:
+  1  — NV-Embed v1 embeddings (asymmetric query/passage, BLOB storage, dim guard)
+  2  — NIM reranker with graceful degradation
+  3  — Nemotron 3 LLM (reasoning disabled, env-driven)
+  5  — Lazy-loaded LLM client
+  6  — Network resilience (timeouts, retries, clean error messages)
+  8  — CORS lockdown
+  9  — Rate limiting with slowapi
+  10 — Conversation history (session_id, condense node, LRU store)
+  11 — Concise response enforcement (sentence truncation, affirmation strip)
+  12 — Correctness cleanup (stale log, grade node collapsed, intent classifier)
+"""
+
 import os
+import re
 import json
+import time
+import uuid
 import sqlite3
 import logging
-from typing import TypedDict, List
+from typing import TypedDict, List, Optional
+from collections import OrderedDict
 
 from dotenv import load_dotenv
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel, field_validator
 
 # LangChain / LangGraph / LangSmith
-from langchain_huggingface import HuggingFaceEmbeddings
-from sentence_transformers import CrossEncoder
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 from langchain_openai import ChatOpenAI
 from langgraph.graph import StateGraph, END
 from langsmith import traceable
 
+# Rate limiting (Task 9)
+from slowapi import Limiter
+from slowapi.errors import RateLimitExceeded
+
 import numpy as np
+
+# Local NIM client (Tasks 1, 2, 6)
+from nim_client import nim_embed_single, nim_rerank
 
 load_dotenv()
 
@@ -27,69 +56,89 @@ logger = logging.getLogger(__name__)
 
 app = FastAPI()
 
-# --- CORS Middleware ---
-# For development: allow all origins
-# For production: replace with your actual domain via ALLOWED_ORIGINS env var
-ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS", "*").split(",")
+
+# ─────────────────────────────────────────────
+# Rate Limiting (Task 9)
+# ─────────────────────────────────────────────
+def _get_real_ip(request: Request) -> str:
+    """Extract client IP from X-Forwarded-For (Render is behind a proxy)."""
+    forwarded = request.headers.get("X-Forwarded-For")
+    if forwarded:
+        return forwarded.split(",")[0].strip()
+    return request.client.host if request.client else "unknown"
+
+
+limiter = Limiter(key_func=_get_real_ip)
+app.state.limiter = limiter
+
+
+@app.exception_handler(RateLimitExceeded)
+async def rate_limit_handler(request: Request, exc: RateLimitExceeded):
+    return JSONResponse(
+        status_code=429,
+        content={"detail": "Rate limit exceeded. Please try again later."},
+    )
+
+
+# ─────────────────────────────────────────────
+# CORS Middleware (Task 8)
+# ─────────────────────────────────────────────
+ALLOWED_ORIGINS = os.getenv(
+    "ALLOWED_ORIGINS", "https://mithil0723.github.io"
+).split(",")
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=ALLOWED_ORIGINS,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_credentials=False,  # No cookies/auth — True + wildcard is invalid per CORS spec
+    allow_methods=["GET", "POST"],
+    allow_headers=["Content-Type"],
 )
 
+
 # ─────────────────────────────────────────────
-# 1. HuggingFace Embeddings (lazy-loaded)
+# 1. LLM Client — Lazy-loaded (Task 3, 5)
 # ─────────────────────────────────────────────
-# Model is downloaded once (~90 MB) and cached in ~/.cache/huggingface/
-# No API key needed — no rate limits, no quota.
-# Lazy-loaded on first request so uvicorn binds the port immediately
-# and Render doesn't time out waiting for a port.
-_embeddings = None
+_llm = None
+_rag_chain = None
 
 
-def get_embeddings():
-    """Lazy singleton — loads the HuggingFace model on first call."""
-    global _embeddings
-    if _embeddings is None:
-        logger.info("Loading HuggingFace embeddings model (first request)...")
-        _embeddings = HuggingFaceEmbeddings(
-            model_name="sentence-transformers/all-MiniLM-L6-v2",
-            model_kwargs={"device": "cpu"},
-            encode_kwargs={"normalize_embeddings": True},
+def get_llm():
+    """Lazy singleton — builds the ChatOpenAI client on first call.
+    Uvicorn binds the port immediately; missing key won't crash at import."""
+    global _llm
+    if _llm is None:
+        logger.info("Initializing LLM client (first request)...")
+
+        enable_thinking = os.getenv("LLM_ENABLE_THINKING", "false").lower() == "true"
+        force_nonempty = os.getenv("LLM_FORCE_NONEMPTY_CONTENT", "true").lower() == "true"
+
+        extra_body = {
+            "chat_template_kwargs": {
+                "enable_thinking": enable_thinking,
+                "force_nonempty_content": force_nonempty,
+            }
+        }
+
+        _llm = ChatOpenAI(
+            model=os.getenv("LLM_MODEL", "nvidia/nemotron-3-nano-30b-a3b"),
+            openai_api_key=os.getenv("NVIDIA_API_KEY"),
+            openai_api_base=os.getenv(
+                "NIM_BASE_URL", "https://integrate.api.nvidia.com/v1"
+            ),
+            temperature=0.2,
+            max_tokens=int(os.getenv("LLM_MAX_TOKENS", "400")),
+            request_timeout=30,  # Task 6: explicit timeout for generate
+            model_kwargs={"extra_body": extra_body},
         )
-        logger.info("Embeddings model loaded successfully")
-    return _embeddings
-
-# ─────────────────────────────────────────────
-# 1b. CrossEncoder Reranker (lazy-loaded)
-# ─────────────────────────────────────────────
-_reranker = None
+        logger.info(
+            f"LLM client initialized: model={os.getenv('LLM_MODEL', 'nvidia/nemotron-3-nano-30b-a3b')}"
+        )
+    return _llm
 
 
-def get_reranker():
-    """Lazy singleton — loads the CrossEncoder reranker on first call."""
-    global _reranker
-    if _reranker is None:
-        logger.info("Loading CrossEncoder reranker model (first request)...")
-        _reranker = CrossEncoder("cross-encoder/ms-marco-MiniLM-L-6-v2")
-        logger.info("Reranker model loaded successfully")
-    return _reranker
-
 # ─────────────────────────────────────────────
-# 2. OpenAI LLM (GPT-4o-mini — fast, cost-efficient)
-# ─────────────────────────────────────────────
-llm = ChatOpenAI(
-    model="gpt-4o-mini",
-    openai_api_key=os.getenv("OPENAI_API_KEY"),
-    temperature=0.3,
-    max_tokens=600,
-)
-
-# ─────────────────────────────────────────────
-# 3. LangChain Prompt Template
+# 2. Prompt Template
 # ─────────────────────────────────────────────
 SYSTEM_INSTRUCTION = (
     "You are the AI assistant for Mithil Ravulapalli's portfolio — sharp, friendly, and concise.\n\n"
@@ -125,33 +174,118 @@ SYSTEM_INSTRUCTION = (
     "7. Context chunks are tagged [Source] and [Section] — mine them thoroughly before responding.\n\n"
 )
 
-prompt_template = ChatPromptTemplate.from_messages([
-    ("system", SYSTEM_INSTRUCTION),
-    ("human",
-     "CONTEXT:\n{context}\n\n"
-     "QUESTION: {question}\n\n"
-     "Answer using only the facts in the context above. Follow all rules in the system prompt exactly.")
-])
+# Prompt template WITHOUT history (single-shot questions)
+prompt_template = ChatPromptTemplate.from_messages(
+    [
+        ("system", SYSTEM_INSTRUCTION),
+        (
+            "human",
+            "CONTEXT:\n{context}\n\n"
+            "QUESTION: {question}\n\n"
+            "Answer using only the facts in the context above. Follow all rules in the system prompt exactly.",
+        ),
+    ]
+)
 
-rag_chain = prompt_template | llm | StrOutputParser()
+# Prompt template WITH history (Task 10)
+prompt_template_with_history = ChatPromptTemplate.from_messages(
+    [
+        ("system", SYSTEM_INSTRUCTION),
+        (
+            "human",
+            "PRIOR CONVERSATION (for continuity only — do NOT treat as grounding facts):\n"
+            "{history}\n\n"
+            "---\n\n"
+            "CONTEXT (grounding source — only these facts may be stated):\n{context}\n\n"
+            "QUESTION: {question}\n\n"
+            "Answer using only the facts in the CONTEXT above. "
+            "The prior conversation is for understanding follow-up intent only. "
+            "Follow all rules in the system prompt exactly.",
+        ),
+    ]
+)
+
+# Condense prompt for follow-up questions (Task 10)
+condense_template = ChatPromptTemplate.from_messages(
+    [
+        (
+            "system",
+            "You rewrite follow-up questions into standalone questions. "
+            "Given the conversation history, rewrite the latest user message "
+            "as a self-contained question that can be understood without context. "
+            "Output ONLY the rewritten question, nothing else.",
+        ),
+        (
+            "human",
+            "CONVERSATION:\n{history}\n\n"
+            "LATEST MESSAGE: {question}\n\n"
+            "Rewrite as a standalone question:",
+        ),
+    ]
+)
+
+
+def get_rag_chain(with_history: bool = False):
+    """Lazy accessor for the RAG chain."""
+    template = prompt_template_with_history if with_history else prompt_template
+    return template | get_llm() | StrOutputParser()
+
+
+def get_condense_chain():
+    """Lazy accessor for the condense chain."""
+    return condense_template | get_llm() | StrOutputParser()
+
 
 # ─────────────────────────────────────────────
-# 4. SQLite Vector Store (lazy-loaded into memory)
+# 3. SQLite Vector Store (lazy-loaded into memory)
 # ─────────────────────────────────────────────
 DB_PATH = os.getenv("VECTOR_DB_PATH", "vectors.db")
 _vectors_cache = None
+
+# Expected embedding dimension for the configured model
+EXPECTED_EMBED_DIM = 4096  # NV-Embed v1
 
 
 def load_vectors():
     """Load all embeddings from SQLite into memory (one-time).
     Returns (docs_list, embeddings_matrix) where embeddings_matrix
-    is a numpy array of shape (n_docs, 384)."""
+    is a numpy array of shape (n_docs, embed_dim).
+
+    Task 1c: dimension guard — raises RuntimeError if loaded dim doesn't match meta.
+    Task 1d: reads BLOBs instead of JSON.
+    """
     global _vectors_cache
     if _vectors_cache is not None:
         return _vectors_cache
 
     logger.info(f"Loading vectors from SQLite database: {DB_PATH}")
+
+    if not os.path.exists(DB_PATH):
+        logger.warning(f"Vector database not found: {DB_PATH}")
+        _vectors_cache = ([], np.array([], dtype=np.float32).reshape(0, 0))
+        return _vectors_cache
+
     conn = sqlite3.connect(DB_PATH)
+
+    # Task 1c: Check schema version and expected dimension from meta table
+    expected_dim = None
+    try:
+        meta_rows = conn.execute("SELECT key, value FROM meta").fetchall()
+        meta = {row[0]: row[1] for row in meta_rows}
+        expected_dim = int(meta.get("embed_dim", 0))
+        stored_model = meta.get("embed_model", "unknown")
+        schema_version = meta.get("schema_version", "unknown")
+        logger.info(
+            f"Vector DB meta: schema_version={schema_version}, "
+            f"model={stored_model}, dim={expected_dim}"
+        )
+    except sqlite3.OperationalError:
+        # meta table doesn't exist — likely old schema
+        logger.warning(
+            "No 'meta' table found in vectors.db — this may be an old 384-dim database. "
+            "Re-run ingest.py to rebuild."
+        )
+
     rows = conn.execute(
         "SELECT id, content, metadata, embedding FROM documents"
     ).fetchall()
@@ -159,36 +293,120 @@ def load_vectors():
 
     if not rows:
         logger.warning("No documents found in SQLite database")
-        _vectors_cache = ([], np.array([], dtype=np.float32))
+        _vectors_cache = ([], np.array([], dtype=np.float32).reshape(0, 0))
         return _vectors_cache
 
     docs = []
     embeddings_list = []
     for row in rows:
-        docs.append({
-            "id": row[0],
-            "content": row[1],
-            "metadata": json.loads(row[2]),
-        })
-        embeddings_list.append(json.loads(row[3]))
+        docs.append(
+            {
+                "id": row[0],
+                "content": row[1],
+                "metadata": json.loads(row[2]),
+            }
+        )
+        # Task 1d: Read BLOB format
+        if isinstance(row[3], bytes):
+            embeddings_list.append(np.frombuffer(row[3], dtype=np.float32))
+        else:
+            # Fallback for old JSON format (shouldn't happen after re-ingest)
+            embeddings_list.append(np.array(json.loads(row[3]), dtype=np.float32))
 
-    _vectors_cache = (docs, np.array(embeddings_list, dtype=np.float32))
-    logger.info(f"Loaded {len(docs)} document vectors into memory")
+    embeddings_matrix = np.array(embeddings_list, dtype=np.float32)
+
+    # Task 1c: Dimension guard
+    actual_dim = embeddings_matrix.shape[1] if len(embeddings_matrix.shape) == 2 else 0
+    if expected_dim and actual_dim != expected_dim:
+        error_msg = (
+            f"DIMENSION MISMATCH: vectors.db contains {actual_dim}-dim embeddings "
+            f"but meta table says {expected_dim}-dim. Re-run ingest.py to rebuild."
+        )
+        logger.error(error_msg)
+        raise RuntimeError(error_msg)
+
+    embed_model = os.getenv("EMBED_MODEL", "nvidia/nv-embed-v1")
+    if actual_dim > 0 and actual_dim != EXPECTED_EMBED_DIM:
+        error_msg = (
+            f"DIMENSION MISMATCH: vectors.db contains {actual_dim}-dim embeddings "
+            f"but current EMBED_MODEL ({embed_model}) expects {EXPECTED_EMBED_DIM}-dim. "
+            f"Re-run ingest.py to rebuild."
+        )
+        logger.error(error_msg)
+        raise RuntimeError(error_msg)
+
+    _vectors_cache = (docs, embeddings_matrix)
+    logger.info(
+        f"Loaded {len(docs)} document vectors ({actual_dim}-dim) into memory"
+    )
     return _vectors_cache
 
 
 # ─────────────────────────────────────────────
-# 5. LangGraph Agent Definition
+# 4. Session History Store (Task 10)
 # ─────────────────────────────────────────────
-class AgentState(TypedDict):
-    """Typed state passed between LangGraph nodes."""
-    question: str
-    context: List[str]
-    answer: str
+MAX_SESSIONS = 500
+SESSION_TTL = 30 * 60  # 30 minutes in seconds
+MAX_TURNS = 4  # last 4 turns per session
 
 
-# NEW — Intent classifier to short-circuit trivial inputs
-import re
+class SessionStore:
+    """Bounded in-memory LRU session store with TTL.
+    500 sessions max, 30-minute TTL, 4 turns per session."""
+
+    def __init__(self):
+        self._store: OrderedDict[str, dict] = OrderedDict()
+
+    def get(self, session_id: str) -> list[dict] | None:
+        """Get history for a session. Returns None if expired or not found."""
+        if session_id not in self._store:
+            return None
+        entry = self._store[session_id]
+        if time.time() - entry["last_access"] > SESSION_TTL:
+            del self._store[session_id]
+            return None
+        # Move to end (LRU)
+        self._store.move_to_end(session_id)
+        entry["last_access"] = time.time()
+        return entry["turns"]
+
+    def add_turn(self, session_id: str, user_msg: str, assistant_msg: str):
+        """Add a turn to a session's history."""
+        if session_id not in self._store:
+            # Evict oldest if at capacity
+            while len(self._store) >= MAX_SESSIONS:
+                self._store.popitem(last=False)
+            self._store[session_id] = {"turns": [], "last_access": time.time()}
+
+        entry = self._store[session_id]
+        entry["turns"].append({"user": user_msg, "assistant": assistant_msg})
+        # Keep only last MAX_TURNS
+        if len(entry["turns"]) > MAX_TURNS:
+            entry["turns"] = entry["turns"][-MAX_TURNS:]
+        entry["last_access"] = time.time()
+        self._store.move_to_end(session_id)
+
+    def cleanup_expired(self):
+        """Remove expired sessions."""
+        now = time.time()
+        expired = [
+            sid
+            for sid, entry in self._store.items()
+            if now - entry["last_access"] > SESSION_TTL
+        ]
+        for sid in expired:
+            del self._store[sid]
+
+
+session_store = SessionStore()
+
+
+# ─────────────────────────────────────────────
+# 5. Intent Classifier (unchanged from original)
+# ─────────────────────────────────────────────
+# Task 12: Confirm greeting short-circuit fires before any network call — yes,
+# classify_intent is called in chat_endpoint before rag_graph.invoke.
+
 
 def classify_intent(message: str) -> str:
     """
@@ -233,40 +451,186 @@ def classify_intent(message: str) -> str:
     return "portfolio_question"
 
 
+# ─────────────────────────────────────────────
+# 6. Response Post-Processing (Task 11)
+# ─────────────────────────────────────────────
+
+# Compiled regexes for performance
+_THINKING_RE = re.compile(r"<think>.*?</think>", re.DOTALL)
+_AFFIRMATION_RE = re.compile(
+    r"^(Sure|Great|Certainly|Of course|Absolutely|Happy to help)[!,.]?\s*",
+    re.IGNORECASE,
+)
+
+# Fallback strings that must be preserved after truncation
+_FALLBACK_SUFFIX_1 = "That one's outside my knowledge, but Mithil's email is always open!"
+_FALLBACK_SUFFIX_2 = "For more detail, Mithil's email is always open!"
+_FALLBACK_DEFAULT = "That one's outside my knowledge, but Mithil's email is always open!"
+
+
+def _split_sentences(text: str) -> list[str]:
+    """Split text into sentences. Handles common abbreviations."""
+    # Split on period, exclamation, question mark followed by space or end
+    sentences = re.split(r'(?<=[.!?])\s+', text.strip())
+    return [s.strip() for s in sentences if s.strip()]
+
+
+def post_process_response(response: str, is_greeting: bool = False) -> str:
+    """
+    Post-process LLM response (Task 11):
+    1. Strip <think>...</think> leaked reasoning markers
+    2. Strip leading affirmations
+    3. Truncate to sentence limit (4 for project questions, 2 for greetings)
+    4. Re-append fallback suffix if original contained it
+    """
+    if not response or not response.strip():
+        return _FALLBACK_DEFAULT
+
+    # 1. Strip thinking markers
+    response = _THINKING_RE.sub("", response).strip()
+
+    if not response:
+        return _FALLBACK_DEFAULT
+
+    # 2. Strip leading affirmations
+    response = _AFFIRMATION_RE.sub("", response).strip()
+
+    if not response:
+        return _FALLBACK_DEFAULT
+
+    # 3. Check if response contains a fallback suffix (before truncation)
+    has_fallback_1 = _FALLBACK_SUFFIX_1 in response
+    has_fallback_2 = _FALLBACK_SUFFIX_2 in response
+
+    # 4. Sentence truncation
+    max_sentences = 2 if is_greeting else 4
+    sentences = _split_sentences(response)
+
+    if len(sentences) > max_sentences:
+        # If the last sentence is a fallback, don't count it
+        fallback_sentence = None
+        if has_fallback_1 or has_fallback_2:
+            # Find which sentence contains the fallback
+            for i, s in enumerate(sentences):
+                if _FALLBACK_SUFFIX_1 in s or _FALLBACK_SUFFIX_2 in s:
+                    fallback_sentence = s
+                    sentences = [x for j, x in enumerate(sentences) if j != i]
+                    break
+
+        # Truncate main content
+        sentences = sentences[:max_sentences]
+        response = " ".join(sentences)
+
+        # Re-append fallback if it was in the original
+        if fallback_sentence:
+            response = response.rstrip(". ") + " " + fallback_sentence
+    else:
+        response = " ".join(sentences)
+
+    return response
+
+
+# ─────────────────────────────────────────────
+# 7. LangGraph Agent Definition
+# ─────────────────────────────────────────────
+class AgentState(TypedDict):
+    """Typed state passed between LangGraph nodes."""
+
+    question: str
+    context: List[str]
+    answer: str
+    history: List[dict]  # Task 10: conversation history
+    condensed_question: str  # Task 10: rewritten standalone question
+
+
+def condense(state: AgentState) -> AgentState:
+    """
+    Node 0 (conditional) — Rewrite follow-up question into standalone question.
+    Task 10: Only runs when history is non-empty. Uses one LLM call.
+    Skipped entirely for single-shot questions (no history) to avoid
+    unnecessary API calls.
+    """
+    history = state.get("history", [])
+    if not history:
+        # No history — use original question as-is
+        return {**state, "condensed_question": state["question"]}
+
+    logger.info("Node: condense — rewriting follow-up with history context")
+
+    # Format history for the condense prompt
+    history_text = "\n".join(
+        f"User: {turn['user']}\nAssistant: {turn['assistant']}"
+        for turn in history
+    )
+
+    try:
+        chain = get_condense_chain()
+        condensed = chain.invoke(
+            {"history": history_text, "question": state["question"]}
+        )
+        logger.info(f"Condensed query: {condensed:.100s}")
+        return {**state, "condensed_question": condensed.strip()}
+    except Exception as e:
+        logger.warning(f"Condense failed, using original question: {e}")
+        return {**state, "condensed_question": state["question"]}
+
+
 def retrieve(state: AgentState) -> AgentState:
     """
     Node 1 — Embed the question and retrieve matching documents from SQLite.
-    Uses HuggingFace embeddings (local, no API quota) and numpy cosine
-    similarity for in-memory vector search.
-    Each retrieved chunk is prefixed with its source file and section
-    so the LLM can reference specific projects by name.
+    Uses NIM NV-Embed v1 embeddings (Task 1) with query-mode encoding (Task 1a).
+    If retrieval returns no context, sets the fallback answer directly
+    (Task 12: grade node logic collapsed into retrieve).
     """
-    logger.info("Node: retrieve — embedding query and searching SQLite")
+    logger.info("Node: retrieve — embedding query via NIM and searching SQLite")
 
-    query_vector = np.array(
-        get_embeddings().embed_query(state["question"]), dtype=np.float32
-    )
+    # Use condensed question if available (Task 10)
+    search_query = state.get("condensed_question") or state["question"]
+
+    try:
+        query_vector = nim_embed_single(search_query, input_type="query")
+    except Exception as e:
+        logger.error(f"Embedding failed: {e}")
+        return {
+            **state,
+            "context": [],
+            "answer": "Sorry, something went wrong. Please try again later.",
+        }
 
     docs, embeddings_matrix = load_vectors()
 
     if len(docs) == 0:
         logger.warning("Vector store is empty — no documents to search")
-        return {**state, "context": []}
+        return {
+            **state,
+            "context": [],
+            "answer": _FALLBACK_DEFAULT,
+        }
 
-    # Cosine similarity (vectors are already normalized by HuggingFace)
+    # Cosine similarity (both sides are L2-normalized — Task 1b)
     similarities = embeddings_matrix @ query_vector
 
-    # Filter by threshold and get top-8
-    match_threshold = 0.25
-    match_count = 8
+    # Filter by threshold and get top-8 (Task 7: env-driven threshold)
+    match_threshold = float(os.getenv("MATCH_THRESHOLD", "0.16"))
+    match_count = int(os.getenv("MATCH_COUNT", "8"))
     scored = [
-        (sim, doc) for sim, doc in zip(similarities, docs)
-        if sim >= match_threshold
+        (sim, doc) for sim, doc in zip(similarities, docs) if sim >= match_threshold
     ]
     scored.sort(key=lambda x: x[0], reverse=True)
     top_docs = scored[:match_count]
 
-    logger.info(f"Retrieved {len(top_docs)} documents (threshold={match_threshold})")
+    logger.info(
+        f"Retrieved {len(top_docs)} documents (threshold={match_threshold})"
+    )
+
+    if not top_docs:
+        # Task 12: grade node logic collapsed — no matching docs = fallback
+        logger.warning("No documents above threshold — returning fallback")
+        return {
+            **state,
+            "context": [],
+            "answer": _FALLBACK_DEFAULT,
+        }
 
     # Build context strings with source attribution
     context_chunks = []
@@ -284,95 +648,151 @@ def retrieve(state: AgentState) -> AgentState:
 
 def rerank(state: AgentState) -> AgentState:
     """
-    Node 2 — Cross-encoder reranking.
-    Scores each retrieved chunk against the question using ms-marco-MiniLM-L-6-v2.
-    Returns the top-3 highest-scoring chunks. No hard score threshold — ms-marco
-    scores are not normalized around 0, so relevant portfolio content can score
-    negative. The grade node handles truly empty retrieval.
+    Node 2 — NIM reranker (Task 2).
+    Scores each retrieved chunk against the question using nvidia/nv-rerankqa-mistral-4b-v3.
+    Returns the top-3 highest-scoring chunks. No hard score threshold.
+    Degrades gracefully on failure: passes top-3 by cosine similarity through. (Task 2, 6)
     """
-    if not state["context"]:
+    if not state["context"] or state.get("answer"):
         return state
 
-    logger.info(f"Node: rerank — scoring {len(state['context'])} chunks")
-    question = state["question"]
-    pairs = [[question, chunk] for chunk in state["context"]]
-    scores = get_reranker().predict(pairs)
+    logger.info(f"Node: rerank — scoring {len(state['context'])} chunks via NIM")
 
-    scored = sorted(zip(scores, state["context"]), key=lambda x: x[0], reverse=True)
-    filtered = [chunk for _, chunk in scored][:3]
+    # Use condensed question for reranking too
+    question = state.get("condensed_question") or state["question"]
 
-    logger.info(f"Rerank: {len(state['context'])} → {len(filtered)} chunks after reranking")
-    return {**state, "context": filtered}
+    try:
+        rankings = nim_rerank(question, state["context"])
 
+        # Take top 3 by logit score
+        top_indices = [r["index"] for r in rankings[:3]]
+        filtered = [state["context"][i] for i in top_indices]
 
-def grade(state: AgentState) -> AgentState:
-    """
-    Node 3 — Check whether any documents were retrieved.
-    Short-circuits to fallback when context is empty (hallucination prevention).
-    """
-    if not state["context"]:
-        logger.warning("No matching documents found — short-circuiting to fallback")
-        return {
-            **state,
-            "answer": "That one's outside my knowledge, but Mithil's email is always open!"
-        }
-    logger.info(f"Grade node: {len(state['context'])} chunks retrieved")
-    return state
+        # Log top-3 scores at INFO for debuggability (Task 2)
+        top_scores = [(r["index"], r.get("logit", 0)) for r in rankings[:3]]
+        logger.info(f"Rerank top-3 scores: {top_scores}")
+
+        logger.info(
+            f"Rerank: {len(state['context'])} → {len(filtered)} chunks"
+        )
+        return {**state, "context": filtered}
+
+    except Exception as e:
+        # Task 2/6: Graceful degradation — pass top-3 by cosine similarity through
+        logger.warning(
+            f"Reranker failed, degrading to cosine top-3: {e}"
+        )
+        return {**state, "context": state["context"][:3]}
 
 
 def generate(state: AgentState) -> AgentState:
     """
-    Node 4 — Build the prompt and call the LLM via the LangChain chain.
-    Now dynamically responds even if context is empty.
+    Node 3 — Build the prompt and call the LLM.
+    Task 3: Uses Nemotron 3 via NIM.
+    Task 10: Includes conversation history in prompt if available.
+    Task 11: Post-processes response for brevity.
     """
-    logger.info("Node: generate — calling Gemma 4 31B via OpenRouter")
+    llm_model = os.getenv("LLM_MODEL", "nvidia/nemotron-3-nano-30b-a3b")
+    logger.info(f"Node: generate — calling {llm_model} via NIM")
+
+    # If retrieve already set an answer (e.g., fallback), skip generation
+    if state.get("answer"):
+        return state
+
     context_text = "\n\n".join(state["context"]) if state["context"] else ""
+    question = state.get("condensed_question") or state["question"]
+    history = state.get("history", [])
 
-    answer = rag_chain.invoke({
-        "context": context_text,
-        "question": state["question"],
-    })
+    try:
+        if history:
+            # Task 10: Include history in prompt
+            history_text = "\n".join(
+                f"User: {turn['user']}\nAssistant: {turn['assistant']}"
+                for turn in history
+            )
+            chain = get_rag_chain(with_history=True)
+            answer = chain.invoke(
+                {
+                    "context": context_text,
+                    "question": question,
+                    "history": history_text,
+                }
+            )
+        else:
+            chain = get_rag_chain(with_history=False)
+            answer = chain.invoke(
+                {"context": context_text, "question": question}
+            )
 
-    logger.info("Generated response successfully")
-    return {**state, "answer": answer}
+        # Task 3: Empty-content guard (reasoning models can consume all tokens on thinking)
+        if not answer or not answer.strip():
+            logger.error(
+                "LLM returned empty content — reasoning may have consumed "
+                "entire token budget. Returning fallback."
+            )
+            answer = _FALLBACK_DEFAULT
+
+        # Task 11: Post-process for brevity
+        answer = post_process_response(answer, is_greeting=False)
+
+        logger.info("Generated response successfully")
+        return {**state, "answer": answer}
+
+    except Exception as e:
+        logger.exception(f"LLM generation failed: {e}")
+        return {
+            **state,
+            "answer": "Sorry, something went wrong. Please try again later.",
+        }
 
 
-# Compile the LangGraph StateGraph
-# Nodes run in order: retrieve → rerank → grade → generate → END
+# ─────────────────────────────────────────────
+# 8. Compile the LangGraph StateGraph
+# ─────────────────────────────────────────────
+# Task 12: Graph simplified — grade node collapsed into retrieve.
+# Flow: condense → retrieve → rerank → generate → END
+# condense is wired unconditionally but skips internally when history is empty.
+
 builder = StateGraph(AgentState)
+builder.add_node("condense", condense)
 builder.add_node("retrieve", retrieve)
 builder.add_node("rerank", rerank)
-builder.add_node("grade", grade)
 builder.add_node("generate", generate)
 
-builder.set_entry_point("retrieve")
+builder.set_entry_point("condense")
+builder.add_edge("condense", "retrieve")
 builder.add_edge("retrieve", "rerank")
-builder.add_edge("rerank", "grade")
 
-def route_after_grade(state: AgentState) -> str:
+
+def route_after_rerank(state: AgentState) -> str:
+    """Skip generate if retrieve already set a fallback answer."""
     if state.get("answer"):
         return "__end__"
     return "generate"
 
-builder.add_conditional_edges("grade", route_after_grade, {"generate": "generate", "__end__": END})
+
+builder.add_conditional_edges(
+    "rerank", route_after_rerank, {"generate": "generate", "__end__": END}
+)
 builder.add_edge("generate", END)
 
 rag_graph = builder.compile()
 
 
 # ─────────────────────────────────────────────
-# 6. FastAPI Endpoints
+# 9. FastAPI Endpoints
 # ─────────────────────────────────────────────
 class ChatRequest(BaseModel):
     message: str
+    session_id: Optional[str] = None  # Task 10
 
-    @field_validator('message')
+    @field_validator("message")
     @classmethod
     def validate_message(cls, v):
         if not v or not v.strip():
-            raise ValueError('Message cannot be empty')
+            raise ValueError("Message cannot be empty")
         if len(v) > 1000:
-            raise ValueError('Message too long (max 1000 characters)')
+            raise ValueError("Message too long (max 1000 characters)")
         return v.strip()
 
 
@@ -389,32 +809,72 @@ async def health_check():
 
 
 @app.post("/chat")
+@limiter.limit("10/minute;100/day")  # Task 9
 @traceable(name="chat_endpoint")  # LangSmith: traces this function as a top-level run
-async def chat_endpoint(request: ChatRequest):
+async def chat_endpoint(request: Request, chat_request: ChatRequest):
     """
     Runs the LangGraph RAG pipeline for a user question.
     Intent classifier short-circuits greetings and out-of-scope queries.
-    The @traceable decorator sends the full execution trace to LangSmith.
+    Task 10: Supports session_id for conversation history.
+    Task 9: Rate limited to 10/min, 100/day per IP.
     """
     try:
-        logger.info(f"Received query: {request.message:.100s}...")
+        logger.info(f"Received query: {chat_request.message:.100s}...")
 
-        # NEW — classify intent before running the full pipeline
-        intent = classify_intent(request.message)
+        # Generate or use provided session_id (Task 10)
+        session_id = chat_request.session_id or str(uuid.uuid4())
+
+        # Classify intent before running the full pipeline (Task 12: confirmed zero network calls)
+        intent = classify_intent(chat_request.message)
 
         if intent == "greeting":
-            return {"reply": "Hey! I'm Mithil's portfolio assistant — ask me about his projects, skills, or background!"}
+            reply = "Hey! I'm Mithil's portfolio assistant — ask me about his projects, skills, or background!"
+            # Still track in session history
+            session_store.add_turn(session_id, chat_request.message, reply)
+            return {"reply": reply, "session_id": session_id}
 
         if intent == "out_of_scope":
-            return {"reply": "That's a bit outside my expertise! I'm here to talk about Mithil's work — projects, skills, experience. What would you like to know?"}
+            reply = "That's a bit outside my expertise! I'm here to talk about Mithil's work — projects, skills, experience. What would you like to know?"
+            session_store.add_turn(session_id, chat_request.message, reply)
+            return {"reply": reply, "session_id": session_id}
 
         # portfolio_question — run full RAG pipeline
-        result = rag_graph.invoke({"question": request.message, "context": [], "answer": ""})
-        return {"reply": result["answer"]}
+        # Task 10: Load session history
+        history = session_store.get(session_id) or []
+
+        result = rag_graph.invoke(
+            {
+                "question": chat_request.message,
+                "context": [],
+                "answer": "",
+                "history": history,
+                "condensed_question": "",
+            }
+        )
+
+        reply = result["answer"]
+
+        # Task 10: Store turn in session history
+        session_store.add_turn(session_id, chat_request.message, reply)
+
+        # Periodic cleanup of expired sessions
+        session_store.cleanup_expired()
+
+        return {"reply": reply, "session_id": session_id}
 
     except ValueError as e:
         logger.error(f"Validation error: {e}")
         raise HTTPException(status_code=400, detail=str(e))
+    except RuntimeError as e:
+        # NIM API errors (missing key, 403, etc.)
+        logger.error(f"Runtime error: {e}")
+        return {
+            "reply": "Sorry, something went wrong. Please try again later.",
+            "session_id": chat_request.session_id or str(uuid.uuid4()),
+        }
     except Exception as e:
         logger.exception(f"Error in /chat endpoint: {e}")
-        return {"reply": "Sorry, something went wrong. Please try again later."}
+        return {
+            "reply": "Sorry, something went wrong. Please try again later.",
+            "session_id": chat_request.session_id or str(uuid.uuid4()),
+        }

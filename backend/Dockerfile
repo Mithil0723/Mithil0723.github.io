@@ -6,11 +6,6 @@ WORKDIR /app
 COPY backend/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Pre-download the HuggingFace model during build (~90 MB)
-# This bakes the model into the image so cold starts load from disk (~2-3s)
-# instead of downloading from the internet (~30-60s)
-RUN python -c "from sentence_transformers import SentenceTransformer; SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')"
-
 # Copy application code
 COPY backend/ .
 
@@ -19,6 +14,9 @@ COPY About_me.md /About_me.md
 COPY "project contents" "/project contents"
 
 # Run ingestion at build time — bakes the SQLite vector DB into the image
+# Requires NVIDIA_API_KEY to hit the NIM embed API
+ARG NVIDIA_API_KEY
+ENV NVIDIA_API_KEY=$NVIDIA_API_KEY
 RUN python ingest.py
 
 # Expose port (Coolify will route to this)

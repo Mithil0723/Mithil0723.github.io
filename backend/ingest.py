@@ -4,7 +4,9 @@ import glob
 import json
 import sqlite3
 import logging
-from langchain_huggingface import HuggingFaceEmbeddings
+import hashlib
+import numpy as np
+from nim_client import nim_embed
 from langchain_text_splitters import (
     MarkdownHeaderTextSplitter,
     RecursiveCharacterTextSplitter,
@@ -17,13 +19,9 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # ─────────────────────────────────────────────
-# HuggingFace Embeddings (same model as server.py — must match!)
+# NIM Embedding Configuration
 # ─────────────────────────────────────────────
-embeddings = HuggingFaceEmbeddings(
-    model_name="sentence-transformers/all-MiniLM-L6-v2",
-    model_kwargs={"device": "cpu"},
-    encode_kwargs={"normalize_embeddings": True},
-)
+EMBED_BATCH_SIZE = 32
 
 # ─────────────────────────────────────────────
 # SQLite Vector Store
@@ -32,14 +30,21 @@ DB_PATH = os.getenv("VECTOR_DB_PATH", "vectors.db")
 
 
 def init_db():
-    """Create the documents table if it doesn't exist."""
+    """Create the documents and meta tables if they don't exist."""
     conn = sqlite3.connect(DB_PATH)
     conn.execute("""
         CREATE TABLE IF NOT EXISTS documents (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             content TEXT NOT NULL,
             metadata TEXT NOT NULL,
-            embedding TEXT NOT NULL
+            embedding BLOB NOT NULL,
+            content_hash TEXT
+        )
+    """)
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS meta (
+            key TEXT PRIMARY KEY,
+            value TEXT
         )
     """)
     conn.commit()
@@ -163,7 +168,7 @@ def chunk_simple(text: str, source_name: str) -> list[dict]:
 def ingest_file(file_path: str, source_name: str, use_markdown_splitting: bool = False):
     """
     Load a file, chunk it, embed it, and upload to SQLite.
-    Clears existing documents from this source before inserting.
+    Resumable: skips chunks whose content_hash already exists in the DB.
     """
     # 1. Load file
     try:
@@ -184,39 +189,83 @@ def ingest_file(file_path: str, source_name: str, use_markdown_splitting: bool =
         logger.warning(f"  Skipping {source_name} — empty after processing")
         return 0, 0
 
-    # 4. Clear old data for this source
-    logger.info(f"  Clearing existing documents for source: {source_name}")
-    conn = sqlite3.connect(DB_PATH)
-    conn.execute(
-        "DELETE FROM documents WHERE json_extract(metadata, '$.source') = ?",
-        (source_name,)
-    )
-    conn.commit()
-
-    # 5. Chunk the text
+    # 4. Chunk the text
     if use_markdown_splitting:
         chunks = chunk_markdown(text, source_name)
     else:
         chunks = chunk_simple(text, source_name)
     logger.info(f"  Split into {len(chunks)} chunks")
 
-    # 6. Batch-embed all chunks at once (HuggingFace runs locally — no rate limits)
-    logger.info(f"  Generating embeddings for {len(chunks)} chunks...")
-    chunk_texts = [c["content"] for c in chunks]
-    chunk_embeddings = embeddings.embed_documents(chunk_texts)
+    # 5. Compute content hashes for all chunks
+    for chunk_data in chunks:
+        chunk_data["content_hash"] = hashlib.md5(
+            chunk_data["content"].encode()
+        ).hexdigest()
 
-    # 7. Upload to SQLite
+    # 6. Load existing content_hashes and embeddings for this source from the DB
+    conn = sqlite3.connect(DB_PATH)
+    existing_rows = conn.execute(
+        "SELECT content_hash, embedding FROM documents WHERE json_extract(metadata, '$.source') = ?",
+        (source_name,)
+    ).fetchall()
+    
+    # Map hash to embedding blob
+    existing_cache = {row[0]: row[1] for row in existing_rows if row[0]}
+
+    # 7. Delete old rows for this source (will re-insert current chunks)
+    logger.info(f"  Clearing existing documents for source: {source_name}")
+    conn.execute(
+        "DELETE FROM documents WHERE json_extract(metadata, '$.source') = ?",
+        (source_name,)
+    )
+    conn.commit()
+
+    # 8. Determine which chunks need new embeddings
+    new_chunks = [c for c in chunks if c["content_hash"] not in existing_cache]
+    cached_chunks = [c for c in chunks if c["content_hash"] in existing_cache]
+
+    if not new_chunks and cached_chunks:
+        logger.info(f"  All {len(chunks)} chunks already cached — skipping embedding")
+    elif new_chunks:
+        logger.info(
+            f"  {len(new_chunks)} new chunks to embed, "
+            f"{len(cached_chunks)} cached"
+        )
+
+    # 9. Batch-embed new chunks via NIM API
+    if new_chunks:
+        new_texts = [c["content"] for c in new_chunks]
+        total_batches = (len(new_texts) + EMBED_BATCH_SIZE - 1) // EMBED_BATCH_SIZE
+        all_embeddings = []
+        for i in range(total_batches):
+            batch = new_texts[i * EMBED_BATCH_SIZE : (i + 1) * EMBED_BATCH_SIZE]
+            logger.info(f"  Embedding batch {i+1}/{total_batches}...")
+            batch_embeddings = nim_embed(batch, input_type="passage")
+            all_embeddings.extend(batch_embeddings)
+
+        # Attach embeddings to new chunks
+        for chunk_data, emb in zip(new_chunks, all_embeddings):
+            chunk_data["embedding"] = emb.tobytes()
+
+    # 10. For cached chunks, reuse the existing embedding blob from the DB
+    if cached_chunks:
+        for chunk_data in cached_chunks:
+            chunk_data["embedding"] = existing_cache[chunk_data["content_hash"]]
+
+    # 11. Insert all chunks into the DB
     successful = 0
     failed = 0
 
-    for i, (chunk_data, embedding) in enumerate(zip(chunks, chunk_embeddings)):
+    for i, chunk_data in enumerate(chunks):
         try:
+            emb_blob = chunk_data["embedding"]
             conn.execute(
-                "INSERT INTO documents (content, metadata, embedding) VALUES (?, ?, ?)",
+                "INSERT INTO documents (content, metadata, embedding, content_hash) VALUES (?, ?, ?, ?)",
                 (
                     chunk_data["content"],
                     json.dumps(chunk_data["metadata"]),
-                    json.dumps(embedding),
+                    emb_blob,
+                    chunk_data["content_hash"],
                 )
             )
             successful += 1
@@ -264,6 +313,34 @@ def main():
             total_failed += f
     else:
         logger.warning(f"Project contents directory not found: {project_dir}")
+
+    # ── 3. Populate meta table ──
+    conn = sqlite3.connect(DB_PATH)
+
+    # Schema version
+    conn.execute(
+        "INSERT OR REPLACE INTO meta (key, value) VALUES (?, ?)",
+        ("schema_version", "2")
+    )
+
+    # Embed model
+    conn.execute(
+        "INSERT OR REPLACE INTO meta (key, value) VALUES (?, ?)",
+        ("embed_model", os.getenv("EMBED_MODEL", "nvidia/nv-embed-v1"))
+    )
+
+    # Embed dimension — read from first row in DB
+    row = conn.execute("SELECT embedding FROM documents LIMIT 1").fetchone()
+    if row and row[0]:
+        embed_dim = len(np.frombuffer(row[0], dtype=np.float32))
+        conn.execute(
+            "INSERT OR REPLACE INTO meta (key, value) VALUES (?, ?)",
+            ("embed_dim", str(embed_dim))
+        )
+        logger.info(f"Embed dimension: {embed_dim}")
+
+    conn.commit()
+    conn.close()
 
     # ── Summary ──
     logger.info("")

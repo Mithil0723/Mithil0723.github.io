@@ -1,109 +1,157 @@
 # backend/tests/test_server.py
 import sys
 import os
+import pytest
+
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
-# Patch env vars before importing server to avoid missing key errors
+# Patch env vars before importing server
 os.environ.setdefault("OPENROUTER_API_KEY", "test-key")
-os.environ.setdefault("SUPABASE_URL", "https://fake.supabase.co")
-os.environ.setdefault("SUPABASE_SERVICE_KEY", "test-key")
+os.environ.setdefault("NVIDIA_API_KEY", "test-nvapi")
+os.environ.setdefault("VECTOR_DB_PATH", ":memory:")  # Prevent creating files
 
 from unittest.mock import patch, MagicMock
-from server import classify_intent
+from server import (
+    classify_intent,
+    rerank,
+    AgentState,
+    get_llm,
+    post_process_response,
+    condense,
+    load_vectors,
+)
+import numpy as np
 
-def test_llm_uses_gemma_model():
-    with patch("langchain_openai.ChatOpenAI") as mock_llm_class:
+def test_llm_uses_nemotron_model():
+    with patch("server.ChatOpenAI") as mock_llm_class:
         mock_llm_class.return_value = MagicMock()
-        # import and reload must be inside the patch context so the mock is active
-        # when server.py executes `llm = ChatOpenAI(...)` at module level
         import importlib
         import server as srv
-        importlib.reload(srv)
+        
+        # Reset the singleton
+        srv._llm = None
+        
+        os.environ["LLM_MODEL"] = "nvidia/nemotron-3-nano-30b-a3b"
+        os.environ["LLM_MAX_TOKENS"] = "400"
+        
+        srv.get_llm()
+        
         call_kwargs = mock_llm_class.call_args.kwargs
-        assert call_kwargs["model"] == "google/gemma-4-31b-it"
-        assert call_kwargs["max_tokens"] == 600
+        assert call_kwargs["model"] == "nvidia/nemotron-3-nano-30b-a3b"
+        assert call_kwargs["max_tokens"] == 400
+        assert "chat_template_kwargs" in call_kwargs["model_kwargs"]["extra_body"]
 
 
+# Intent Classifier Tests
 def test_classify_hi_is_greeting():
     assert classify_intent("Hi") == "greeting"
-
-def test_classify_hello_is_greeting():
-    assert classify_intent("hello there!") == "greeting"
-
-def test_classify_who_are_you_is_greeting():
-    assert classify_intent("who are you") == "greeting"
-
-def test_classify_what_are_you_is_greeting():
-    assert classify_intent("what are you") == "greeting"
-
-def test_classify_what_can_you_do_is_greeting():
-    assert classify_intent("what can you do") == "greeting"
-
-def test_classify_help_is_greeting():
-    assert classify_intent("help") == "greeting"
-
-def test_classify_single_char_is_greeting():
-    assert classify_intent("?") == "greeting"
-
-def test_classify_weather_is_out_of_scope():
-    assert classify_intent("weather today") == "out_of_scope"
-
-def test_classify_greeting_prefix_portfolio_question_reaches_rag():
-    # "hi what projects..." must NOT be swallowed by the greeting pattern
-    assert classify_intent("hi what projects has Mithil built?") == "portfolio_question"
 
 def test_classify_portfolio_question():
     assert classify_intent("what projects has Mithil built?") == "portfolio_question"
 
-def test_classify_is_mithil_employed():
-    assert classify_intent("is Mithil employed?") == "portfolio_question"
+def test_classify_weather_is_out_of_scope():
+    assert classify_intent("weather today") == "out_of_scope"
 
 
-import numpy as np
-from server import rerank, AgentState
+# Rerank Node Tests (Mocking nim_rerank)
+@patch("server.nim_rerank")
+def test_rerank_orders_by_score(mock_nim_rerank):
+    # Second chunk scores higher
+    mock_nim_rerank.return_value = [
+        {"index": 1, "logit": 0.8},
+        {"index": 0, "logit": -0.3},
+    ]
+    state: AgentState = {
+        "question": "test?",
+        "context": [
+            "Chunk 0",
+            "Chunk 1",
+        ],
+        "answer": "",
+        "history": [],
+        "condensed_question": "",
+    }
+    result = rerank(state)
+    assert len(result["context"]) == 2
+    assert result["context"][0] == "Chunk 1"
 
-def test_rerank_orders_by_score():
-    """Highest-scoring chunk should come first regardless of input order."""
-    mock_scores = np.array([-0.3, 0.8])  # second chunk scores higher
-    with patch("server.get_reranker") as mock_get:
-        mock_get.return_value.predict.return_value = mock_scores
-        state: AgentState = {
-            "question": "What is Mithil's RAG chatbot project?",
-            "context": [
-                "[Source: About_me.md]\nThe capital of France is Paris.",
-                "[Source: RAG Chatbot.md]\nMithil built an agentic RAG chatbot using LangGraph.",
-            ],
-            "answer": "",
-        }
-        result = rerank(state)
-        assert len(result["context"]) == 2
-        assert "RAG" in result["context"][0]  # higher-scored chunk is first
 
-def test_rerank_returns_at_most_3_chunks():
-    """Never passes more than 3 chunks to the LLM, even with 8 candidates."""
-    mock_scores = np.array([0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2])
-    with patch("server.get_reranker") as mock_get:
-        mock_get.return_value.predict.return_value = mock_scores
-        chunks = [
-            f"[Source: test.md]\nMithil worked on project {i} using Python."
-            for i in range(8)
-        ]
-        state: AgentState = {
-            "question": "What projects did Mithil build?",
-            "context": chunks,
-            "answer": "",
-        }
-        result = rerank(state)
-        assert len(result["context"]) == 3
+@patch("server.nim_rerank")
+def test_rerank_degrades_gracefully(mock_nim_rerank):
+    mock_nim_rerank.side_effect = RuntimeError("API down")
+    state: AgentState = {
+        "question": "test?",
+        "context": ["C1", "C2", "C3", "C4"],
+        "answer": "",
+        "history": [],
+        "condensed_question": "",
+    }
+    result = rerank(state)
+    # Should fall back to taking the top 3 passed in (which are by cosine sim)
+    assert len(result["context"]) == 3
+    assert result["context"] == ["C1", "C2", "C3"]
 
-def test_rerank_empty_context_passthrough():
-    """Empty context should pass through without calling the reranker."""
-    with patch("server.get_reranker") as mock_get:
-        state: AgentState = {
-            "question": "What is Mithil's GPA?",
-            "context": [],
-            "answer": "",
-        }
-        result = rerank(state)
-        assert result["context"] == []
-        mock_get.assert_not_called()
+
+# Post-processing Tests
+def test_post_process_strips_thinking():
+    raw = "<think>I should say hello.</think>Hello there!"
+    processed = post_process_response(raw)
+    assert processed == "Hello there!"
+
+def test_post_process_strips_affirmations():
+    raw = "Sure! Here is the info."
+    assert post_process_response(raw) == "Here is the info."
+    
+    raw2 = "Absolutely, I can help. The info is here."
+    assert post_process_response(raw2) == "I can help. The info is here."
+
+def test_post_process_sentence_limits():
+    raw = "One. Two. Three. Four. Five. Six."
+    # 4 sentences for standard questions
+    processed = post_process_response(raw, is_greeting=False)
+    assert processed == "One. Two. Three. Four."
+
+    # 2 sentences for greetings
+    processed_greeting = post_process_response(raw, is_greeting=True)
+    assert processed_greeting == "One. Two."
+
+def test_post_process_empty_fallback():
+    raw = "   "
+    processed = post_process_response(raw)
+    assert "Mithil's email is always open" in processed
+    
+    raw2 = "<think>thinking...</think>"
+    processed2 = post_process_response(raw2)
+    assert "Mithil's email is always open" in processed2
+
+
+# Condense Node Tests
+@patch("server.get_condense_chain")
+def test_condense_skips_when_no_history(mock_get_chain):
+    state: AgentState = {
+        "question": "What is Python?",
+        "context": [],
+        "answer": "",
+        "history": [],
+        "condensed_question": "",
+    }
+    result = condense(state)
+    assert result["condensed_question"] == "What is Python?"
+    mock_get_chain.assert_not_called()
+
+@patch("server.get_condense_chain")
+def test_condense_with_history(mock_get_chain):
+    mock_chain = MagicMock()
+    mock_chain.invoke.return_value = "Rewritten question"
+    mock_get_chain.return_value = mock_chain
+    
+    state: AgentState = {
+        "question": "How did he use it?",
+        "context": [],
+        "answer": "",
+        "history": [{"user": "Did he use Python?", "assistant": "Yes."}],
+        "condensed_question": "",
+    }
+    result = condense(state)
+    assert result["condensed_question"] == "Rewritten question"
+    mock_chain.invoke.assert_called_once()

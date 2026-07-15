@@ -8,9 +8,17 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - OPENAI_API_KEY=$OPENAI_API_KEY
+      - NVIDIA_API_KEY=$NVIDIA_API_KEY
+      - NIM_BASE_URL=${NIM_BASE_URL:-https://integrate.api.nvidia.com/v1}
+      - EMBED_MODEL=${EMBED_MODEL:-nvidia/nv-embed-v1}
+      - RERANK_MODEL=${RERANK_MODEL:-nvidia/nv-rerankqa-mistral-4b-v3}
+      - LLM_MODEL=${LLM_MODEL:-nvidia/nemotron-3-nano-30b-a3b}
+      - LLM_ENABLE_THINKING=${LLM_ENABLE_THINKING:-false}
+      - LLM_FORCE_NONEMPTY_CONTENT=${LLM_FORCE_NONEMPTY_CONTENT:-true}
+      - MATCH_THRESHOLD=${MATCH_THRESHOLD:-0.16}
+      - MATCH_COUNT=${MATCH_COUNT:-8}
       - VECTOR_DB_PATH=vectors.db
-      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-*}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-https://mithil0723.github.io}
       - LANGCHAIN_TRACING_V2=${LANGCHAIN_TRACING_V2:-false}
       - LANGCHAIN_API_KEY=${LANGCHAIN_API_KEY:-}
       - LANGCHAIN_PROJECT=${LANGCHAIN_PROJECT:-rag-agent}
