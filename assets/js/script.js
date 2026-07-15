@@ -105,7 +105,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 // Use CONFIG from frontend-helpers.js if available
                 const backendUrl = (typeof CONFIG !== 'undefined' && CONFIG.BACKEND_URL)
                     ? CONFIG.BACKEND_URL
-                    : 'http://h13mknd7fpzckplg94ol6gen.72.61.6.35.sslip.io';
+                    : 'https://rag-chatbot-6boa.onrender.com';
 
                 const controller = new AbortController();
                 const timeout = setTimeout(() => controller.abort(), 30000);

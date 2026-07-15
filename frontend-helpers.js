@@ -7,7 +7,7 @@
 
 const CONFIG = {
     // Replace this with your Coolify backend deployment URL
-    BACKEND_URL: 'http://h13mknd7fpzckplg94ol6gen.72.61.6.35.sslip.io',
+    BACKEND_URL: 'https://rag-chatbot-6boa.onrender.com',
 
     // Timeouts and limits
     REQUEST_TIMEOUT: 30000, // 30 seconds
