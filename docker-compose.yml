@@ -5,6 +5,8 @@ services:
     build:
       context: .
       dockerfile: backend/Dockerfile
+      args:
+        - NVIDIA_API_KEY=${NVIDIA_API_KEY}
     ports:
       - "8000:8000"
     environment:
