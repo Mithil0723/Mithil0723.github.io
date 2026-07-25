@@ -6,7 +6,7 @@
 // =============================================================================
 
 const CONFIG = {
-    // Replace this with your Coolify backend deployment URL
+    // Render deployment URL for the FastAPI RAG backend
     BACKEND_URL: 'https://rag-chatbot-6boa.onrender.com',
 
     // Timeouts and limits

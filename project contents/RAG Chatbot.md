@@ -4,8 +4,8 @@ project_id: "2026-02-13_RAGChatbot"
 title: "AI Portfolio Chatbot with Retrieval-Augmented Generation (RAG)"
 status: "completed"
 confidence_level: 0.95
-analysis_date: "2026-04-04"
-analysis_version: "3.0"
+analysis_date: "2026-07-24"
+analysis_version: "4.0"
 
 # ACADEMIC CONTEXT
 course_context: "Personal Project"
@@ -16,15 +16,15 @@ primary_role: "Full-Stack AI Developer"
 
 # TECHNICAL STACK - Arrays Only
 primary_languages: ["Python", "JavaScript"]
-frameworks: ["FastAPI", "LangGraph", "LangChain", "LangSmith"]
-databases: ["Supabase (PostgreSQL + pgvector)"]
-tools: ["Uvicorn", "HuggingFace sentence-transformers", "CrossEncoder (cross-encoder/ms-marco-MiniLM-L-6-v2)", "OpenRouter", "LangSmith Dashboard", "Supabase Dashboard"]
-cloud_platforms: ["Supabase", "OpenRouter", "Render"]
+frameworks: ["FastAPI", "LangGraph", "LangChain", "LangSmith", "slowapi"]
+databases: ["SQLite (vectors.db, BLOB embeddings + in-memory numpy cosine search)"]
+tools: ["Uvicorn", "NVIDIA NIM API", "nv-embed-v1", "nv-rerankqa-mistral-4b-v3", "Nemotron 3 Nano 30B", "httpx", "NumPy", "pytest", "Docker", "LangSmith Dashboard"]
+cloud_platforms: ["NVIDIA NIM (build.nvidia.com)", "Render", "GitHub Pages"]
 
 # SKILLS ASSESSMENT - Integers 1-10 Only
 programming_fundamentals: 8
 oop_concepts: 5
-data_structures: 7
+data_structures: 8
 algorithms: 7
 database_design: 7
 api_development: 9
@@ -42,8 +42,8 @@ deployment_automated: false
 documentation_comprehensive: true
 
 # PROJECT METRICS - Integers Only
-estimated_loc: 400
-files_created: 4
+estimated_loc: 900
+files_created: 6
 complexity_score: 9
 portfolio_score: 10
 market_relevance: 10
@@ -53,16 +53,16 @@ salary_range_low: 90000
 salary_range_high: 140000
 relevant_job_titles: ["AI/ML Engineer", "Full-Stack Developer", "GenAI Developer", "Backend Engineer", "LLM Engineer"]
 target_companies: ["AI startups", "tech companies", "consulting firms", "SaaS companies"]
-next_learning_priorities: ["Multi-turn Conversation Memory", "Authentication & Rate Limiting", "Production Caching Strategies", "LangSmith Evaluations & Datasets", "Query Rewriting & HyDE"]
+next_learning_priorities: ["Authentication", "Production Caching Strategies", "LangSmith Evaluations & Datasets", "Query Rewriting & HyDE", "Approximate nearest-neighbour indexing for scale"]
 
 # PROFESSIONAL OUTPUTS - Single Strings
-resume_bullet_technical: "Engineered an agentic RAG chatbot using LangGraph, LangChain, HuggingFace embeddings, cross-encoder reranking, and Gemma 4 31B via OpenRouter, with full LangSmith observability for every request trace."
-resume_bullet_impact: "Built an AI-powered portfolio assistant that delivers context-aware answers to visitor questions, leveraging local HuggingFace embeddings and structured LangGraph orchestration for cost-effective, traceable AI workflows."
-resume_bullet_behavioral: "Independently designed, implemented, and deployed a full-stack AI application end-to-end — from vector database schema design and embedding pipeline to agentic LangGraph orchestration, LangSmith tracing, and frontend chat integration — demonstrating strong initiative and rapid prototyping skills."
+resume_bullet_technical: "Engineered an agentic RAG chatbot on a LangGraph StateGraph (condense → retrieve → rerank → generate) using NVIDIA NIM for NV-Embed v1 embeddings, nv-rerankqa-mistral reranking, and Nemotron 3 generation, backed by a hand-built SQLite vector store with in-memory numpy cosine search."
+resume_bullet_impact: "Built an AI-powered portfolio assistant that answers visitor questions grounded in real project data, with conversation memory, rate limiting, reranker fallback, and LangSmith tracing on every request."
+resume_bullet_behavioral: "Independently designed, implemented, and deployed a full-stack AI application end-to-end — vector store schema, embedding pipeline, agentic LangGraph orchestration, network-resilience layer, and frontend chat integration — then migrated the entire model stack from local HuggingFace models to the NVIDIA NIM API without downtime."
 
 # SEARCHABLE KEYWORDS - Space Separated
-technical_keywords: "python javascript fastapi langgraph langchain langsmith langchain-huggingface huggingface sentence-transformers cross-encoder reranking gemma gemma-4-31b openrouter supabase pgvector rag retrieval-augmented-generation embeddings vector-search llm chatbot rest-api cors pydantic agentic-ai intent-classifier"
-skill_keywords: "ai-engineering full-stack-development api-design vector-databases prompt-engineering system-design document-chunking semantic-search llm-orchestration observability tracing"
+technical_keywords: "python javascript fastapi langgraph langchain langsmith nvidia nim nv-embed nv-embed-v1 nv-rerankqa-mistral nemotron nemotron-3-nano sqlite numpy cosine-similarity blob-storage reranking rag retrieval-augmented-generation embeddings vector-search asymmetric-embeddings llm chatbot rest-api cors pydantic slowapi rate-limiting agentic-ai intent-classifier conversation-memory exponential-backoff docker pytest"
+skill_keywords: "ai-engineering full-stack-development api-design vector-databases prompt-engineering system-design document-chunking semantic-search llm-orchestration observability tracing network-resilience graceful-degradation migration"
 ---
 
 # AI Portfolio Chatbot with Retrieval-Augmented Generation (RAG)
@@ -72,57 +72,71 @@ skill_keywords: "ai-engineering full-stack-development api-design vector-databas
 Visitors to a personal portfolio website often have specific questions about skills, projects, and experience that static content doesn't efficiently surface. This project addresses that gap by providing an intelligent, conversational AI assistant that can answer questions grounded in real portfolio data — bridging the gap between a traditional resume and a natural conversation.
 
 ### Technical Solution Delivered
-An agentic RAG system was built using **LangGraph** for explicit stateful orchestration, **LangChain** for the prompt pipeline, **HuggingFace** for local embeddings, and **Supabase** for vector storage. The system ingests portfolio content using LangChain's `RecursiveCharacterTextSplitter`, generates 384-dimensional embeddings locally with `sentence-transformers/all-MiniLM-L6-v2`, retrieves candidates via cosine similarity, and re-ranks them with a `cross-encoder/ms-marco-MiniLM-L-6-v2` cross-encoder to eliminate noisy context before generation. The final answer is generated by **Gemma 4 31B** via **OpenRouter**, with every request automatically traced end-to-end in **LangSmith** for full observability.
+An agentic RAG system built on **LangGraph** for explicit stateful orchestration, **LangChain** for the prompt pipeline, and the **NVIDIA NIM API** for all three model calls. The system ingests portfolio content with LangChain's markdown-aware and recursive text splitters, embeds chunks with **`nvidia/nv-embed-v1`** (4096-dimensional, asymmetric query/passage encoding), and stores them as float32 BLOBs in a **SQLite** database. At query time the whole matrix is loaded into memory once and searched with a **numpy** cosine dot-product, candidates are re-scored by **`nvidia/nv-rerankqa-mistral-4b-v3`**, and the final answer is generated by **`nvidia/nemotron-3-nano-30b-a3b`** — with every request traced in **LangSmith**.
 
 ### Key Professional Achievement
-Designed and implemented a production-ready agentic AI pipeline that demonstrates mastery of modern GenAI engineering: LangGraph state management, LangChain prompt chains, vector databases, local embedding models, LLM orchestration, and full-stack observability with LangSmith.
+Designed and implemented an agentic AI pipeline that demonstrates modern GenAI engineering — LangGraph state management, asymmetric embedding models, reranking, conversation memory, and a hand-rolled vector store — then migrated the entire model stack from local HuggingFace models to a hosted inference API, including a vector-dimension change from 384 to 4096, without breaking the deployed service.
 
 ## 🛠️ TECHNICAL_IMPLEMENTATION
 ### Technology Stack Analysis
-**Primary Languages**: [`Python`](../backend/server.py) powers the entire backend — from the FastAPI server, LangGraph agent, and LangChain pipeline to all embedding and generation interactions. [`JavaScript`](../assets/js/script.js) handles the frontend chat UI integration.
+**Primary Languages**: [`Python`](../backend/server.py) powers the entire backend — FastAPI server, LangGraph agent, LangChain pipeline, SQLite vector store, and the NIM client. [`JavaScript`](../assets/js/script.js) handles the frontend chat UI integration.
 
 **Frameworks & Libraries**:
-- **LangGraph**: Provides the `StateGraph` orchestration framework with typed `AgentState`, enabling an explicit four-node pipeline (`retrieve → rerank → grade → generate`) where each step is independently inspectable and traceable.
-- **LangChain**: Handles the prompt template (`ChatPromptTemplate`), output parsing (`StrOutputParser`), text splitting (`RecursiveCharacterTextSplitter`), and HuggingFace embedding integration — all composable via the LCEL pipe operator.
-- **HuggingFace sentence-transformers**: `all-MiniLM-L6-v2` runs entirely locally — no API key, no rate limits, no quota to monitor. Produces 384-dimensional normalized embeddings.
-- **LangSmith**: Zero-config observability via `@traceable` decorator and `LANGCHAIN_TRACING_V2=true` env var. Traces every request with node-level timing, inputs/outputs, and token usage.
-- **Gemma 4 31B via OpenRouter**: Google's instruction-tuned model — strong grounding rule compliance and factual accuracy. OpenAI-compatible API via `ChatOpenAI`.
-- **CrossEncoder (ms-marco-MiniLM-L-6-v2)**: Runs locally via `sentence-transformers`. Re-scores retrieved chunks against the question using a bi-directional attention cross-encoder, dramatically improving relevance precision before generation.
-- **FastAPI + Pydantic**: Provides the REST API layer with automatic request validation, CORS middleware, and structured error handling. Input validation uses Pydantic's [`field_validator`](../backend/server.py) to enforce message length limits and empty-string checks.
-- **Supabase Client**: The `supabase-py` client interfaces with a PostgreSQL database enhanced with the `pgvector` extension, enabling vector similarity search via a custom [`match_documents`](../rag_agent_guide.md) RPC function.
+- **LangGraph**: Provides the `StateGraph` orchestration framework with a typed `AgentState`, enabling an explicit four-node pipeline (`condense → retrieve → rerank → generate`) plus a conditional edge that skips generation entirely when retrieval already produced a fallback answer.
+- **LangChain**: Handles the prompt template (`ChatPromptTemplate`), output parsing (`StrOutputParser`), and text splitting (`MarkdownHeaderTextSplitter` + `RecursiveCharacterTextSplitter`) — composed via the LCEL pipe operator.
+- **NVIDIA NIM API**: One OpenAI-compatible endpoint (`integrate.api.nvidia.com/v1`) serves all three models — embeddings, reranking, and generation. Consolidating on a single provider removed the local model download, the ~90 MB cache, and the CPU inference cost from the deploy footprint.
+- **`nvidia/nv-embed-v1`**: 4096-dimensional embeddings via `/v1/embeddings`. A bi-encoder trained asymmetrically, so queries are sent with `input_type="query"` and documents with `input_type="passage"` — getting these backwards degrades retrieval silently.
+- **`nvidia/nv-rerankqa-mistral-4b-v3`**: Cross-attention reranking via `/v1/ranking`. Returns raw unbounded logits (can be negative), so the code takes the top-3 by score rather than applying a threshold.
+- **`nvidia/nemotron-3-nano-30b-a3b`**: Generation via `ChatOpenAI` pointed at the NIM base URL. Reasoning traces are disabled through `extra_body.chat_template_kwargs.enable_thinking=false` to keep responses short and latency low.
+- **LangSmith**: Observability via the `@traceable` decorator on the `/chat` endpoint, gated by `LANGCHAIN_TRACING_V2`.
+- **FastAPI + Pydantic**: REST layer with automatic request validation, CORS middleware locked to `ALLOWED_ORIGINS`, and structured error handling. `field_validator` enforces message length limits and empty-string checks.
+- **slowapi**: Per-IP rate limiting on `/chat` at `10/minute;100/day`.
+- **SQLite + NumPy**: The vector store. A `documents` table holds content, metadata, and the embedding as a float32 BLOB; a `meta` table records `schema_version`, `embed_model`, and `embed_dim` so a dimension mismatch fails loudly at load instead of producing silent garbage.
 
 ### Architecture & Design Assessment
 **System Architecture**: The application follows an explicit agentic RAG pipeline using LangGraph's `StateGraph`:
 
 ```
-User Query → FastAPI Backend
-  → Intent Classifier: greetings/out-of-scope short-circuited before RAG
+User Query → FastAPI Backend (rate-limited, CORS-locked)
+  → Intent Classifier: greetings/bot-identity/out-of-scope short-circuited before RAG
   → LangGraph StateGraph:
-    → Node 1 (retrieve): Embed query with HuggingFace → vector search in Supabase (top-8, threshold 0.40)
-    → Node 2 (rerank): Score chunks with CrossEncoder ms-marco → return top-3 by relevance
-    → Node 3 (grade): Check if documents were retrieved → set fallback if empty
-    → Node 4 (generate): Build LangChain prompt chain → call Gemma 4 31B
+    → Node 1 (condense): rewrite follow-ups into standalone questions using
+                         session history; skips internally when history is empty
+    → Node 2 (retrieve): embed query via NIM (input_type="query") → numpy cosine
+                         over the in-memory matrix (threshold 0.16, top-8);
+                         sets a fallback answer directly if nothing clears the bar
+    → Node 3 (rerank):   score chunks via NIM reranker → keep top-3;
+                         degrades to cosine top-3 if the reranker call fails
+    → Conditional edge:  skip generation if a fallback answer is already set
+    → Node 4 (generate): LangChain prompt chain → Nemotron 3 via NIM
   → Return JSON response to frontend
-  → Full trace sent to LangSmith automatically
+  → Full trace sent to LangSmith
 ```
 
 **Key Technical Decisions**:
-- **[LangGraph Orchestration]**: Used `StateGraph` with typed `AgentState` instead of a monolithic function. Each node is independently testable, traceable in LangSmith, and extensible — adding `rerank` required no changes to `retrieve`, `grade`, or `generate`.
-- **[Cross-Encoder Reranking]**: After vector retrieval returns top-8 candidates, a local `cross-encoder/ms-marco-MiniLM-L-6-v2` re-scores each chunk against the question using bidirectional attention (far more accurate than cosine similarity). Only the top-3 are passed to the LLM, cutting hallucination from noisy context.
-- **[Local Embeddings]**: Chose HuggingFace `all-MiniLM-L6-v2` over cloud APIs to eliminate API rate limits, reduce latency, and achieve zero embedding cost. Runs on CPU, cached after first download (~90 MB).
-- **[Intent Classifier]**: Keyword-pattern classifier short-circuits greetings, bot-identity questions, and out-of-scope queries before the RAG pipeline runs — reducing unnecessary LLM calls and latency.
-- **[Hardened Prompt]**: System prompt enforces hard sentence limits (2 for conversational, 4 for factual), bans filler phrases by structural description, and explicitly separates fallback suffix from the main answer body to prevent rule conflicts.
-- **[LangSmith Observability]**: Every `/chat` call is traced via the `@traceable` decorator, providing full visibility into each LangGraph node's inputs, outputs, latency, and token usage.
-- **[Graceful Degradation]**: The `grade` node checks for empty retrieval results and sets a sentinel answer, allowing the pipeline to return a friendly fallback without calling the LLM unnecessarily.
-- **[Idempotent Ingestion]**: The `ingest.py` script deletes existing documents by source metadata before re-inserting, preventing duplicate entries on re-runs.
+- **[LangGraph Orchestration]**: `StateGraph` with a typed `AgentState` instead of a monolithic function. Each node is independently testable and traceable, and the conditional edge after `rerank` means a no-match query never pays for an LLM call.
+- **[Grade Node Collapsed]**: An earlier version had a separate `grade` node that only checked whether retrieval returned anything. That check now lives inside `retrieve`, which sets the fallback answer directly — one less node, one less state hop, identical behaviour.
+- **[Asymmetric Embeddings]**: NV-Embed is a bi-encoder trained with different treatment for queries and passages. Ingestion embeds with `input_type="passage"`, retrieval with `input_type="query"`. L2 normalization is applied explicitly in code rather than trusting the API to return normalized vectors.
+- **[Hand-Rolled Vector Store]**: With a corpus this small, a managed vector database is overhead. SQLite stores embeddings as BLOBs; `load_vectors()` reads them once into a single numpy matrix and every search is one dot product. No network hop, no extra service to deploy, no monthly cost.
+- **[Threshold Recalibration]**: `MATCH_THRESHOLD` dropped from 0.40 to **0.16** during the migration — cosine similarity distributions are model-specific, and the 384-dim MiniLM threshold rejected almost everything against 4096-dim NV-Embed vectors. The value was set empirically using `calibrate.py`.
+- **[Graceful Degradation]**: If the reranker call fails, the pipeline passes the top-3 by cosine similarity instead of erroring. A degraded answer beats a 500.
+- **[Network Resilience]**: `nim_client.py` wraps every NIM call in exponential backoff with jitter on 429/5xx, explicit timeouts, and latency logging. HTTP 403 is treated as terminal and non-retryable — it signals an account entitlement problem, not a transient fault, and retrying just burns time.
+- **[Conversation Memory]**: A bounded LRU `SessionStore` (500 sessions, 30-minute TTL, last 4 turns each) keyed by `session_id`. The `condense` node uses that history to rewrite follow-ups like "what about the other one?" into standalone questions before retrieval.
+- **[Intent Classifier]**: A keyword-pattern classifier short-circuits greetings, bot-identity questions, and out-of-scope queries before the RAG pipeline runs, cutting unnecessary API calls and latency.
+- **[Lazy LLM Client]**: The `ChatOpenAI` client is built on first request, not at import. Uvicorn binds the port immediately, so a missing API key surfaces as a clean runtime error instead of a crash loop at boot.
+- **[Idempotent Ingestion]**: `ingest.py` deletes existing documents by source metadata before re-inserting, so re-runs don't create duplicates.
 
 ### File Structure
 ```
 backend/
-├── server.py        # FastAPI app with LangGraph agent, LangChain pipeline, LangSmith tracing
-├── ingest.py        # Data ingestion with HuggingFace embeddings + LangChain text splitter
-├── requirements.txt # All dependencies (langchain, langgraph, langsmith, sentence-transformers, etc.)
-└── .env             # API keys and LangSmith config (gitignored)
+├── server.py        # FastAPI app, LangGraph agent, SQLite vector store, LangSmith tracing
+├── nim_client.py    # NIM embeddings + reranking client with retry/backoff
+├── ingest.py        # Chunking, NIM passage embedding, SQLite write with meta table
+├── calibrate.py     # Empirical threshold calibration against real queries
+├── tests/           # pytest suite (model wiring, endpoint behaviour)
+├── Dockerfile       # Container build for Render deployment
+├── requirements.txt # fastapi, langchain, langgraph, langsmith, httpx, numpy, slowapi
+└── .env             # NVIDIA_API_KEY and config (gitignored)
 frontend/
 ├── script.js        # Chat UI integration (handleUserMessage)
 └── frontend-helpers.js  # Markdown rendering, message utilities
@@ -130,34 +144,36 @@ frontend/
 
 ## 💡 COMPREHENSIVE_SKILLS_ANALYSIS
 ### Technical Competency Assessment
-- **API Development**: 9/10 — Clean REST API design with proper CORS configuration, structured error handling, input validation, and health-check endpoints. Demonstrates production-level backend engineering.
-- **Database Design**: 7/10 — Designed a vector-enabled schema with pgvector, implemented a custom similarity search function in PL/pgSQL, and configured appropriate vector indexing.
-- **AI/ML Engineering**: 9/10 — Demonstrates strong applied understanding of agentic orchestration (LangGraph), embedding models, vector similarity search, prompt engineering, RAG pipeline design, and production observability (LangSmith).
-- **Programming Fundamentals**: 8/10 — Well-structured, readable code with logging, error handling, environment variable management, and clear separation of concerns between ingestion and serving.
+- **API Development**: 9/10 — REST API with CORS lockdown, per-IP rate limiting, structured error handling, input validation, and a health-check endpoint. Production-aware backend engineering.
+- **Database Design**: 7/10 — Designed a vector schema with BLOB storage and a `meta` table carrying schema version, model name, and dimension, so a model swap fails loudly instead of silently returning nonsense.
+- **AI/ML Engineering**: 9/10 — Applied understanding of agentic orchestration, asymmetric bi-encoder embeddings, cross-attention reranking, threshold calibration, RAG pipeline design, and production observability.
+- **Programming Fundamentals**: 8/10 — Well-structured code with logging, retry logic, environment-driven configuration, and clear separation between the NIM client, ingestion, and serving layers.
 
 ### Professional Development Demonstrated
-**Problem-Solving Sophistication**: Rather than using ad-hoc scripting, the project demonstrates the ability to architect a system using industry-standard frameworks — selecting LangGraph for orchestration, LangChain for pipeline composition, HuggingFace for embeddings, and LangSmith for observability — and composing them into a cohesive, debuggable pipeline.
+**Problem-Solving Sophistication**: The system is architected from industry-standard frameworks — LangGraph for orchestration, LangChain for pipeline composition, NIM for inference, LangSmith for observability — but the vector store is deliberately hand-built, because a managed vector DB would have been more operational surface than the corpus justified. Knowing when *not* to add a dependency is part of the design.
 
-**Learning Agility**: Rapidly adopted emerging technologies (LangGraph, LangSmith, HuggingFace embeddings, OpenRouter) and integrated them into a working product, showcasing the ability to learn and ship quickly in the fast-moving GenAI landscape.
+**Learning Agility**: Migrated the full model stack from local HuggingFace models plus Supabase pgvector to NVIDIA NIM plus SQLite — a change that touched the embedding dimension (384 → 4096), the storage format (JSON → BLOB), the similarity threshold, and every model identifier — and recalibrated the retrieval parameters empirically rather than by guesswork.
 
 ## 🚀 PROFESSIONAL_VALUE_TRANSLATION
 ### Resume Bullets (Optimized for ATS and Human Reviewers)
-• **Technical Focus**: Engineered an agentic RAG chatbot using LangGraph StateGraph orchestration, cross-encoder reranking, LangChain prompt pipelines, HuggingFace local embeddings, and Gemma 4 31B via OpenRouter, with full LangSmith tracing for every request.
-• **Impact Focus**: Built an AI-powered portfolio assistant that answers visitor questions grounded in real project data, with cross-encoder reranking and a hardened system prompt eliminating hallucination and verbosity.
-• **Growth Focus**: Independently designed, implemented, and deployed a full-stack AI application end-to-end — from vector database schema design and embedding pipeline to agentic LangGraph orchestration, LangSmith observability, and frontend chat integration.
+• **Technical Focus**: Engineered an agentic RAG chatbot on a LangGraph StateGraph (condense → retrieve → rerank → generate) using NVIDIA NIM for NV-Embed v1 embeddings, nv-rerankqa-mistral reranking, and Nemotron 3 generation, backed by a hand-built SQLite vector store with in-memory numpy cosine search.
+• **Impact Focus**: Built an AI-powered portfolio assistant answering visitor questions grounded in real project data, with conversation memory, per-IP rate limiting, reranker fallback, and LangSmith tracing on every request.
+• **Growth Focus**: Migrated an entire production RAG stack from local HuggingFace models and Supabase pgvector to the NVIDIA NIM API and SQLite — including a 384→4096 embedding dimension change and empirical threshold recalibration — without service downtime.
 
 ### Interview Preparation Arsenal
 **Technical Discussion Points**:
-- "Explain how your LangGraph RAG pipeline works — from user query to generated answer, and how LangSmith traces each step."
+- "Walk me through your LangGraph pipeline from user query to generated answer, and explain why the `grade` node was removed."
 - "Why did you choose LangGraph for orchestration? How does the StateGraph pattern help with testing and extensibility?"
-- "Why HuggingFace local embeddings instead of a cloud embedding API? What are the trade-offs?"
-- "How does LangSmith tracing work with the @traceable decorator? What can you inspect in the dashboard?"
-- "How does the vector similarity search work in Supabase? What is the role of pgvector and the match_documents function?"
-- "Walk me through your chunking strategy with RecursiveCharacterTextSplitter. How did you handle overlap and why?"
+- "NV-Embed is asymmetric — what does `input_type` do, and what breaks if you get query and passage backwards?"
+- "Why build your own SQLite vector store instead of using a managed vector database? At what corpus size does that decision flip?"
+- "Your match threshold went from 0.40 to 0.16 during the migration. Why can't you carry a similarity threshold across embedding models?"
+- "What happens when the reranker API fails? Walk me through the degradation path."
+- "Why is HTTP 403 non-retryable in your NIM client when 429 and 5xx are?"
+- "How does the condense node handle a follow-up question like 'what about the other one'?"
 
 **Behavioral Interview Stories (STAR Format)**:
-- **Challenge**: "Tell me about a time you chose the right tools for the job." (Choosing LangGraph for explicit state management, LangChain for composable pipelines, HuggingFace for cost-free local embeddings, and LangSmith for observability — each tool selected for a specific architectural purpose.)
-- **Learning**: "Describe a project where you had to learn a new technology quickly." (Adopting LangGraph, LangSmith, HuggingFace sentence-transformers, and OpenRouter within a short development cycle to build a production-ready agentic RAG pipeline.)
+- **Challenge**: "Tell me about a time you migrated a system." (Moving the full model stack from local HuggingFace models and Supabase pgvector to NIM and SQLite — the hard part wasn't swapping model names, it was recognizing that the similarity threshold was tuned to the old embedding space and had to be recalibrated empirically.)
+- **Learning**: "Describe a project where you had to learn a new technology quickly." (Adopting LangGraph, LangSmith, and the NVIDIA NIM API within a short development cycle to build and then re-platform an agentic RAG pipeline.)
 - **Impact**: "How did you make your portfolio stand out?" (Built an interactive AI chatbot that turns a static website into a conversational experience, with full observability — demonstrating both technical depth and product thinking.)
 
 # STUDENT_PROJECT_RECALL_SECTION
@@ -166,31 +182,37 @@ frontend/
 *This section is your personal reference to quickly remember the specific details of your work.*
 
 ### What You Actually Built (Feature Breakdown)
-- **Agentic RAG Pipeline**: LangGraph StateGraph with four nodes — `retrieve` (embed + search), `rerank` (cross-encoder scoring), `grade` (check results), `generate` (LangChain chain → Gemma 4 31B).
+- **Agentic RAG Pipeline**: LangGraph StateGraph with four nodes — `condense` (rewrite follow-ups), `retrieve` (embed + numpy cosine search), `rerank` (NIM reranker), `generate` (LangChain chain → Nemotron 3), plus a conditional edge that skips `generate` when a fallback is already set.
+- **SQLite Vector Store**: `documents` table (id, content, metadata, embedding BLOB) and a `meta` table (`schema_version=2`, `embed_model`, `embed_dim`). Loaded once into a numpy matrix and cached in memory.
+- **NIM Client**: Shared `nim_client.py` for embeddings and reranking — exponential backoff with jitter, explicit timeouts, latency logging, terminal handling of 403.
 - **Intent Classifier**: Keyword-pattern classifier at the API layer short-circuits greetings, bot-identity queries ("who are you"), and out-of-scope questions before hitting the RAG pipeline.
-- **Cross-Encoder Reranking**: `cross-encoder/ms-marco-MiniLM-L-6-v2` re-scores the top-8 retrieved chunks against the question; only top-3 pass to the LLM.
-- **Full Observability**: Every request traced in LangSmith via `@traceable` — node-level timing, inputs, outputs, token counts.
-- **Data Ingestion**: A standalone `ingest.py` script that reads `About_me.md` and all project markdown files, splits with LangChain's `RecursiveCharacterTextSplitter`, batch-embeds with HuggingFace, and upserts to Supabase.
-- **REST API**: Two endpoints — `POST /chat` for question answering (with LangSmith tracing) and `GET /health` for monitoring.
-- **Input Validation**: Pydantic validators enforce non-empty messages and a 1000-character limit.
-- **Graceful Fallbacks**: The `grade` node returns a sentinel when no relevant documents are found; the `generate` node returns a friendly message without calling the LLM.
+- **Conversation Memory**: LRU `SessionStore` — 500 sessions, 30-minute TTL, last 4 turns per session, keyed by `session_id` from the request body.
+- **Rate Limiting**: slowapi on `/chat` at `10/minute;100/day` per IP.
+- **Data Ingestion**: `ingest.py` reads `About_me.md` (simple chunking) and every file in `project contents/` (markdown-header-aware chunking), strips YAML frontmatter, batch-embeds with `input_type="passage"`, and writes to SQLite.
+- **REST API**: `POST /chat` for question answering and `GET /health` for monitoring.
+- **Input Validation**: Pydantic validators enforce non-empty messages and a length limit.
 - **Frontend Chat UI**: JavaScript integration that sends user messages to the backend, displays loading states, and renders AI responses.
 
 ### Technical Implementation Details You Might Forget
-- **Embedding Model**: `sentence-transformers/all-MiniLM-L6-v2` (HuggingFace, local) — produces 384-dimensional normalized vectors. Downloaded once (~90 MB), cached in `~/.cache/huggingface/`.
-- **Reranker Model**: `cross-encoder/ms-marco-MiniLM-L-6-v2` (local) — scores chunk-question pairs with bidirectional attention. Returns top-3 by score (no hard threshold — ms-marco scores are not normalized around 0).
-- **LLM Model**: `google/gemma-4-31b-it` via OpenRouter. Uses `ChatOpenAI` with `openai_api_base="https://openrouter.ai/api/v1"`, `temperature=0.3`, `max_tokens=600`.
-- **Orchestration**: LangGraph `StateGraph` with typed `AgentState(TypedDict)`. Nodes: `retrieve → rerank → grade → generate → END`.
+- **Embedding Model**: `nvidia/nv-embed-v1` via NIM — **4096 dimensions**, asymmetric (`input_type="query"` vs `"passage"`), L2-normalized explicitly in code. **Licensed for non-commercial use only** — this matters if the site ever becomes commercial.
+- **Reranker Model**: `nvidia/nv-rerankqa-mistral-4b-v3` via NIM `/v1/ranking`. Returns raw logits, unbounded and possibly negative — take top-3 by rank, never threshold on the raw score.
+- **LLM Model**: `nvidia/nemotron-3-nano-30b-a3b` via `ChatOpenAI` with `openai_api_base` pointed at NIM. `temperature=0.2`, `max_tokens=400` (env `LLM_MAX_TOKENS`), `request_timeout=30`, thinking disabled via `extra_body.chat_template_kwargs`.
+- **Orchestration**: LangGraph `StateGraph` with typed `AgentState(TypedDict)`. Flow: `condense → retrieve → rerank → [conditional] → generate → END`.
 - **Prompt Chain**: `ChatPromptTemplate | ChatOpenAI | StrOutputParser` (LCEL pipe operator).
-- **Chunk Config**: `RecursiveCharacterTextSplitter` with `chunk_size=800`, `chunk_overlap=150`, separators `["\n\n", "\n", ". ", " ", ""]`.
-- **Match Threshold**: `0.40` (deliberately permissive — the reranker filters noise after retrieval).
+- **Chunk Config**: `chunk_size=800`, `chunk_overlap=150`. Project files use markdown-header-aware splitting with `strip_headers=False` so section context survives into the chunk.
+- **Match Threshold**: **0.16** (env `MATCH_THRESHOLD`) — recalibrated for NV-Embed's similarity distribution. The old 0.40 was tuned for 384-dim MiniLM and rejects nearly everything here.
 - **Match Count**: Retrieves top-8 candidates; reranker reduces to top-3 before generation.
-- **LangSmith Config**: `LANGCHAIN_TRACING_V2=true`, `LANGCHAIN_API_KEY`, `LANGCHAIN_PROJECT=rag-agent`. Free tier: 5,000 traces/month.
-- **No Rate Limits on Embeddings or Reranking**: Both HuggingFace models run 100% locally — no API calls, no quota.
-- **CORS**: Defaults to `*` in development; set `ALLOWED_ORIGINS` env var for production.
+- **Dimension Guard**: `EXPECTED_EMBED_DIM = 4096`. If `vectors.db` has no `meta` table it's an old 384-dim database and needs a full re-ingest.
+- **Retry Policy**: 3 attempts, 1s initial backoff, 2× multiplier, up to 0.5s jitter. Retries on 429 and 5xx only.
+- **LangSmith Config**: `LANGCHAIN_TRACING_V2`, `LANGCHAIN_API_KEY`, `LANGCHAIN_PROJECT=mithil-portfolio-rag`. Tracing defaults to **off**; set the flag to enable.
+- **CORS**: `ALLOWED_ORIGINS` env var, defaults to the GitHub Pages origin.
+- **Deployment**: Docker container on Render; frontend on GitHub Pages via GitHub Actions.
 - **Idempotent Ingestion**: `ingest.py` deletes documents by source metadata before inserting, so re-runs don't create duplicates.
+
+### Previous Architecture (Superseded — Useful for "What Changed" Questions)
+Before the NIM migration, this system ran local HuggingFace `sentence-transformers/all-MiniLM-L6-v2` embeddings (384-dim), a local `cross-encoder/ms-marco-MiniLM-L-6-v2` reranker, Supabase PostgreSQL with `pgvector` and a `match_documents` RPC, and Gemma 4 31B via OpenRouter. The pipeline was `retrieve → rerank → grade → generate` with a match threshold of 0.40. Every one of those components has been replaced. `threshold_diagnostic.py` is a leftover from that era and no longer runs — its `supabase` and `langchain_huggingface` imports aren't in `requirements.txt`.
 
 ## ✅ ANALYSIS_CONFIDENCE_METADATA
 - **Overall Assessment Confidence**: 0.95/1.0
-- **Reasoning**: High confidence. The implementation uses industry-standard frameworks (LangGraph, LangChain, LangSmith, HuggingFace), the code is clean and well-documented in `rag_agent_guide.md`, and the architecture follows established agentic RAG best practices with full observability. Minor deduction because authentication and caching are not yet implemented for production hardening.
+- **Reasoning**: High confidence — this document was rebuilt directly from `server.py`, `nim_client.py`, `ingest.py`, `requirements.txt`, and `.env.example` on 2026-07-24. Minor deduction because authentication and caching are not yet implemented for production hardening.
 - **Structure Guarantee**: Bulletproof Consistency for Database Integration

@@ -15,7 +15,7 @@ I am driven by a vision of AI not as isolated models, but as orchestrated ecosys
 ## 2\. **My Projects:**
 
 ### **Tata Data Visualization:**
-   link: "https://public.tableau.com/app/profile/venkata.sai.mithil.ravulapalli/viz/BuisnessAnalysisVisuals/Dashboard1"
+   link: "https://lookerstudio.google.com/reporting/f6717d30-9776-40eb-8e11-dbb543bf7399"
    Skills and tools covered:
       Effective Communication
       Dashboard Development
